@@ -11,11 +11,10 @@ namespace TextRPG
 {
     public static class Loader
     {
-
         //플레이어의 데이터를 가져오는 함수 .json 형식
-        public static JObject LoadPlayerData()
+        public static JObject LoadPlayerData(string path)
         {
-            using (StreamReader file = File.OpenText(@"..\..\..\Player.json"))
+            using (StreamReader file = File.OpenText(path))//@"..\..\..\Player.json"
             {
                 using(JsonTextReader reader = new JsonTextReader(file))
                 {
@@ -24,16 +23,28 @@ namespace TextRPG
             }
         }
 
-        //무기와 방어구 장비의 데이터를 가져오는 함수
-        public static JObject LoadEquipment()
+        //무기와 방어구 장비의 데이터를 가져오는 함수 .json 형식
+        public static JObject LoadEquipment(string path)
         {
-            using (StreamReader file = File.OpenText(@"..\..\..\Equipment.json"))
+            using (StreamReader file = File.OpenText(path))//@"..\..\..\Equipment.json"
             {
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
                     return (JObject)JToken.ReadFrom(reader);
                 }
             }
+        }
+
+        //파일이 있는지 없는지 체크하는 함수
+        public static bool LoadCheck(string path)
+        {
+            //해당 경로에 파일이 없으면 false 전달
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         //플레이어의 데이터를 원본 파일에 저장하는 함수

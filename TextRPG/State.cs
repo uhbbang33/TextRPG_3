@@ -66,9 +66,9 @@ namespace TextRPG
         public TitleScene()
         {            
             _name = "타이틀";
-            //_display = File.ReadAllLines(@"..\..\..\art\Title.txt");
+            _display = File.ReadAllLines(@"..\..\..\art\Title.txt");
 
-            _next.Add("Town", new TownScene(this));
+            _next.Add("ClassSelect", new SelectClassScene(this));
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
@@ -76,7 +76,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.Enter:
-                    game.ChangeScene(_next["Town"]);
+                    game.ChangeScene(_next["ClassSelect"]);
                     break;
             }
         }
@@ -88,7 +88,52 @@ namespace TextRPG
         }
     }
 
+    //직업 선택 씬
+    class SelectClassScene : Scene
+    {
+        public SelectClassScene(Scene parent)
+        {
+            _name = "직업 선택";
+            _comment = "원하는 직업을 선택하세요";
+            _prev = parent;
 
+            _choices = new string[] {"전사", "마법사"};
+
+            _next.Add("Town", new TownScene(this));
+
+            SetDisplay();
+        }
+
+        override public void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+                case ConsoleKey.D1:
+                    game.ChangeScene(_next["Town"]);
+                    break;
+                case ConsoleKey.D2:
+                    game.ChangeScene(_next["Town"]);
+                    break;
+
+            }
+        }
+
+        void SetDisplay()
+        {
+            _display = File.ReadAllLines(@"..\..\..\art\CharacterClass.txt");
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.Split();
+            Screen.DrawTopScreen(Display, 2);
+        }
+
+    }
     
     class TownScene : Scene
     {

@@ -1,12 +1,12 @@
 {
-  "Lv": 5,
+  "Lv": 1,
   "Class": "전사",
   "Atk": 18,
   "Def": 5,
   "MaxHP": 100,
-  "Exp": 3,
+  "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1727,
+  "Gold": 1908,
   "Inventory": [
     {
       "bEquip": true,

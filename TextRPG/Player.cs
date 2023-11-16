@@ -19,7 +19,7 @@ namespace TextRPG
         // _equips[(int)Item.EType]
         public EquipManager()
         {
-            //JObject save = Loader.LoadEquipment();
+            //JObject save = Loader.LoadEquipment(@"..\..\..\Player.json");
             //_equips = save["Equip"].ToObject<Item[]>();
             _equips = new Item[2];
 
@@ -125,7 +125,7 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public Player() // 초기값 설정
         {
-            JObject save = Loader.LoadPlayerData();
+            JObject save = Loader.LoadPlayerData(@"..\..\..\Player.json");
             //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화
             lv = (int)save["Lv"];
             job = save["Class"].ToString();

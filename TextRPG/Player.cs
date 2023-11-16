@@ -56,7 +56,7 @@ namespace TextRPG
         int lv = 1;
         public int Lv { get { return lv; } }
         
-        string job = "전사";
+        string job = "초보자";
         public string Class { get { return job; } }
 
         int atk = 10;
@@ -126,7 +126,7 @@ namespace TextRPG
         public Player() // 초기값 설정
         {
             JObject save = Loader.LoadPlayerData();
-
+            //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화
             lv = (int)save["Lv"];
             job = save["Class"].ToString();
             atk = (int)save["Atk"];

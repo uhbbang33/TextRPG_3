@@ -59,13 +59,15 @@ namespace TextRPG
         }
     }
 
+
     class TitleScene : Scene
     {
         TextBlock tb;
         public TitleScene()
         {            
             _name = "타이틀";
-            //_display = File.ReadAllLines(@"..\..\..\Title.txt");
+            //_display = File.ReadAllLines(@"..\..\..\art\Title.txt");
+
             _next.Add("Town", new TownScene(this));
         }
 
@@ -85,6 +87,8 @@ namespace TextRPG
             Screen.DrawScreen(Display, 5, 0);
         }
     }
+
+
     
     class TownScene : Scene
     {
@@ -139,7 +143,7 @@ namespace TextRPG
 
         void SetDisplay()
         {
-            _display = File.ReadAllLines(@"..\..\..\Town.txt");
+            _display = File.ReadAllLines(@"..\..\..\art\Town.txt");
         }
 
         public override void DrawScene()
@@ -330,7 +334,7 @@ namespace TextRPG
             _choices = new string[] { "구입", "판매" };
             shop = new Shop();
             
-            _display = File.ReadAllLines(@"..\..\..\npc.txt");
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
 
             _next.Add("Buy", new BuyScene(this));
             _next.Add("Sell", new SellScene(this));
@@ -564,7 +568,7 @@ namespace TextRPG
 
         void SetDisplay()
         {
-            _display = File.ReadAllLines(@"..\..\..\Church.txt");
+            _display = File.ReadAllLines(@"..\..\..\art\Church.txt");
         }
 
         public override void DrawScene()

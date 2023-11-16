@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace TextRPG
 {
@@ -21,7 +10,7 @@ namespace TextRPG
         protected int _width = 0;
         public int Width { get { return _width; } }
 
-        protected  int _height = 0;
+        protected int _height = 0;
         public int Height { get { return _height; } }
 
 
@@ -29,7 +18,7 @@ namespace TextRPG
         Dictionary<string, Widget> _children;
         protected int ChildrenCount { get { return _children.Count; } }
 
-        public Widget() 
+        public Widget()
         {
             _children = new Dictionary<string, Widget>();
         }
@@ -44,17 +33,17 @@ namespace TextRPG
         {
             _children = new Dictionary<string, Widget>();
             SetPosition(x, y);
-            SetSize(width, height);            
+            SetSize(width, height);
         }
 
-        public void Draw() 
+        public void Draw()
         {
             Draw(0, 0);
         }
 
         virtual protected void Draw(int x, int y)
         {
-            foreach(var widget in _children)
+            foreach (var widget in _children)
             {
                 widget.Value.Draw(x, y);
             }
@@ -62,7 +51,7 @@ namespace TextRPG
 
         virtual protected void AddChild(string name, Widget widget)
         {
-            if(_children.Count < _maxChildrenCount)
+            if (_children.Count < _maxChildrenCount)
             {
                 _children.Add(name, widget);
             }
@@ -74,7 +63,7 @@ namespace TextRPG
             _y = y;
         }
 
-        
+
         protected T? GetChild<T>(string name) where T : Widget
         {
             T? child = _children.ContainsKey(name) && _children[name] is T ? (T)_children[name] : null;
@@ -110,21 +99,21 @@ namespace TextRPG
 
     class Border : Widget
     {
-        public Border() 
+        public Border()
         {
             _width = 10;
             _height = 5;
             _maxChildrenCount = 1;
         }
 
-        public Border(int x, int y) : base(x, y) 
+        public Border(int x, int y) : base(x, y)
         {
             _width = 10;
             _height = 5;
             _maxChildrenCount = 1;
         }
 
-        public Border(int x, int y, int width, int height) : base(x, y, width, height) 
+        public Border(int x, int y, int width, int height) : base(x, y, width, height)
         {
             _maxChildrenCount = 1;
         }
@@ -167,7 +156,7 @@ namespace TextRPG
             Console.Write("┛");
         }
     }
-    
+
     class TextBlock : Widget
     {
         public TextBlock()
@@ -177,7 +166,7 @@ namespace TextRPG
             _width = 10;
             _height = 3;
 
-            AddChild("Boundary", new Border(0, 0, _width,_height));
+            AddChild("Boundary", new Border(0, 0, _width, _height));
             AddChild("Text", new Text(2, 1));
         }
 
@@ -201,7 +190,7 @@ namespace TextRPG
         public override void SetSize(int width, int height)
         {
             base.SetSize(width, height);
-            if(GetChild<Border>("Boundary") != null)
+            if (GetChild<Border>("Boundary") != null)
                 GetChild<Border>("Boundary").SetSize(width, height);
         }
     }
@@ -245,16 +234,16 @@ namespace TextRPG
 
             AddChild("Background", new Border(0, 0, width, height));
             AddChild("Content", new Border(2, 1, width - 4, height - 2));
-            
-            AddChild("LvLabel", new Text(5,2));
+
+            AddChild("LvLabel", new Text(5, 2));
             AddChild("LvText", new Text(25, 3));
-            
+
             AddChild("EXPLabel", new Text(5, 4));
             AddChild("EXPText", new Text(13, 5));
-            
+
             AddChild("HPLabel", new Text(5, 6));
             AddChild("HPText", new Text(25, 7));
-            
+
             AddChild("GoldLabel", new Text(5, 8));
             AddChild("GoldText", new Text(17, 9));
 
@@ -271,23 +260,23 @@ namespace TextRPG
         public void SetResult(Record before, Record after)
         {
             GetChild<Text>("LvLabel").text = $"레벨 --------------------------";
-            GetChild<Text>("LvText").text = $"{before.lv, 3} --> {after.lv, 3}";
+            GetChild<Text>("LvText").text = $"{before.lv,3} --> {after.lv,3}";
 
             GetChild<Text>("EXPLabel").text = $"경험치 ------------------------";
-            GetChild<Text>("EXPText").text = $"{before.exp, 3} / {before.maxExp, 3} --> {after.exp, 3} / {after.maxExp,3}";
+            GetChild<Text>("EXPText").text = $"{before.exp,3} / {before.maxExp,3} --> {after.exp,3} / {after.maxExp,3}";
 
             GetChild<Text>("HPLabel").text = $"체력 --------------------------";
             GetChild<Text>("HPText").text = $"{before.hp,3} --> {after.hp,3}";
 
             GetChild<Text>("GoldLabel").text = $"골드 --------------------------";
-            GetChild<Text>("GoldText").text = $"{before.gold, 5} G --> {after.gold, 5} G";
+            GetChild<Text>("GoldText").text = $"{before.gold,5} G --> {after.gold,5} G";
 
-            if(before.lv != after.lv)
+            if (before.lv != after.lv)
             {
                 GetChild<Text>("LevelUpText").text = "LEVEL UP !!";
                 GetChild<Text>("AtkText").text = $"공격력 + {2}";
                 GetChild<Text>("DefText").text = $"방어력 + {1}";
-            }            
+            }
         }
     }
 
@@ -315,7 +304,7 @@ namespace TextRPG
             GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}";
             GetChild<Text>("ItemEffectText").text = $"| {item.Status} + {item.Value} |";
             GetChild<Text>("ItemDescriptionText").text = $"{item.Description}";
-            GetChild<Text>("ItemPriceText").text = $"{item.Price, 5}G";
+            GetChild<Text>("ItemPriceText").text = $"{item.Price,5}G";
         }
 
         protected override void Draw(int x, int y)
@@ -357,10 +346,10 @@ namespace TextRPG
 
         protected override void Draw(int x, int y)
         {
-            for(int i = 0; i < _widgets.Count; ++i)
+            for (int i = 0; i < _widgets.Count; ++i)
             {
-                _widgets[i].SetPosition(_xMargin * (i% _col + 1) + _widgets[i].Width * (i% _col), 
-                    _yMargin * (i/_col + 1) + _widgets[i].Height * (i/ _col));
+                _widgets[i].SetPosition(_xMargin * (i % _col + 1) + _widgets[i].Width * (i % _col),
+                    _yMargin * (i / _col + 1) + _widgets[i].Height * (i / _col));
             }
             base.Draw(x + _x, y + _y);
         }
@@ -436,12 +425,12 @@ namespace TextRPG
 
         public static void SetSize(int width, int height)
         {
-            Width = width; 
+            Width = width;
             Height = height;
             Left = 4;
             Right = Left + Width;
             Console.SetWindowSize(Width + 10, Height + 10);
-            
+
             DrawBoundary();
 
         }
@@ -454,7 +443,7 @@ namespace TextRPG
 
         static void DrawBoundary()
         {
-            for (int i = Left + 1 ; i < Right - 1; ++i)
+            for (int i = Left + 1; i < Right - 1; ++i)
             {
                 Console.SetCursorPosition(i, 0);
                 Console.Write("━");
@@ -463,7 +452,7 @@ namespace TextRPG
                 Console.Write("━");
             }
 
-            for(int i = 1; i < Height; ++i)
+            for (int i = 1; i < Height; ++i)
             {
                 Console.SetCursorPosition(Left, i);
                 Console.Write("┃");
@@ -489,7 +478,7 @@ namespace TextRPG
         {
             int line = Boundary + yOffset;
 
-            for(int i = Left + 1; i < Right - 1; ++i)
+            for (int i = Left + 1; i < Right - 1; ++i)
             {
                 Console.SetCursorPosition(i, line);
                 Console.Write("━");
@@ -518,7 +507,7 @@ namespace TextRPG
 
         static void DeleteLine(int line)
         {
-            for(int i = Left + 1; i < Right; ++i)
+            for (int i = Left + 1; i < Right; ++i)
             {
                 Console.SetCursorPosition(i, line);
                 Console.Write(' ');
@@ -560,7 +549,7 @@ namespace TextRPG
             {
                 if (space) y++;
                 Console.SetCursorPosition(Left + xOffset, y++);
-                Console.Write($"{i+1}. {contents[i]}");
+                Console.Write($"{i + 1}. {contents[i]}");
             }
 
             Console.SetCursorPosition(Left + xOffset, Height - 2);
@@ -569,7 +558,7 @@ namespace TextRPG
 
         static void ClearTopScreen()
         {
-            for(int i = 2; i < Boundary; ++i)
+            for (int i = 2; i < Boundary; ++i)
             {
                 DeleteLine(i);
             }
@@ -577,7 +566,7 @@ namespace TextRPG
 
         static void ClearBotScreen()
         {
-            for (int i = Boundary + 1; i < Height ; ++i)
+            for (int i = Boundary + 1; i < Height; ++i)
             {
                 DeleteLine(i);
             }

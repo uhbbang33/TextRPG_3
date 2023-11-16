@@ -11,6 +11,8 @@ namespace TextRPG
 {
     public static class Loader
     {
+
+        //플레이어의 데이터를 가져오는 함수 .json 형식
         public static JObject LoadPlayerData()
         {
             using (StreamReader file = File.OpenText(@"..\..\..\Player.json"))
@@ -22,6 +24,7 @@ namespace TextRPG
             }
         }
 
+        //무기와 방어구 장비의 데이터를 가져오는 함수
         public static JObject LoadEquipment()
         {
             using (StreamReader file = File.OpenText(@"..\..\..\Equipment.json"))
@@ -33,6 +36,7 @@ namespace TextRPG
             }
         }
 
+        //플레이어의 데이터를 원본 파일에 저장하는 함수
         public static void Save(Player player)
         {
             string path = @"..\..\..\Player.json";
@@ -55,6 +59,8 @@ namespace TextRPG
             Save(player.Equipment);
         }
 
+
+        //장비 아이템의 변경된 데이터를 원본 파일에 저장하는 함수
         public static void Save(Item[] items)
         {
             string path = @"..\..\..\Equipment.json";

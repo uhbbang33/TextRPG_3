@@ -4,10 +4,10 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "목검",
-      "Value": 3,
-      "Description": "나무로 만들어진 검이다.",
-      "Price": 10
+      "Name": "검",
+      "Value": 5,
+      "Description": "흔한 검이다.",
+      "Price": 3
     },
     {
       "bEquip": true,

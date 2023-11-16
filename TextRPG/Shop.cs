@@ -24,7 +24,19 @@
             {
                 string[] itemSetting = CSVLine[i].Split(',');
                 string _name = itemSetting[0];
-                Item.EType _type = itemSetting[1] == "Weapon"? Item.EType.Weapon : Item.EType.Armor ;
+                Item.EType _type = new Item().type;
+                if (itemSetting[1] == "Weapon")
+                {
+                    _type = Item.EType.Weapon;
+                }
+                else if (itemSetting[1] == "Armor")
+                {
+                    _type = Item.EType.Armor;
+                }
+                else if (itemSetting[1] == "Potion")
+                {
+                    _type = Item.EType.Potion;
+                }
 
                 int _hp = int.Parse(itemSetting[2]);
                 int _atk = int.Parse(itemSetting[3]);

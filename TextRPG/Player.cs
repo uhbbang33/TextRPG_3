@@ -121,6 +121,8 @@ namespace TextRPG
         List<Item> _inventory = new List<Item>();
         public List<Item> Inventory { get { return _inventory; } }
 
+        public int hasPotion = 0;
+
         EquipManager _equipManager;
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public Player() // 초기값 설정
@@ -136,6 +138,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];            
             _gold = (int)save["Gold"];
+            
+            hasPotion = (int)save["HasPotion"];
 
             _inventory = save["Inventory"].ToObject<List<Item>>();
 
@@ -207,13 +211,21 @@ namespace TextRPG
             {
                 throw new GoldShortageException();
             }
-            else if (_inventory.Count == 5)// _inventory.Max)
+            else if (_inventory.Count == 5 && item.type != Item.EType.Potion)// _inventory.Max)
             {
                 throw new IndexOutOfRangeException();
             }
             else
             {
-                _inventory.Add(item);
+                _gold -= item.Price;
+               if (item.type != Item.EType.Potion)
+                {
+                    _inventory.Add(item);
+                }
+                else
+                {
+                    hasPotion += 1;
+                }
             }
         }
 

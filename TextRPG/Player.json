@@ -4,28 +4,11 @@
   "Atk": 16,
   "Def": 4,
   "MaxHP": 100,
-  "Exp": 18,
+  "Exp": 25,
   "MaxExp": 40,
-  "Gold": 1676,
+  "Gold": 2008,
+  "HasPotion": 0,
   "Inventory": [
-    {
-      "bEquip": true,
-      "_status": 1,
-      "type": 0,
-      "Name": "목검",
-      "Value": 3,
-      "Description": "나무로 만들어진 검이다.",
-      "Price": 10
-    },
-    {
-      "bEquip": false,
-      "_status": 1,
-      "type": 0,
-      "Name": "검",
-      "Value": 5,
-      "Description": "흔한 검이다.",
-      "Price": 3
-    },
     {
       "bEquip": true,
       "_status": 2,
@@ -34,6 +17,42 @@
       "Value": 1,
       "Description": "나무로 만들어진 투구이다.",
       "Price": 5
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 10,
+      "Description": "낡은 신발이다.",
+      "Price": 20
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 10,
+      "Description": "낡은 신발이다.",
+      "Price": 20
+    },
+    {
+      "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
+    },
+    {
+      "bEquip": false,
+      "_status": 1,
+      "type": 0,
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
     }
   ]
 }

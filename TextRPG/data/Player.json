@@ -1,14 +1,14 @@
 {
   "Lv": 1,
-  "Class": "마법사",
+  "Class": "전사",
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
-  "Gold": 980,
-  "Critical": 50.0,
-  "HasPotion": 1,
+  "Gold": 1500,
+  "Critical": 15.0,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,
@@ -23,9 +23,9 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "완드",
+      "Name": "검",
       "Value": 5,
-      "Description": "흔한 마법봉이다.",
+      "Description": "흔한 검이다.",
       "Price": 3
     }
   ],
@@ -38,22 +38,22 @@
       "cost": 0
     },
     {
-      "name": "수리수리마수리",
-      "desc": "마술로 패는 기술이다.",
+      "name": "힘차게 패기",
+      "desc": "힘차게 패는 기술이다.",
       "damage": 2.0,
       "accuracy": 90.0,
       "cost": 0
     },
     {
-      "name": "아브라카다브라",
-      "desc": "마술로 패는 기술이다.",
+      "name": "엎드려 패기",
+      "desc": "엎드려 패는 기술이다.",
       "damage": 2.0,
       "accuracy": 80.0,
       "cost": 0
     },
     {
-      "name": "아베다케다브라",
-      "desc": "마술로 패는 기술이다.",
+      "name": "약하게 패기",
+      "desc": "약하게 패는 기술이다.",
       "damage": 2.0,
       "accuracy": 70.0,
       "cost": 0

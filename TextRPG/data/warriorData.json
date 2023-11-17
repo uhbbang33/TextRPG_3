@@ -6,8 +6,8 @@
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1000,
-  "Critical": 50,
+  "Gold": 1500,
+  "Critical": 15,
   "HasPotion": 0,
   "Inventory": [
     {

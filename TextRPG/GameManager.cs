@@ -26,13 +26,9 @@ namespace TextRPG
         
         Scene _currentScene;
 
-        // public ?
-        public Dictionary<string, Scene> Scenes = new Dictionary<string, Scene>();
-
         private GameManager()
         {
             _instance = this;
-            // LoadPlayerData > Status , Inventory , Equip(?)
             
             _currentScene = new TitleScene();
             _player = new Player();

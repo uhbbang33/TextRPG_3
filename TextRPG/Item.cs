@@ -12,7 +12,7 @@ namespace TextRPG
     public class Item
     {
         public enum EStatus { HP, ATK, DEF };
-        public enum EType { Weapon, Armor }
+        public enum EType { Weapon, Armor, Potion  }
         string[] _statusWord = { " 체력 ", "공격력", "방어력" };
 
         string _name;
@@ -68,9 +68,9 @@ namespace TextRPG
         public string name;
         public string desc;
         public int damage;
-        public int accurity;
+        public int cost;
 
-        public Skill(string name, string desc, int damage, int accurity)
+        public Skill(string name, string desc, int damage)
         {
             this.name = name;
             this.desc = desc;

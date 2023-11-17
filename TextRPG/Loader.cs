@@ -35,7 +35,6 @@ namespace TextRPG
             return true;
         }
 
-        //플레이어의 데이터를 원본 파일에 저장하는 함수
         public static void Save(Player player)
         {
             string path = @"..\..\..\data\Player.json";
@@ -47,7 +46,8 @@ namespace TextRPG
                 new JProperty("MaxHP", player.MaxHp),
                 new JProperty("Exp", player.Exp),
                 new JProperty("MaxExp", player.MaxExp),
-                new JProperty("Gold", player.Gold)
+                new JProperty("Gold", player.Gold),
+                new JProperty("HasPotion", player.hasPotion)
                 );
             
             Item[] inventory = player.Inventory.ToArray();

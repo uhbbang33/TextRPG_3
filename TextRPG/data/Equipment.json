@@ -4,10 +4,10 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "완드",
-      "Value": 5,
-      "Description": "흔한 마법봉이다.",
-      "Price": 3
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
     },
     {
       "bEquip": true,

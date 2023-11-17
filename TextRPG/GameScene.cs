@@ -983,7 +983,7 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)SceneGroupScene).Dungeon;
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1]);

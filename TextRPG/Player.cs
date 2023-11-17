@@ -64,6 +64,7 @@ namespace TextRPG
         public int Def { get { return def + _deltaDef; } }
 
         float _crit = 0.3f;
+        public float Crit { get { return _crit; } }
 
         int hp;
         public int Hp
@@ -138,7 +139,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            crit = (int)save["Critical"];
+            _crit = (int)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -170,7 +171,7 @@ namespace TextRPG
 
             _gold = gold;
 
-            crit = critical;
+            _crit = critical;
         }
 
         public void EquipItem(int index)
@@ -212,7 +213,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            crit = (int)save["Critical"];
+            _crit = (int)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -242,7 +243,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            crit = (int)save["Critical"];
+            _crit = (int)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -338,7 +339,7 @@ namespace TextRPG
                 Exp.ToString(),
                 _maxExp.ToString(),
                 Gold.ToString(),
-                crit.ToString()
+                _crit.ToString()
                 );
         }
 

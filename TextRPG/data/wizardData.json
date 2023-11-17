@@ -34,25 +34,25 @@
       "Name": "후드려 패기",
       "Desc": "후드려 패는 기술이다.",
       "Damage": 2,
-      "Accurity": 100
+      "accuracy": 100
     },
     {
       "Name": "수리수리마수리",
       "Desc": "마술로 패는 기술이다.",
       "Damage": 2,
-      "Accurity": 90
+      "accuracy": 90
     },
     {
       "Name": "아브라카다브라",
       "Desc": "마술로 패는 기술이다.",
       "Damage": 2,
-      "Accurity": 80
+      "accuracy": 80
     },
     {
       "Name": "아베다케다브라",
       "Desc": "마술로 패는 기술이다.",
       "Damage": 2,
-      "Accurity": 70
+      "accuracy": 70
     }
 
   ]

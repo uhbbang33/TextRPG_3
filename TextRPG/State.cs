@@ -104,11 +104,11 @@
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://전사 클래스 선택 시, 플레이어 직업 반영
-                    //game.Player.SetWarrior();
+                    game.Player.SetWarrior();
                     game.ChangeScene(_next["Town"]);
                     break;
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
-                    //game.Player.SetWizard();
+                    game.Player.SetWizard();
                     game.ChangeScene(_next["Town"]);
                     break;
                 case ConsoleKey.D3://이어하기

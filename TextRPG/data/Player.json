@@ -18,7 +18,7 @@
       "Price": 5
     },
     {
-      "bEquip": false,
+      "bEquip": true,
       "_status": 1,
       "type": 0,
       "Name": "검",
@@ -27,5 +27,30 @@
       "Price": 3
     }
   ],
-  "Skills": []
+  "Skills": [
+    {
+      "name": "후드려 패기",
+      "desc": "후드려 패는 기술이다.",
+      "damage": 2,
+      "accurity": 100
+    },
+    {
+      "name": "힘차게 패기",
+      "desc": "힘차게 패는 기술이다.",
+      "damage": 2,
+      "accurity": 90
+    },
+    {
+      "name": "엎드려 패기",
+      "desc": "엎드려 패는 기술이다.",
+      "damage": 2,
+      "accurity": 80
+    },
+    {
+      "name": "약하게 패기",
+      "desc": "약하게 패는 기술이다.",
+      "damage": 2,
+      "accurity": 70
+    }
+  ]
 }

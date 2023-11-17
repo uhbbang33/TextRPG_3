@@ -1,12 +1,13 @@
 {
-  "Lv": 1,
+  "Lv": 4,
   "Class": "전사",
-  "Atk": 10,
-  "Def": 5,
+  "Atk": 16,
+  "Def": 4,
   "MaxHP": 100,
-  "Exp": 5,
-  "MaxExp": 50,
-  "Gold": 1000,
+  "Exp": 25,
+  "MaxExp": 40,
+  "Gold": 2008,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,
@@ -19,13 +20,39 @@
     },
     {
       "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 10,
+      "Description": "낡은 신발이다.",
+      "Price": 20
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 10,
+      "Description": "낡은 신발이다.",
+      "Price": 20
+    },
+    {
+      "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "검",
-      "Value": 5,
-      "Description": "흔한 검이다.",
-      "Price": 3
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
+    },
+    {
+      "bEquip": false,
+      "_status": 1,
+      "type": 0,
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
     }
-  ],
-  "Skills": []
+  ]
 }

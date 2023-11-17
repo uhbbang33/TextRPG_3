@@ -122,7 +122,10 @@ namespace TextRPG
         public int Gold { get { return _gold; } }
 
 
-        public Player()
+
+        public int hasPotion = 0;
+
+        public Player() 
         {
             //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화(이어하기)
             JObject save = Loader.LoadData(@"..\..\..\data\Player.json");
@@ -135,6 +138,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -263,13 +268,21 @@ namespace TextRPG
             {
                 throw new GoldShortageException();
             }
-            else if (_inventory.Count == 5)// _inventory.Max)
+            else if (_inventory.Count == 5 && item.type != Item.EType.Potion)// _inventory.Max)
             {
                 throw new IndexOutOfRangeException();
             }
             else
             {
-                _inventory.Add(item);
+                _gold -= item.Price;
+               if (item.type != Item.EType.Potion)
+                {
+                    _inventory.Add(item);
+                }
+                else
+                {
+                    hasPotion += 1;
+                }
             }
         }
 

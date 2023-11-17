@@ -20,6 +20,8 @@
 
         static MessageBox _board = new MessageBox(33, 28, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
+        static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
+        static TextBlock _pagination = new TextBlock(3, 20, 25, 3);
 
         protected void ThrowMessage(string msg)
         {
@@ -31,9 +33,19 @@
 
         protected void ShowGold()
         {
+            string playerHasPotion = GameManager.Instance.Player.hasPotion.ToString();
+            _potionText.SetText($"포션 {playerHasPotion,5}EA");
+            _potionText.Draw();
+
             string playerGold = GameManager.Instance.Player.Gold.ToString();
             _goldText.SetText($"{playerGold,10} G");
             _goldText.Draw();
+        }
+
+        protected void ShowPagination()
+        {
+            _pagination.SetText("◀ 이전 Q / E 다음 ▶");
+            _pagination.Draw();
         }
 
         virtual public void HandleInput(GameManager game, ConsoleKey key) { }
@@ -382,7 +394,9 @@
             _choices = new string[] { "구입", "판매" };
             shop = new Shop();
 
+
             _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
 
             _next.Add("Buy", new BuyScene(this));
             _next.Add("Sell", new SellScene(this));
@@ -424,6 +438,8 @@
 
         GridBox _ShopItems;
 
+        int _pagination = 0;
+
         public BuyScene(Scene parent)
         {
             _name = "구입";
@@ -431,23 +447,37 @@
             _prev = parent;
             _shop = ((ShopScene)Prev).shop;
             _ShopItems = new GridBox();
-            SetDisplay();
-            SetOption();
+            SetDisplay(_shop.storePageBundle, _pagination);
+            SetOption(_shop.storePageBundle, _pagination);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) return;
-
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length)&&(key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+  
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
 
+                case ConsoleKey.Q:
+                    ForewardItemBundle();
+                    SetDisplay(_shop.storePageBundle, _pagination);
+                    SetOption(_shop.storePageBundle, _pagination);
+                    DrawScene();
+                    break;
+
+                case ConsoleKey.E:
+                    BackwardItemBundle();
+                    SetDisplay(_shop.storePageBundle, _pagination);
+                    SetOption(_shop.storePageBundle, _pagination);
+                    DrawScene();
+                    break;
+
                 default:
-                    Item item = _shop.Goods[(int)key - 49];
+                    Item item = _shop.storePageBundle[_pagination][(int)key - 49];
                     try
                     {
                         game.Player.Buy(item);
@@ -467,21 +497,21 @@
             }
         }
 
-        void SetDisplay()
+        void SetDisplay(List<List<Item>> itembundle, int _page)
         {
             _ShopItems.Clear();
-            for (int i = 0; i < _shop.Goods.Count; ++i)
+            for (int i = 0; i < itembundle[_page].Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
-                slot.SetItem(i, _shop.Goods[i]);
+                slot.SetItem(i, _shop.storePageBundle[_pagination][i]);
                 _ShopItems.AddItem(slot);
             }
         }
 
-        void SetOption()
+        void SetOption(List<List<Item>> itembundle, int _page)
         {
             List<string> lines = new List<string>();
-            foreach (Item item in _shop.Goods)
+            foreach (Item item in itembundle[_page])
             {
                 string line = $"{item.Name}";
                 lines.Add(line);
@@ -494,8 +524,41 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _ShopItems.Draw();
+            ShowPagination();
             ShowGold();
         }
+        
+        // 아이템 번들 전환 시 화면을 다시 그림
+        public void ReDrawItem()
+        {
+            base.DrawScene();
+            ShowGold();
+        }
+
+        //_pagination 전환 코드
+        public void ForewardItemBundle()
+        {
+            if (_pagination  == 0)
+            {
+                _pagination = _shop.storePageBundle.Count - 1;
+            }
+            else
+            {
+                _pagination -= 1;
+            }
+        }
+        public void BackwardItemBundle()
+        {
+            if (_pagination ==  _shop.storePageBundle.Count - 1)
+            {
+                _pagination = 0;
+            }
+            else
+            {
+                _pagination +=  1;
+            }
+        }
+
     }
 
     class SellScene : Scene

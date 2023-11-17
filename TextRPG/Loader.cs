@@ -35,7 +35,6 @@ namespace TextRPG
             return true;
         }
 
-        //플레이어의 데이터를 원본 파일에 저장하는 함수
         public static void Save(Player player)
         {
             string path = @"..\..\..\data\Player.json";

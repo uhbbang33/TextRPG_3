@@ -29,8 +29,11 @@ namespace TextRPG
         static Random Random;
         public Record beforeRecord;
         public Record afterRecord;
+        
+        List<MyMonster> _monsters;
+        Queue<MyMonster> _monsterOrder;
 
-        public enum EDungunState { Continue, Clear, Fail };
+        public enum EDungunState { PlayerTurn , MonsterTurn, PlayerDeath, MonsterAllDeath, Clear };
         public EDungunState state;
 
         enum EDifficulty { Easy , Normal, Hard, Hell };
@@ -39,17 +42,10 @@ namespace TextRPG
         string _name;
         public string Name { get { return _name; } }
 
-        public int _recommendedDef = 1;
-        int[] _goldByDiff = { 100, 300, 700, 1000 };
-        int _rewardGold;
-        
-        Player _player;
+        int _selectedSkillIndex = 0;
 
-        int _maxTryCount = 5;
-        int _tryCount = 0;
-        int _diffDef = 0;
-        float _clearPercent = 0;
-        int _exp;
+        Player _player;
+        MyMonster _targetMonster;
 
         public Dungeon(string name, int difficulty, int def, int exp)
         {
@@ -57,53 +53,117 @@ namespace TextRPG
             beforeRecord = new Record();
             afterRecord = new Record();
 
-            state = EDungunState.Continue;
+            state = EDungunState.PlayerTurn;
             _name = name;
 
             _difficulty = (EDifficulty)difficulty;
 
-            _recommendedDef = def;
-            _rewardGold = _goldByDiff[(int)_difficulty];
-            _exp = exp;
+            _monsters = new List<MyMonster>();
+            _monsterOrder = new Queue<MyMonster>();
+
+            // 랜덤한 몬스터 수 결정
+            int monsterCount = Random.Next(1, 5);
+
+            // 랜덤한 몬스터 종류 선택
+            //int MID = Random.Next(0, 5);
+
+            _monsters.Add(new MyMonster("꼬부기"));
+            _monsters.Add(new MyMonster("파이리"));
+            _monsters.Add(new MyMonster("이상해씨"));
         }
 
         public void Enter(Player player)
         {
-            _player = player;
-            _diffDef = _recommendedDef - player.Def;
-            _clearPercent = (float)player.Def / (_recommendedDef + player.Def);
+            if(_player == null)
+                _player = player;            
             beforeRecord.Save(_player);
+            // 몬스터 생성
         }
 
-        public EDungunState Progress()
+        public EDungunState Progress(out string[] msg)
         {
-            ++_tryCount;
-            if(_tryCount > _maxTryCount) 
+            int dmg = 0;
+            msg = null;
+
+            switch(state)
             {
-                state = EDungunState.Fail;
-                SettleUp();
-            }
-            else if(Random.NextDouble() < _clearPercent)
-            {
-                state = EDungunState.Clear;
-                SettleUp();
+                case EDungunState.PlayerTurn:
+                    dmg = Attack();
+                    // check monster is die? 
+                    // Reward. Add . Monster's
+
+                    msg = new string[] { $"{_player.Class} 의 공격!!", $"{_targetMonster.Name} 을(를) 맞췄습니다. 데미지 : {dmg} ]" };
+                    break;
+
+                case EDungunState.MonsterAllDeath:
+                    msg = new string[] { "모든 몬스터를 쓰러트렸습니다.", "보상을 획득합니다." };
+                    state = EDungunState.Clear;
+                    break;
+
+                case EDungunState.MonsterTurn:                    
+                    MyMonster monster = _monsterOrder.Dequeue();
+                    dmg = monster.Attack(_player);
+
+                    msg = new string[2] { $"{monster.Name} 의 공격!!", $"{_player.Class} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]" };
+
+                    if (_player.Hp <= 0)
+                    {
+                        state = EDungunState.PlayerDeath;
+                    }
+                    else if (_monsterOrder.Count == 0)
+                    {
+                        state = EDungunState.PlayerTurn;
+                    }
+                    break;
             }
 
             return state;
         }
 
-        public void SettleUp()
+        bool SetMonsterOrder()
         {
-            if(state == EDungunState.Clear)
+            foreach(var monster in _monsters)
             {
-                _rewardGold += (int)(_rewardGold * Random.NextDouble());
-                _player.ReceiveGold(_rewardGold);
-                _player.Exp += _exp;
+                if (monster.HP > 0)
+                    _monsterOrder.Enqueue(monster);
             }
+            return _monsterOrder.Count > 0 ? true : false;
+        }
 
-            // 체력 감소
-            _player.Damaged(Random.Next(20 * ((int)_difficulty+1) + _diffDef, 25 * ((int)_difficulty + 1) + _diffDef));
-            afterRecord.Save(_player);
+        public void SelectSkill(int index)
+        {
+            _selectedSkillIndex = index;
+        }
+
+        public bool SelectMonster(int index)
+        {
+            if (_monsters[index].HP <= 0)
+            {
+                return false;
+            }
+            _targetMonster = _monsters[index];
+            return true;
+        }
+
+        int Attack()
+        {            
+            int dmg = _player.Attack(_targetMonster);
+            
+            if(SetMonsterOrder())
+            {
+                state = EDungunState.MonsterTurn;
+            }
+            else
+            {
+                state = EDungunState.MonsterAllDeath;
+            }
+            
+            return dmg;
+        }
+
+        public MyMonster[] GetMonster()
+        {
+            return _monsters.ToArray();
         }
     }
 }

@@ -13,7 +13,6 @@ namespace TextRPG
         protected int _height = 0;
         public int Height { get { return _height; } }
 
-
         protected int _maxChildrenCount = 0;
         Dictionary<string, Widget> _children;
         protected int ChildrenCount { get { return _children.Count; } }
@@ -41,14 +40,17 @@ namespace TextRPG
             Draw(0, 0);
         }
 
+        // override  후 base.Draw(_x + x, _y + y) 필요!
         virtual protected void Draw(int x, int y)
         {
             foreach (var widget in _children)
             {
+                //Console.ForegroundColor = color;
                 widget.Value.Draw(x, y);
             }
         }
 
+        // Widget 추가
         virtual protected void AddChild(string name, Widget widget)
         {
             if (_children.Count < _maxChildrenCount)
@@ -62,7 +64,6 @@ namespace TextRPG
             _x = x;
             _y = y;
         }
-
 
         protected T? GetChild<T>(string name) where T : Widget
         {
@@ -85,15 +86,22 @@ namespace TextRPG
     class Text : Widget
     {
         public string text = "";
-
+        ConsoleColor color = ConsoleColor.Black;
         public Text() { }
 
         public Text(int x, int y) : base(x, y) { }
 
         protected override void Draw(int x, int y)
         {
+            Console.ForegroundColor = color;
             Screen.SetCursorPosition(_x + x, _y + y);
             Console.Write(text);
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
+
+        public void SetColor(ConsoleColor c)
+        {
+            color = c;
         }
     }
 
@@ -390,6 +398,91 @@ namespace TextRPG
         protected override void Draw(int x, int y)
         {
             base.Draw(x + _x, y + _y);
+        }
+    }
+
+    class UnitViewer : Widget
+    {
+        public UnitViewer() : base()
+        {
+            _maxChildrenCount = 3;
+
+            AddChild("Content", new Border(0, 0, 30, 5));
+            AddChild("NameText", new Text(2, 1));
+            AddChild("HPText", new Text(2, 2));
+            GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+        }
+
+        public UnitViewer(int x, int y) : base(x, y)
+        {
+            _maxChildrenCount = 3;
+
+            AddChild("Content", new Border(0, 0, 30, 5));
+            AddChild("NameText", new Text(2, 1));
+            AddChild("HPText", new Text(2, 2));
+            GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+        }
+
+        public UnitViewer(int x, int y, int width, int height) : base(x, y, width, height)
+        {
+            _maxChildrenCount = 3;
+
+            AddChild("Content", new Border(0, 0, 30, 5));
+            AddChild("NameText", new Text(2, 1));
+            AddChild("HPText", new Text(2, 2));
+            GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+        }
+
+        public void SetText(string monsterName, int monsterHP)
+        {
+            GetChild<Text>("NameText").text = monsterName;
+            if (monsterHP <= 0)
+            {
+                GetChild<Text>("NameText").SetColor(ConsoleColor.Gray);
+                GetChild<Text>("HPText").SetColor(ConsoleColor.Gray);
+                GetChild<Text>("HPText").text = "Dead";
+            }
+            else
+            {                
+                GetChild<Text>("HPText").text = monsterHP.ToString();
+            }
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
+        }
+
+        public override void SetSize(int width, int height)
+        {
+            base.SetSize(width, height);
+            if (GetChild<Border>("Content") != null)
+            {
+                GetChild<Border>("Content").SetSize(width, height);
+            }
+        }
+    }
+
+    class BattleWidget : Widget
+    {
+        public BattleWidget(int x, int y, int width, int height) : base(x, y, width, height)
+        {
+            _maxChildrenCount = 3;
+
+            AddChild("Content", new Border(0, 0, width, height));
+            AddChild("Text1", new Text(2,1));
+            AddChild("Text2", new Text(2,2));
+        }
+
+        public void SetText(string main, string sub)
+        {
+            GetChild<Text>("Text1").text = main;
+            GetChild<Text>("Text2").text = sub;
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
         }
     }
 

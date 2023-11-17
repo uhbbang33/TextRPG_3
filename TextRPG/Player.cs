@@ -138,7 +138,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            
+            crit = (int)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -154,7 +154,7 @@ namespace TextRPG
             }
         }
 
-        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold)
+        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, int critical)
         {
             this.lv = lv;
             this.job = job;
@@ -169,6 +169,8 @@ namespace TextRPG
             Exp = exp;
 
             _gold = gold;
+
+            crit = critical;
         }
 
         public void EquipItem(int index)
@@ -210,6 +212,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            crit = (int)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -238,6 +242,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            crit = (int)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -323,7 +329,7 @@ namespace TextRPG
 
         public string GetData()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
                 lv.ToString(),
                 job,
                 atk.ToString(),
@@ -331,7 +337,8 @@ namespace TextRPG
                 maxHp.ToString(),
                 Exp.ToString(),
                 _maxExp.ToString(),
-                Gold.ToString()
+                Gold.ToString(),
+                crit.ToString()
                 );
         }
 

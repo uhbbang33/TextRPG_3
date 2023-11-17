@@ -207,7 +207,7 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 10;
+            _maxChildrenCount = 11;
 
             AddChild("Background", new Border(0, 0, 39, 20));
 
@@ -219,7 +219,9 @@ namespace TextRPG
             AddChild("AtkText", new Text(5, 6));
             AddChild("DefText", new Text(5, 8));
             AddChild("HPText", new Text(5, 10));
-            AddChild("GoldText", new Text(5, 12));
+            AddChild("CritText", new Text(5, 12));
+            AddChild("GoldText", new Text(5, 14));
+            AddChild("PotionText", new Text(5, 16));
         }
 
         public void SetPlayer(Player player)
@@ -230,7 +232,9 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
+            GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
+            GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";
         }
     }
 

@@ -171,7 +171,7 @@ namespace TextRPG
                 case EDungeoState.MonsterTurn:
                     Monster monster = _monsterOrder.Dequeue();
                     dmg = monster.Attack(_player);
-                    msg = MakeMessage(_targetMonster, _player, dmg);
+                    msg = MakeMessage(monster, _player, dmg);
 
                     if (CheckPlayerIsAlive())
                     {
@@ -193,7 +193,7 @@ namespace TextRPG
             msg[0] = $"{attacker.Class} 의 {skillName}!!";
 
             if (dmg == 0) msg[1] = "빗나갔습니다.";
-            else msg[1] = $"{deffender.Name} 을(를) 맞췄습니다. 데미지 : {dmg} ]";
+            else msg[1] = $"{deffender.Name} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
 
             return msg;
         }
@@ -219,7 +219,7 @@ namespace TextRPG
             msg[0] = $"{attacker.Name} 의 공격!!";
 
             if (dmg == 0) msg[1] = "빗나갔습니다.";
-            else msg[1] = $"{deffender.Class} 을(를) 맞췄습니다. 데미지 : {dmg} ]";
+            else msg[1] = $"{deffender.Class} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
 
             return msg;
         }

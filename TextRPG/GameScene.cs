@@ -887,7 +887,8 @@ namespace TextRPG
         public override void Update(GameManager game)
         {
             if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
-
+            
+            _skills.Clear();
             int idx = 1;
             foreach(var skill in game.Player.Skills)
             {
@@ -949,7 +950,8 @@ namespace TextRPG
         public override void Update(GameManager game)
         {
             if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-
+            
+            _monsters.Clear();
             int idx = 1;
             foreach(var monster in _dungeon.GetMonster())
             {

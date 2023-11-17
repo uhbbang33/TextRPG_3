@@ -2,16 +2,16 @@
 {
     internal class Shop
     {
-        List<Item> _items = new List<Item>();
-        public List<Item> Goods { get { return _items; } }
+        
+        public List<List<Item>> storePageBundle = new List<List<Item>>();
 
         public Shop()
         {
-            LoadItemCSV(_items);
+            LoadItemCSV(storePageBundle);
         }
 
         //CSV를 읽어서 리스트를 넣음
-        static void LoadItemCSV(List<Item> _item)
+        static void LoadItemCSV(List<List<Item>> _storePageBundle)
         {
             StreamReader itemCSV = new StreamReader(@"..\..\..\ItemData.csv");
 
@@ -61,10 +61,16 @@
 
                 Item item = new Item(_name, _status, _description, _type, _price);
 
-                _item.Add(item);
+                StoreItems.Add(item);
+                
+                if (StoreItems.Count > 5 || i == CSVLine.Length - 1)
+                {
+                    _storePageBundle.Add(StoreItems);
+                    StoreItems = new List<Item>();
+                }
             }
 
         }
-
+    
     }
 }

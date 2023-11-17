@@ -33,6 +33,17 @@ namespace TextRPG
             }
         }
 
+        public static JObject LoadMonsterData()
+        {
+            using (StreamReader file = File.OpenText(@"..\..\..\MonsterData.json"))
+            {
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    return (JObject)JToken.ReadFrom(reader);
+                }
+            }
+        }
+
         public static void Save(Player player)
         {
             string path = @"..\..\..\Player.json";

@@ -1,13 +1,13 @@
 {
   "Equip": [
     {
-      "bEquip": false,
-      "_status": 0,
+      "bEquip": true,
+      "_status": 1,
       "type": 0,
-      "Name": "",
-      "Value": 0,
-      "Description": null,
-      "Price": 0
+      "Name": "완드",
+      "Value": 5,
+      "Description": "흔한 마법봉이다.",
+      "Price": 3
     },
     {
       "bEquip": true,

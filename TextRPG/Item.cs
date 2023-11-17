@@ -68,19 +68,14 @@ namespace TextRPG
         public string name;
         public string desc;
         public int damage;
+        public int accurity;
 
-
-        string _name { get { return name; } set { name = value; } }
-        string _desc { get { return _desc; } set { desc = value; } }
-        int _damage { get { return _damage; } set { damage = value; } }
-
-
-
-        public Skill(string name, string desc, int damage)
+        public Skill(string name, string desc, int damage, int accurity)
         {
             this.name = name;
             this.desc = desc;
             this.damage = damage;
+            this.accurity = accurity;
         }
     }
 }

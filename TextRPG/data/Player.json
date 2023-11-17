@@ -1,6 +1,6 @@
 {
   "Lv": 1,
-  "Class": "전사",
+  "Class": "마법사",
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
@@ -18,14 +18,39 @@
       "Price": 5
     },
     {
-      "bEquip": false,
+      "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "검",
+      "Name": "완드",
       "Value": 5,
-      "Description": "흔한 검이다.",
+      "Description": "흔한 마법봉이다.",
       "Price": 3
     }
   ],
-  "Skills": []
+  "Skills": [
+    {
+      "name": "후드려 패기",
+      "desc": "후드려 패는 기술이다.",
+      "damage": 2,
+      "accurity": 100
+    },
+    {
+      "name": "수리수리마수리",
+      "desc": "마술로 패는 기술이다.",
+      "damage": 2,
+      "accurity": 90
+    },
+    {
+      "name": "아브라카다브라",
+      "desc": "마술로 패는 기술이다.",
+      "damage": 2,
+      "accurity": 80
+    },
+    {
+      "name": "아베다케다브라",
+      "desc": "마술로 패는 기술이다.",
+      "damage": 2,
+      "accurity": 70
+    }
+  ]
 }

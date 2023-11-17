@@ -508,6 +508,33 @@ namespace TextRPG
         }
     }
 
+    class SkillSlot : Widget
+    {
+        public SkillSlot()
+        {
+            _maxChildrenCount = 5;
+            _width = 38;
+            _height = 5;
+
+            AddChild("Content", new Border(0, 0, _width, _height));
+            AddChild("NameText", new Text(2, 1));
+            AddChild("AtkText", new Text(2, 3));
+            AddChild("Accuracy", new Text(23, 3));
+        }
+
+        public void SetSkill(int idx, Skill skill)
+        {
+            GetChild<Text>("NameText").text = $"{idx}. [ {skill.name} ]";
+            GetChild<Text>("AtkText").text = $"피해배율 : {skill.damage * 100} %";
+            GetChild<Text>("Accuracy").text = $"명중률 : {skill.accuracy * 100} %";
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
+        }
+    }
+
     public static class Screen
     {
         static int Width;

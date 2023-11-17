@@ -67,7 +67,8 @@ namespace TextRPG
     {
         public string name;
         public string desc;
-        public int damage;
+        public float damage;
+        public float accuracy;
         public int cost;
 
         public Skill(string name, string desc, int damage)

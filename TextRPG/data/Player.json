@@ -59,25 +59,29 @@
     {
       "name": "후드려 패기",
       "desc": "후드려 패는 기술이다.",
-      "damage": 10,
+      "damage": 1.0,
+      "accuracy": 0.8,
       "cost": 10
     },
     {
       "name": "힘차게 패기",
       "desc": "힘차게 패는 기술이다.",
-      "damage": 11,
+      "damage": 1.0,
+      "accuracy": 0.8,
       "cost": 11
     },
     {
       "name": "엎드려 패기",
       "desc": "엎드려 패는 기술이다.",
-      "damage": 7,
+      "damage": 2.0,
+      "accuracy": 0.8,
       "cost": 7
     },
     {
       "name": "약하게 패기",
       "desc": "약하게 패는 기술이다.",
-      "damage": 5,
+      "damage": 2.0,
+      "accuracy": 0.8,
       "cost": 5
     }
   ]

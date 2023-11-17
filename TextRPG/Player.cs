@@ -63,7 +63,7 @@ namespace TextRPG
         int _deltaDef = 0;
         public int Def { get { return def + _deltaDef; } }
 
-       
+        float _crit = 0.3f;
 
         int hp;
         public int Hp
@@ -88,6 +88,8 @@ namespace TextRPG
         int maxHp = 100;
         int _deltaHp = 0;
         public int MaxHp { get { return maxHp + _deltaHp; } }
+
+        float _evasion = 0.2f;
 
         int _exp = 0;
         int _maxExp = 10;
@@ -334,9 +336,39 @@ namespace TextRPG
         }
 
         // Attack
-        public int Attack(Monster monster)
+        public int Attack(int SID, Monster monster) // SID : Skill ID
         {
-            int dmg = 0;
+            int atkOffset = (int)Math.Ceiling(0.1f * Atk);
+
+            Random random = new Random();
+            int dmg = random.Next(Atk - atkOffset, Atk + atkOffset + 1);
+
+            if(random.NextDouble() < _crit)
+            {
+                dmg *= 2;
+            }
+
+            dmg =  (int)(dmg * Skills[SID].damage);
+
+            dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
+
+            return dmg;
+        }
+
+        public int TakeDamage(int damage)
+        {
+            int dmg = damage - Def;
+            if (dmg < 0) dmg = 1;
+
+            Random random = new Random();
+            if (random.NextDouble() > _evasion)
+            {
+                Hp -= dmg;
+            }
+            else
+            {
+                dmg = 0;
+            }
             return dmg;
         }
     }

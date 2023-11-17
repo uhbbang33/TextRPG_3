@@ -63,6 +63,11 @@ namespace TextRPG
         int _deltaDef = 0;
         public int Def { get { return def + _deltaDef; } }
 
+        int crit = 1;
+        public int BaseCrit { get { return crit; } }
+        int _deltaCrit = 0;
+        public int Crit { get { return crit + _deltaCrit; } }
+
 
         int hp;
         public int Hp
@@ -135,7 +140,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            
+            crit = (int)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -167,6 +172,7 @@ namespace TextRPG
 
             _gold = gold;
 
+            crit = critical;
         }
 
         public void EquipItem(int index)
@@ -208,6 +214,9 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            crit = (int)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
+
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
             _inventory = save["Inventory"].ToObject<List<Item>>();
@@ -235,6 +244,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            crit = (int)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -320,7 +331,7 @@ namespace TextRPG
 
         public string GetData()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
                 lv.ToString(),
                 job,
                 atk.ToString(),
@@ -328,7 +339,8 @@ namespace TextRPG
                 maxHp.ToString(),
                 Exp.ToString(),
                 _maxExp.ToString(),
-                Gold.ToString()
+                Gold.ToString(),
+                crit.ToString()
                 );
         }
 

@@ -1,12 +1,13 @@
 {
-  "Lv": 4,
+  "Lv": 1,
   "Class": "전사",
-  "Atk": 16,
-  "Def": 4,
+  "Atk": 10,
+  "Def": 5,
   "MaxHP": 100,
-  "Exp": 25,
-  "MaxExp": 40,
-  "Gold": 2008,
+  "Exp": 5,
+  "MaxExp": 50,
+  "Gold": 1000,
+  "Critical": 50,
   "HasPotion": 0,
   "Inventory": [
     {
@@ -19,66 +20,39 @@
       "Price": 5
     },
     {
-      "bEquip": false,
-      "_status": 2,
-      "type": 1,
-      "Name": "판금 갑옷",
-      "Value": 10,
-      "Description": "낡은 신발이다.",
-      "Price": 20
-    },
-    {
-      "bEquip": false,
-      "_status": 2,
-      "type": 1,
-      "Name": "판금 갑옷",
-      "Value": 10,
-      "Description": "낡은 신발이다.",
-      "Price": 20
-    },
-    {
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "강철 검",
-      "Value": 3,
-      "Description": "단단한 강철 검이다.",
-      "Price": 50
-    },
-    {
-      "bEquip": false,
-      "_status": 1,
-      "type": 0,
-      "Name": "강철 검",
-      "Value": 3,
-      "Description": "단단한 강철 검이다.",
-      "Price": 50
+      "Name": "검",
+      "Value": 5,
+      "Description": "흔한 검이다.",
+      "Price": 3
     }
   ],
   "Skills": [
     {
       "name": "후드려 패기",
       "desc": "후드려 패는 기술이다.",
-      "damage": 10,
-      "cost": 10
+      "damage": 2,
+      "accurity": 100
     },
     {
       "name": "힘차게 패기",
       "desc": "힘차게 패는 기술이다.",
-      "damage": 11,
-      "cost": 11
+      "damage": 2,
+      "accurity": 90
     },
     {
       "name": "엎드려 패기",
       "desc": "엎드려 패는 기술이다.",
-      "damage": 7,
-      "cost": 7
+      "damage": 2,
+      "accurity": 80
     },
     {
       "name": "약하게 패기",
       "desc": "약하게 패는 기술이다.",
-      "damage": 5,
-      "cost": 5
+      "damage": 2,
+      "accurity": 70
     }
   ]
 }

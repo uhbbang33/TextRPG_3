@@ -7,6 +7,8 @@
   "Exp": 5,
   "MaxExp": 50,
   "Gold": 1000,
+  "Critical": 50,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,

@@ -68,9 +68,9 @@ namespace TextRPG
         public string name;
         public string desc;
         public int damage;
-        public int cost;
+        public int accurity;
 
-        public Skill(string name, string desc, int damage)
+        public Skill(string name, string desc, int damage, int accurity)
         {
             this.name = name;
             this.desc = desc;

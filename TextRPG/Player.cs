@@ -121,8 +121,6 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } }
 
-
-
         public int hasPotion = 0;
 
         public Player() 
@@ -333,6 +331,13 @@ namespace TextRPG
                 _maxExp.ToString(),
                 Gold.ToString()
                 );
+        }
+
+        // Attack
+        public int Attack(Monster monster)
+        {
+            int dmg = 0;
+            return dmg;
         }
     }
 }

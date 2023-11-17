@@ -1,13 +1,13 @@
 {
   "Equip": [
     {
-      "bEquip": false,
-      "_status": 0,
+      "bEquip": true,
+      "_status": 1,
       "type": 0,
-      "Name": "",
-      "Value": 0,
-      "Description": null,
-      "Price": 0
+      "Name": "강철 검",
+      "Value": 3,
+      "Description": "단단한 강철 검이다.",
+      "Price": 50
     },
     {
       "bEquip": true,

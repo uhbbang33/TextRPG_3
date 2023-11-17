@@ -56,9 +56,6 @@ namespace TextRPG
             //사용중인 플레이어 데이터를 가져와 json에 배열로 기록
             Skill[] skills = player.Skills.ToArray();
             configData.Add("Skills", JArray.FromObject(skills));
-
-            Console.WriteLine("= " + player.Skills.Count());
-
             File.WriteAllText(path, configData.ToString());
             
             Save(player.Equipment);

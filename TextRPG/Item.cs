@@ -68,13 +68,7 @@ namespace TextRPG
         public string name;
         public string desc;
         public int damage;
-
-
-        string _name { get { return name; } set { name = value; } }
-        string _desc { get { return _desc; } set { desc = value; } }
-        int _damage { get { return _damage; } set { damage = value; } }
-
-
+        public int cost;
 
         public Skill(string name, string desc, int damage)
         {

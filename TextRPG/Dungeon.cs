@@ -30,8 +30,8 @@ namespace TextRPG
         public Record beforeRecord;
         public Record afterRecord;
         
-        List<MyMonster> _monsters;
-        Queue<MyMonster> _monsterOrder;
+        List<Monster> _monsters;
+        Queue<Monster> _monsterOrder;
 
         public enum EDungunState { PlayerTurn , MonsterTurn, PlayerDeath, MonsterAllDeath, Clear };
         public EDungunState state;
@@ -45,7 +45,7 @@ namespace TextRPG
         int _selectedSkillIndex = 0;
 
         Player _player;
-        MyMonster _targetMonster;
+        Monster _targetMonster;
 
         public Dungeon(string name, int difficulty, int def, int exp)
         {
@@ -58,18 +58,24 @@ namespace TextRPG
 
             _difficulty = (EDifficulty)difficulty;
 
-            _monsters = new List<MyMonster>();
-            _monsterOrder = new Queue<MyMonster>();
+            _monsters = new List<Monster>();
+            _monsterOrder = new Queue<Monster>();
 
             // 랜덤한 몬스터 수 결정
             int monsterCount = Random.Next(1, 5);
 
             // 랜덤한 몬스터 종류 선택
             //int MID = Random.Next(0, 5);
+            //switch(mid)
+            //{
+            //    case 0:
+            //        _monsters.Add(new Gryphon());
+            //        break;
 
-            _monsters.Add(new MyMonster("꼬부기"));
-            _monsters.Add(new MyMonster("파이리"));
-            _monsters.Add(new MyMonster("이상해씨"));
+            //}
+            //_monsters.Add(new Monster());
+            //_monsters.Add(new Monster());
+            //_monsters.Add(new Monster());
         }
 
         public void Enter(Player player)
@@ -100,8 +106,8 @@ namespace TextRPG
                     state = EDungunState.Clear;
                     break;
 
-                case EDungunState.MonsterTurn:                    
-                    MyMonster monster = _monsterOrder.Dequeue();
+                case EDungunState.MonsterTurn:
+                    Monster monster = _monsterOrder.Dequeue();
                     dmg = monster.Attack(_player);
 
                     msg = new string[2] { $"{monster.Name} 의 공격!!", $"{_player.Class} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]" };
@@ -124,7 +130,7 @@ namespace TextRPG
         {
             foreach(var monster in _monsters)
             {
-                if (monster.HP > 0)
+                if (monster.Hp > 0)
                     _monsterOrder.Enqueue(monster);
             }
             return _monsterOrder.Count > 0 ? true : false;
@@ -137,7 +143,7 @@ namespace TextRPG
 
         public bool SelectMonster(int index)
         {
-            if (_monsters[index].HP <= 0)
+            if (_monsters[index].Hp <= 0)
             {
                 return false;
             }
@@ -146,7 +152,7 @@ namespace TextRPG
         }
 
         int Attack()
-        {            
+        {
             int dmg = _player.Attack(_targetMonster);
             
             if(SetMonsterOrder())
@@ -161,7 +167,7 @@ namespace TextRPG
             return dmg;
         }
 
-        public MyMonster[] GetMonster()
+        public Monster[] GetMonster()
         {
             return _monsters.ToArray();
         }

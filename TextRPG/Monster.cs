@@ -50,6 +50,13 @@ namespace TextRPG
                 _isDead = true;
             }
         }
+
+        // Attack
+        public int Attack(Player player)
+        {
+            int dmg = 0;
+            return dmg;
+        }
     }
 
     class Bat : Monster

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace TextRPG
 {
+
+    
+ 
     class EquipManager
     {
         Item[] _equips;
@@ -23,7 +17,7 @@ namespace TextRPG
             //_equips = save["Equip"].ToObject<Item[]>();
             _equips = new Item[2];
 
-            for(int i = 0; i < _equips.Length; ++i)
+            for (int i = 0; i < _equips.Length; ++i)
             {
                 _equips[i] = Item.NULL;
             }
@@ -37,7 +31,7 @@ namespace TextRPG
                 _equips[parts].bEquip = false;
                 _equips[parts] = Item.NULL;
             }
-            else if(_equips[parts] == Item.NULL) // 비어있는 경우
+            else if (_equips[parts] == Item.NULL) // 비어있는 경우
             {
                 _equips[parts] = item;
                 item.bEquip = true;
@@ -47,7 +41,7 @@ namespace TextRPG
                 _equips[parts].bEquip = false;
                 _equips[parts] = item;
                 item.bEquip = true;
-            }            
+            }
         }
     }
 
@@ -55,7 +49,7 @@ namespace TextRPG
     {
         int lv = 1;
         public int Lv { get { return lv; } }
-        
+
         string job = "초보자";
         public string Class { get { return job; } }
 
@@ -68,18 +62,20 @@ namespace TextRPG
         public int BaseDef { get { return def; } }
         int _deltaDef = 0;
         public int Def { get { return def + _deltaDef; } }
-        
+
+       
+
         int hp;
-        public int Hp 
+        public int Hp
         {
-            get 
+            get
             {
-                return hp; 
-            } 
+                return hp;
+            }
             set
             {
                 hp = value;
-                if(hp < 0)
+                if (hp < 0)
                 {
                     hp = 0;
 
@@ -98,35 +94,38 @@ namespace TextRPG
         public int MaxExp { get { return _maxExp; } }
         int[] _expByLevel = { 0, 10, 20, 30, 40, 50, 70, 95, 120, 200 };
 
-        public int Exp 
+        public int Exp
         {
             get { return _exp; }
-            set 
+            set
             {
-                _exp = value; 
-                if(_exp >= _maxExp)
+                _exp = value;
+                if (_exp >= _maxExp)
                 {
-                    _exp -= _maxExp;                    
+                    _exp -= _maxExp;
                     ++lv;
                     _maxExp = _expByLevel[lv];
                     atk += 2;
                     def += 1;
                 }
-            } 
+            }
         }
 
+        List<Item> _inventory = new List<Item>();
+        List<Skill> _skills = new List<Skill>();
+        EquipManager _equipManager;
         int _gold = 0;
+
+        public List<Item> Inventory { get { return _inventory; } }
+        public List<Skill> Skills { get { return _skills; } }
+        public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } }
 
-        List<Item> _inventory = new List<Item>();
-        public List<Item> Inventory { get { return _inventory; } }
 
-        EquipManager _equipManager;
-        public Item[] Equipment { get { return _equipManager.EquipItems; } }
-        public Player() // 초기값 설정
+        public Player()
         {
-            JObject save = Loader.LoadPlayerData(@"..\..\..\Player.json");
-            //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화
+            //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화(이어하기)
+            JObject save = Loader.LoadData(@"..\..\..\data\Player.json");
             lv = (int)save["Lv"];
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
@@ -134,14 +133,16 @@ namespace TextRPG
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
             _maxExp = (int)save["MaxExp"];
-            Exp = (int)save["Exp"];            
+            Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
 
+            //스킬 불러와 리스트에 저장
+            _skills = save["Skills"].ToObject<List<Skill>>();
             _inventory = save["Inventory"].ToObject<List<Item>>();
 
             _equipManager = new EquipManager();
 
-            foreach(var item in _inventory)
+            foreach (var item in _inventory)
             {
                 if (item.bEquip)
                     _equipManager.Wear(item);
@@ -153,16 +154,16 @@ namespace TextRPG
             this.lv = lv;
             this.job = job;
             this.atk = atk;
-            
+
             this.def = def;
-            
+
             this.maxHp = maxHp;
             hp = maxHp;
 
             _maxExp = maxExp;
-            Exp = exp;            
-             
-            _gold = gold;            
+            Exp = exp;
+
+            _gold = gold;
         }
 
         public void EquipItem(int index)
@@ -171,10 +172,10 @@ namespace TextRPG
 
             _deltaHp = _deltaDef = _deltaAtk = 0;
 
-            foreach(Item item in _equipManager.EquipItems)
+            foreach (Item item in _equipManager.EquipItems)
             {
                 if (item == null) continue;
-                switch(item.Status)
+                switch (item.Status)
                 {
                     case "체력":
                         _deltaHp += item.Value;
@@ -188,6 +189,61 @@ namespace TextRPG
                         _deltaDef += item.Value;
                         break;
                 }
+            }
+        }
+
+        //클래스 선택창에서 마법사 직업을 골랐을 때, 기존 데이터 덮어씌우기
+        public void SetWizard()
+        {
+            JObject save = Loader.LoadData(@"..\..\..\data\wizardData.json");
+            lv = (int)save["Lv"];
+            job = save["Class"].ToString();
+            atk = (int)save["Atk"];
+            def = (int)save["Def"];
+            maxHp = (int)save["MaxHP"];
+            hp = maxHp;
+            _maxExp = (int)save["MaxExp"];
+            Exp = (int)save["Exp"];
+            _gold = (int)save["Gold"];
+
+            //스킬 불러와 리스트에 저장
+            _skills = save["Skills"].ToObject<List<Skill>>();
+            _inventory = save["Inventory"].ToObject<List<Item>>();
+
+            _equipManager = new EquipManager();
+
+            foreach (var item in _inventory)
+            {
+                if (item.bEquip)
+                    _equipManager.Wear(item);
+            }
+
+        }
+
+        //클래스 선택창에서 전사 직업을 골랐을 때, 기존 데이터 덮어씌우기
+        public void SetWarrior()
+        {
+            JObject save = Loader.LoadData(@"..\..\..\data\warriorData.json");
+            lv = (int)save["Lv"];
+            job = save["Class"].ToString();
+            atk = (int)save["Atk"];
+            def = (int)save["Def"];
+            maxHp = (int)save["MaxHP"];
+            hp = maxHp;
+            _maxExp = (int)save["MaxExp"];
+            Exp = (int)save["Exp"];
+            _gold = (int)save["Gold"];
+
+            //스킬 불러와 리스트에 저장
+            _skills = save["Skills"].ToObject<List<Skill>>();
+            _inventory = save["Inventory"].ToObject<List<Item>>();
+
+            _equipManager = new EquipManager();
+
+            foreach (var item in _inventory)
+            {
+                if (item.bEquip)
+                    _equipManager.Wear(item);
             }
         }
 
@@ -244,12 +300,12 @@ namespace TextRPG
         {
             if (_gold >= 300)
             {
-                hp = MaxHp; 
+                hp = MaxHp;
                 _gold -= 300;
                 return true;
             }
-            return false;   
-            
+            return false;
+
         }
 
         public string GetData()

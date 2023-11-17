@@ -11,24 +11,12 @@ namespace TextRPG
 {
     public static class Loader
     {
-        //플레이어의 데이터를 가져오는 함수 .json 형식
-        public static JObject LoadPlayerData(string path)
+        //파일 경로에 있는 .json 형식의 파일을 로드하는 함수
+        public static JObject LoadData(string path)
         {
             using (StreamReader file = File.OpenText(path))//@"..\..\..\Player.json"
             {
                 using(JsonTextReader reader = new JsonTextReader(file))
-                {
-                    return (JObject)JToken.ReadFrom(reader);
-                }
-            }
-        }
-
-        //무기와 방어구 장비의 데이터를 가져오는 함수 .json 형식
-        public static JObject LoadEquipment(string path)
-        {
-            using (StreamReader file = File.OpenText(path))//@"..\..\..\Equipment.json"
-            {
-                using (JsonTextReader reader = new JsonTextReader(file))
                 {
                     return (JObject)JToken.ReadFrom(reader);
                 }
@@ -50,7 +38,7 @@ namespace TextRPG
         //플레이어의 데이터를 원본 파일에 저장하는 함수
         public static void Save(Player player)
         {
-            string path = @"..\..\..\Player.json";
+            string path = @"..\..\..\data\Player.json";
             JObject configData = new JObject(
                 new JProperty("Lv", player.Lv),
                 new JProperty("Class", player.Class),
@@ -65,6 +53,12 @@ namespace TextRPG
             Item[] inventory = player.Inventory.ToArray();
             configData.Add("Inventory", JArray.FromObject(inventory));
 
+            //사용중인 플레이어 데이터를 가져와 json에 배열로 기록
+            Skill[] skills = player.Skills.ToArray();
+            configData.Add("Skills", JArray.FromObject(skills));
+
+            Console.WriteLine("= " + player.Skills.Count());
+
             File.WriteAllText(path, configData.ToString());
             
             Save(player.Equipment);
@@ -74,7 +68,7 @@ namespace TextRPG
         //장비 아이템의 변경된 데이터를 원본 파일에 저장하는 함수
         public static void Save(Item[] items)
         {
-            string path = @"..\..\..\Equipment.json";
+            string path = @"..\..\..\data\Equipment.json";
             JObject configData = new JObject();
             configData.Add("Equip", JArray.FromObject(items));
 

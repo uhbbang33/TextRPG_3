@@ -1,0 +1,21 @@
+{
+  "Lv": 1,
+  "Class": "무직",
+  "Atk": 10,
+  "Def": 5,
+  "MaxHP": 100,
+  "Exp": 0,
+  "MaxExp": 50,
+  "Gold": 1000,
+  "Inventory": [
+    {
+      "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "검",
+      "Value": 5,
+      "Description": "흔한 검이다.",
+      "Price": 3
+    }
+  ]
+}

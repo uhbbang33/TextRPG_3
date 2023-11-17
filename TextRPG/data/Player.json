@@ -1,12 +1,12 @@
 {
   "Lv": 1,
   "Class": "전사",
-  "Atk": 18,
+  "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1908,
+  "Gold": 1000,
   "Inventory": [
     {
       "bEquip": true,
@@ -18,7 +18,7 @@
       "Price": 5
     },
     {
-      "bEquip": true,
+      "bEquip": false,
       "_status": 1,
       "type": 0,
       "Name": "검",
@@ -26,5 +26,6 @@
       "Description": "흔한 검이다.",
       "Price": 3
     }
-  ]
+  ],
+  "Skills": []
 }

@@ -1,13 +1,13 @@
 {
   "Equip": [
     {
-      "bEquip": true,
-      "_status": 1,
+      "bEquip": false,
+      "_status": 0,
       "type": 0,
-      "Name": "검",
-      "Value": 5,
-      "Description": "흔한 검이다.",
-      "Price": 3
+      "Name": "",
+      "Value": 0,
+      "Description": null,
+      "Price": 0
     },
     {
       "bEquip": true,

@@ -1,0 +1,57 @@
+{
+  "Lv": 1,
+  "Class": "전사",
+  "Atk": 10,
+  "Def": 5,
+  "MaxHP": 100,
+  "Exp": 5,
+  "MaxExp": 50,
+  "Gold": 1000,
+  "Inventory": [
+    {
+      "bEquip": true,
+      "_status": 2,
+      "type": 1,
+      "Name": "나무 투구",
+      "Value": 1,
+      "Description": "나무로 만들어진 투구이다.",
+      "Price": 5
+    },
+    {
+      "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "검",
+      "Value": 5,
+      "Description": "흔한 검이다.",
+      "Price": 3
+    }
+  ],
+  "Skills": [
+    {
+      "Name": "후드려 패기",
+      "Desc": "후드려 패는 기술이다.",
+      "Damage": 10,
+      "Cost": 10
+    },
+    {
+      "Name": "힘차게 패기",
+      "Desc": "힘차게 패는 기술이다.",
+      "Damage": 11,
+      "Cost": 11
+    },
+    {
+      "Name": "엎드려 패기",
+      "Desc": "엎드려 패는 기술이다.",
+      "Damage": 7,
+      "Cost": 7
+    },
+    {
+      "Name": "약하게 패기",
+      "Desc": "약하게 패는 기술이다.",
+      "Damage": 5,
+      "Cost": 5
+    }
+
+  ]
+}

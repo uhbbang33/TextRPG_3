@@ -139,7 +139,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            _crit = (int)save["Critical"];
+            _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -155,7 +155,7 @@ namespace TextRPG
             }
         }
 
-        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, int critical)
+        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
         {
             this.lv = lv;
             this.job = job;
@@ -213,7 +213,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            _crit = (int)save["Critical"];
+            _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -243,7 +243,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            _crit = (int)save["Critical"];
+            _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장

@@ -62,7 +62,7 @@ namespace TextRPG
         //public static operator ==
     }
 
-    //json파일에서 불러온 스킬들을 담을 구조체
+    //json파일에서 불러온 스킬들을 담을 클래스
     public class Skill
     {
         public string name;
@@ -71,7 +71,7 @@ namespace TextRPG
         public float accuracy;
         public int cost;
 
-        public Skill(string name, string desc, int damage, int accuracy)
+        public Skill(string name, string desc, int damage, float accuracy)
         {
             this.name = name;
             this.desc = desc;

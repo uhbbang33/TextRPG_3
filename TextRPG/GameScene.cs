@@ -224,6 +224,14 @@ namespace TextRPG
 
     }
 
+    class GetNameScene : Scene
+    {
+        public GetNameScene(Scene parent)
+        {
+
+        }
+    }
+
     class TownScene : Scene
     {
         public TownScene(Scene parent)

@@ -781,21 +781,25 @@ namespace TextRPG
 
         public Dungeon Dungeon { get { return _dungeon; } }
 
-        GridBox _monsters;
+        MonsterGridBox _monsters;
         UnitViewer _playerWidget;
+        List<Monster> _monsterList;
+        protected int _difficulty;
 
         public BaseDungeonScene()
         {
-            _playerWidget = new UnitViewer(3, 18);
+            _playerWidget = new UnitViewer(3, 19);
 
-            _monsters = new GridBox();
-            _monsters.SetPosition(45, 0);
+            _monsters = new MonsterGridBox();
+           // _monsters.SetPosition(0, 0);
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
             _choices = new string[] { "공격", "가방" };
             AddScene("Attack", new AttackScene(this));
-            AddScene("Bag", new BagScene(this));            
+            AddScene("Bag", new BagScene(this));
+
+            _monsterList = new List<Monster>();
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -806,7 +810,7 @@ namespace TextRPG
             for (int i = 0; i < count; ++i)
             {
                 UnitViewer textBlock = new UnitViewer();
-                textBlock.SetSize(30, 5);
+                textBlock.SetSize(15, 4);
                 textBlock.SetText(monsters[i].Name, monsters[i].Hp);
                 _monsters.AddItem(textBlock);
             }
@@ -834,6 +838,9 @@ namespace TextRPG
         {   
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
+            _monsterList = _dungeon.GetMonster().ToList();
+
+            _playerWidget.SetSize(30, 4);
             _playerWidget.SetText(game.Player.Class, game.Player.Hp);
         }
 
@@ -842,8 +849,31 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
 
+            DrawMonster();
+
             _monsters.Draw();
             _playerWidget.Draw();
+
+        }
+
+        private void DrawMonster()
+        {
+            int x, y;
+            for (int i = 0; i < _monsterList.Count; ++i)
+            {
+                if (i == 0) { x = 14; y = 2; }
+                else if (i == 1) { x = 50; y = 2; }
+                else if (i == 2) { x = 14; y = 12; }
+                else { x = 50; y = 12; }
+
+                if (_difficulty == 2) { x = 35; y = 2; }
+
+                for (int j = 0; j < _monsterList[i].Display.Length; ++j)
+                {
+                    Console.SetCursorPosition(x, y++);
+                    Console.Write(_monsterList[i].Display[j]);
+                }
+            }
         }
     }
 
@@ -1092,6 +1122,7 @@ namespace TextRPG
     {
         public EasyDungeonScene(Scene parent)
         {
+            _difficulty = 0;
             _dungeon = new Dungeon("마을 근처", 0, 2, 2);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1102,6 +1133,7 @@ namespace TextRPG
     {
         public NormalDungeonScene(Scene parent)
         {
+            _difficulty = 1;
             _dungeon = new Dungeon("성벽 외곽", 1, 7, 7);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1112,6 +1144,7 @@ namespace TextRPG
     {
         public HardDungeonScene(Scene parent)
         {
+            _difficulty = 2;
             _dungeon = new Dungeon("지하 미궁", 2, 20, 14);
             _name = _dungeon.Name;
             _prev = parent;

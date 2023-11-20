@@ -331,7 +331,7 @@ namespace TextRPG
         int _xMargin = 1;
         int _yMargin = 0;
         int _col = 2;
-        List<Widget> _widgets;
+        protected List<Widget> _widgets;
 
         public GridBox()
         {
@@ -366,11 +366,31 @@ namespace TextRPG
             base.Draw(x + _x, y + _y);
         }
 
+        protected void DrawBase(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+
         override public void Clear()
         {
             base.Clear();
             _widgets.Clear();
             _index = 0;
+        }
+    }
+
+    class MonsterGridBox : GridBox
+    {
+        protected override void Draw(int x, int y)
+        {
+            for (int i = 0; i < _widgets.Count; ++i)
+            {
+                if (i == 0) _widgets[i].SetPosition(14, 6);
+                else if( i == 1) _widgets[i].SetPosition(50, 6);
+                else if( i == 2) _widgets[i].SetPosition(14, 16);
+                else if( i == 3) _widgets[i].SetPosition(50, 16);
+            }
+            DrawBase(x, y);
         }
     }
 

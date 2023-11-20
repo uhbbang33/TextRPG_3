@@ -98,42 +98,62 @@ namespace TextRPG
             _reward = new Reward();
 
             // 랜덤한 몬스터 수 결정
-            int monsterCount = Random.Next(1, 5);
+            //int monsterCount = Random.Next(1, 5);
+            int monsterCount;
+            if (difficulty == 2) monsterCount = 1;
+            else monsterCount = Random.Next(1, 5);
 
-            for(int i = 0; i < monsterCount; ++i)
+            for (int i = 0; i < monsterCount; ++i)
             {
-                int MID = Random.Next(0, 7);
-                CreateMonster(MID);
+                CreateMonster(difficulty);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
             }
         }
 
-        void CreateMonster(int MID)
+        void CreateMonster(int difficulty)
         {
-            switch (MID)
+            int MID;
+            if (difficulty == 0)
             {
-                case 0:
-                    _monsters.Add(new Bat());
-                    break;
-
-                case 1:
-                    _monsters.Add(new Centaurs());
-                    break;
-
-                case 2:
-                    _monsters.Add(new Gryphon());
-                    break;
-
-                case 3:
-                    _monsters.Add(new Dragon());
-                    break;
-
-                case 4:
-                    _monsters.Add(new Aardvark());
-                    break;
-
-                case 5:
-                    _monsters.Add(new Unicorn());                    
-                    break;
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Spider());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 1)
+            {
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Frog());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 2)
+            {
+                MID = Random.Next(0, 3);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Dragon());
+                        break;
+                    case 1:
+                        _monsters.Add(new Gryphon());
+                        break;
+                    case 2:
+                        _monsters.Add(new Unicorn());
+                        break;
+                }
             }
         }
 

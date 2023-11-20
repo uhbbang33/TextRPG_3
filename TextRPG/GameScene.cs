@@ -1,6 +1,4 @@
-﻿using static TextRPG.Dungeon;
-
-namespace TextRPG
+﻿namespace TextRPG
 {
     class Scene
     {
@@ -32,7 +30,7 @@ namespace TextRPG
 
         protected void AddScene(string name, Scene scene)
         {
-            if(SceneGroup.ContainsKey(name) == false)
+            if (SceneGroup.ContainsKey(name) == false)
             {
                 SceneGroup.Add(name, scene);
             }
@@ -51,7 +49,7 @@ namespace TextRPG
         protected void ShowGold()
         {
             string playerHasPotion = GameManager.Instance.Player.hasPotion.ToString();
-            _potionText.SetText($"포션 {playerHasPotion,5}EA");
+            _potionText.SetText($"포션 {playerHasPotion, 5}EA");
             _potionText.Draw();
 
             string playerGold = GameManager.Instance.Player.Gold.ToString();
@@ -182,7 +180,7 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사"};
+            _choices = new string[] { "전사", "마법사" };
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -539,8 +537,8 @@ namespace TextRPG
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length)&&(key != ConsoleKey.Q && key != ConsoleKey.E)) return;
-  
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -612,7 +610,7 @@ namespace TextRPG
             ShowPagination();
             ShowGold();
         }
-        
+
         // 아이템 번들 전환 시 화면을 다시 그림
         public void ReDrawItem()
         {
@@ -623,7 +621,7 @@ namespace TextRPG
         //_pagination 전환 코드
         public void ForewardItemBundle()
         {
-            if (_pagination  == 0)
+            if (_pagination == 0)
             {
                 _pagination = _shop.storePageBundle.Count - 1;
             }
@@ -634,13 +632,13 @@ namespace TextRPG
         }
         public void BackwardItemBundle()
         {
-            if (_pagination ==  _shop.storePageBundle.Count - 1)
+            if (_pagination == _shop.storePageBundle.Count - 1)
             {
                 _pagination = 0;
             }
             else
             {
-                _pagination +=  1;
+                _pagination += 1;
             }
         }
 
@@ -859,7 +857,7 @@ namespace TextRPG
 
             _choices = new string[] { "공격", "가방" };
             AddScene("Attack", new AttackScene(this));
-            AddScene("Bag", new BagScene(this));            
+            AddScene("Bag", new BagScene(this));
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -878,7 +876,7 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            switch(key)
+            switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
@@ -895,7 +893,7 @@ namespace TextRPG
         }
 
         public override void Update(GameManager game)
-        {   
+        {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
             _playerWidget.SetText(game.Player.Class, game.Player.Hp);
@@ -950,10 +948,10 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
 
             int idx = 1;
-            foreach(var skill in game.Player.Skills)
+            foreach (var skill in game.Player.Skills)
             {
                 SkillSlot slot = new SkillSlot();
                 slot.SetSkill(idx++, skill);
@@ -998,7 +996,7 @@ namespace TextRPG
                     break;
 
                 default:
-                    if(_dungeon.SelectMonster((int)key - 49))
+                    if (_dungeon.SelectMonster((int)key - 49))
                     {
                         game.ChangeScene(SceneGroup["MonsterTurn"]);
                     }
@@ -1012,10 +1010,10 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
 
             int idx = 1;
-            foreach(var monster in _dungeon.GetMonster())
+            foreach (var monster in _dungeon.GetMonster())
             {
                 UnitViewer slot = new UnitViewer();
                 slot.SetSize(38, 5);
@@ -1047,7 +1045,7 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1]);
@@ -1056,13 +1054,13 @@ namespace TextRPG
         public override void DrawScene()
         {
             base.DrawScene();
-            
+
             battleMsg.Draw();
             Thread.Sleep(2000);
 
 
             // switch 로 바꾸자 
-            switch(state)
+            switch (state)
             {
                 case Dungeon.EDungeoState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
                     GameManager.Instance.ChangeScene(dungdeonStartScene);
@@ -1144,10 +1142,14 @@ namespace TextRPG
             // _choice = game.player.inventory
             List<string> itemNames = new List<string>();
 
-            for(int i = 0; i < game.Player.Inventory.Count; ++i)
+            for (int i = 0; i < game.Player.Inventory.Count; ++i)
             {
                 itemNames.Add(game.Player.Inventory[i].Name);
             }
+
+            //포션 선택지 추가
+            itemNames.Add("포션 마시기");
+
             _choices = itemNames.ToArray();
         }
     }

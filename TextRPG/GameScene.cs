@@ -1,4 +1,7 @@
+﻿using Microsoft.VisualBasic;
+using System.Numerics;
 ﻿using static TextRPG.Dungeon;
+
 
 namespace TextRPG
 {
@@ -28,7 +31,7 @@ namespace TextRPG
         static MessageBox _board = new MessageBox(33, 33, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
-        static TextBlock _pagination = new TextBlock(3, 20, 25, 3);
+        static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
         protected void AddScene(string name, Scene scene)
         {
@@ -59,9 +62,11 @@ namespace TextRPG
             _goldText.Draw();
         }
 
+        int pageNum;
+        int LastPage;
         protected void ShowPagination()
         {
-            _pagination.SetText("◀ 이전 Q / E 다음 ▶");
+            _pagination.SetText($"◀이전 Q  /  E 다음▶");
             _pagination.Draw();
         }
 
@@ -180,6 +185,7 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
+
             _choices = new string[] { "전사", "마법사"};
 
             //위 화면에 출력할 아스키아트 로드
@@ -363,13 +369,22 @@ namespace TextRPG
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-
+            Player player = game.Player;
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
-
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.BackwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
                 case ConsoleKey.D1:
                     game.ChangeScene(SceneGroup["Equip"]);
                     break;
@@ -390,7 +405,7 @@ namespace TextRPG
             base.Update(game);
             Player player = game.Player;
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -404,6 +419,7 @@ namespace TextRPG
             Screen.DrawTopScreen(Display);
 
             _inventoryWidget.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -421,20 +437,32 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length)
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
             }
+            Player player = game.Player;
 
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
 
                 default:
-                    game.Player.EquipItem((int)key - 49);
+                    int index = (int)key - 49 + (player.invenPage* 6);
+                    game.Player.EquipItem(index);
                     game.RefreshScene();
                     break;
             }
@@ -453,7 +481,7 @@ namespace TextRPG
         void SetDisplay(Player player)
         {
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -465,7 +493,7 @@ namespace TextRPG
         {
             List<string> lines = new List<string>();
 
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 Item item = player.Inventory[i];
                 string line = $"{item.Name}";
@@ -480,6 +508,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _inventoryWidget.Draw();
+            ShowPagination();
         }
     }
 
@@ -553,13 +582,14 @@ namespace TextRPG
             _prev = parent;
             _shop = ((ShopScene)Prev).shop;
             _ShopItems = new GridBox();
-            SetDisplay(_shop.storePageBundle, _pagination);
-            SetOption(_shop.storePageBundle, _pagination);
+            SetDisplay();
+            SetOption();
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
+
             if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
@@ -574,20 +604,21 @@ namespace TextRPG
 
                 case ConsoleKey.Q:
                     ForewardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 case ConsoleKey.E:
                     BackwardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 default:
-                    Item item = _shop.storePageBundle[_pagination][(int)key - 49];
+                    int index = ((int)key - 49) + (_pagination * 6);
+                    Item item = _shop.storeItems[index];
                     try
                     {
                         game.Player.Buy(item);
@@ -607,23 +638,23 @@ namespace TextRPG
             }
         }
 
-        void SetDisplay(List<List<Item>> itembundle, int _page)
+        void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0; i < itembundle[_page].Count; ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
-                slot.SetItem(i, _shop.storePageBundle[_pagination][i]);
+                slot.SetItem(i, _shop.storeItems[i]);
                 _ShopItems.AddItem(slot);
             }
         }
 
-        void SetOption(List<List<Item>> itembundle, int _page)
+        void SetOption()
         {
             List<string> lines = new List<string>();
-            foreach (Item item in itembundle[_page])
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
-                string line = $"{item.Name}";
+                string line = $"{_shop.storeItems[i].Name}";
                 lines.Add(line);
             }
             _choices = lines.ToArray();
@@ -637,7 +668,7 @@ namespace TextRPG
             ShowPagination();
             ShowGold();
         }
-        
+
         // 아이템 번들 전환 시 화면을 다시 그림
         public void ReDrawItem()
         {
@@ -648,9 +679,9 @@ namespace TextRPG
         //_pagination 전환 코드
         public void ForewardItemBundle()
         {
-            if (_pagination  == 0)
+            if (_pagination == 0)
             {
-                _pagination = _shop.storePageBundle.Count - 1;
+                _pagination = (_shop.storeItems.Count / 6) - 1;
             }
             else
             {
@@ -659,13 +690,13 @@ namespace TextRPG
         }
         public void BackwardItemBundle()
         {
-            if (_pagination ==  _shop.storePageBundle.Count - 1)
+            if (_pagination == (_shop.storeItems.Count / 6) - 1)
             {
                 _pagination = 0;
             }
             else
             {
-                _pagination +=  1;
+                _pagination += 1;
             }
         }
 
@@ -686,11 +717,13 @@ namespace TextRPG
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length)
+
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
             }
+            Player player = game.Player;
 
             switch (key)
             {
@@ -698,11 +731,23 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
 
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+
                 default:
                     string ItemName = game.Player.Inventory[(int)key - 49].Name;
                     try
                     {
-                        game.Player.Sell((int)key - 49);
+                        int index = (int)key - 49 + (player.invenPage * 6);
+                        game.Player.Sell(index);
                     }
                     catch (IndexOutOfRangeException e)
                     {
@@ -723,7 +768,7 @@ namespace TextRPG
         {
             base.Update(game);
             Player player = game.Player;
-
+            
             SetDisplay(player);
             SetOption(player);
         }
@@ -731,19 +776,21 @@ namespace TextRPG
         void SetDisplay(Player player)
         {
             _playerInventory.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
                 _playerInventory.AddItem(slot);
             }
+
         }
 
         void SetOption(Player player)
         {
             List<string> lines = new List<string>();
-            foreach (Item item in player.Inventory)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
+                Item item = player.Inventory[i];
                 string line = $"{item.Name}";
                 lines.Add(line);
             }
@@ -755,6 +802,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _playerInventory.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -915,7 +963,7 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            switch(key)
+            switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
@@ -936,7 +984,7 @@ namespace TextRPG
         }
 
         public override void Update(GameManager game)
-        {   
+        {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
             _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
@@ -955,6 +1003,7 @@ namespace TextRPG
     class AttackScene : Scene
     {
         protected Dungeon _dungeon;
+
         GridBox _skills;
         public AttackScene(Scene parent)
         {
@@ -1042,7 +1091,7 @@ namespace TextRPG
                     break;
 
                 default:
-                    if(_dungeon.SelectMonster((int)key - 49))
+                    if (_dungeon.SelectMonster((int)key - 49))
                     {
                         game.ChangeScene(SceneGroup["MonsterTurn"]);
                     }
@@ -1101,12 +1150,13 @@ namespace TextRPG
         public override void DrawScene()
         {
             Screen.DrawBotScreen(Option, 3, true);
+
             battleMsg.Draw();
             Thread.Sleep(2000);
 
 
             // switch 로 바꾸자 
-            switch(state)
+            switch (state)
             {
                 case Dungeon.EDungeoState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
                     GameManager.Instance.ChangeScene(dungdeonStartScene);
@@ -1189,7 +1239,7 @@ namespace TextRPG
             // _choice = game.player.inventory
             List<string> itemNames = new List<string>();
 
-            for(int i = 0; i < game.Player.Inventory.Count; ++i)
+            for (int i = 0; i < game.Player.Inventory.Count; ++i)
             {
                 itemNames.Add(game.Player.Inventory[i].Name);
             }

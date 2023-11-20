@@ -276,7 +276,7 @@ namespace TextRPG
             {
                 throw new GoldShortageException();
             }
-            else if (_inventory.Count == 5 && item.type != Item.EType.Potion)// _inventory.Max)
+            else if (_inventory.Count == 40 && item.type != Item.EType.Potion)// _inventory.Max)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -395,5 +395,34 @@ namespace TextRPG
             }
             return dmg;
         }
+
+        public int invenPage = 0;
+        public void ResetPage()
+        {
+            invenPage = 0;
+        }
+        public void ForwardPage()
+        {
+            if (invenPage == 0)
+            {
+                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6)-1;
+            }
+            else
+            {
+                invenPage -= 1;
+            }
+        }
+        public void BackwardPage()
+        {
+            if (invenPage >=  (int)Math.Ceiling((double)Inventory.Count / 6)- 1)
+            {
+                invenPage = 0;
+            }
+            else
+            {
+                invenPage += 1;
+            }
+        }
+
     }
 }

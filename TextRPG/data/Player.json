@@ -12,6 +12,33 @@
   "Inventory": [
     {
       "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "날카로운 검",
+      "Value": 7,
+      "Description": "단단한 강철 검이다.",
+      "Price": 140
+    },
+    {
+      "bEquip": false,
+      "_status": 1,
+      "type": 0,
+      "Name": "고목 지팡이",
+      "Value": 6,
+      "Description": "고목으로 만든 지팡이다.",
+      "Price": 80
+    },
+    {
+      "bEquip": false,
+      "_status": 1,
+      "type": 0,
+      "Name": "나무 지팡이",
+      "Value": 4,
+      "Description": "나무으로 만든 지팡이다.",
+      "Price": 50
+    },
+    {
+      "bEquip": true,
       "_status": 2,
       "type": 1,
       "Name": "나무 투구",
@@ -20,13 +47,50 @@
       "Price": 5
     },
     {
-      "bEquip": true,
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 10,
+      "Description": "낡은 신발이다.",
+      "Price": 20
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 12,
+      "Description": "단단한 판금 갑옷이다.",
+      "Price": 180
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "벨벳 로브",
+      "Value": 8,
+      "Description": "벨벳으로 만든 로브다.",
+      "Price": 150
+    },
+    {
+      "bEquip": false,
       "_status": 1,
       "type": 0,
-      "Name": "완드",
-      "Value": 5,
-      "Description": "흔한 마법봉이다.",
-      "Price": 3
+      "Name": "녹슨 검",
+      "Value": 3,
+      "Description": "낡은 검이다.",
+      "Price": 40
+    },
+    {
+      "bEquip": false,
+      "_status": 2,
+      "type": 1,
+      "Name": "판금 갑옷",
+      "Value": 12,
+      "Description": "단단한 판금 갑옷이다.",
+      "Price": 180
+
     }
   ],
   "Skills": [

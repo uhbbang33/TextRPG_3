@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Numerics;
 
 namespace TextRPG
@@ -149,10 +150,12 @@ namespace TextRPG
 
             _equipManager = new EquipManager();
 
-            foreach (var item in _inventory)
+            for(int i = 0; i < _inventory.Count; ++i)
             {
-                if (item.bEquip)
-                    _equipManager.Wear(item);
+                if (_inventory[i].bEquip)
+                {
+                    EquipItem(i);
+                }
             }
         }
 

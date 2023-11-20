@@ -1,9 +1,3 @@
-
-﻿using Microsoft.VisualBasic;
-using System.Numerics;
-﻿using static TextRPG.Dungeon;
-
-
 namespace TextRPG
 {
     class Scene
@@ -55,7 +49,7 @@ namespace TextRPG
         protected void ShowGold()
         {
             string playerHasPotion = GameManager.Instance.Player.hasPotion.ToString();
-            _potionText.SetText($"포션 {playerHasPotion, 5}EA");
+            _potionText.SetText($"포션 {playerHasPotion,5}EA");
             _potionText.Draw();
 
             string playerGold = GameManager.Instance.Player.Gold.ToString();
@@ -188,7 +182,7 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사"};
+            _choices = new string[] { "전사", "마법사" };
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -268,7 +262,7 @@ namespace TextRPG
 
         override public void HandleInput(GameManager game, ConsoleKey key)
         {
-             
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -439,7 +433,7 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
@@ -463,7 +457,7 @@ namespace TextRPG
                     break;
 
                 default:
-                    int index = (int)key - 49 + (player.invenPage* 6);
+                    int index = (int)key - 49 + (player.invenPage * 6);
                     game.Player.EquipItem(index);
                     game.RefreshScene();
                     break;
@@ -642,7 +636,7 @@ namespace TextRPG
         void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, _shop.storeItems[i]);
@@ -769,7 +763,7 @@ namespace TextRPG
         {
             base.Update(game);
             Player player = game.Player;
-            
+
             SetDisplay(player);
             SetOption(player);
         }
@@ -941,11 +935,11 @@ namespace TextRPG
             _playerWidget = new UnitViewer(3, 19);
 
             _monsters = new MonsterGridBox();
-           // _monsters.SetPosition(0, 0);
+            // _monsters.SetPosition(0, 0);
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
-            _choices = new string[] { "공격", "가방" };
+            _choices = new string[] { "공격", "가방", "포션 마시기" };
             AddScene("Attack", new AttackScene(this));
             AddScene("Bag", new BagScene(this));
 
@@ -981,7 +975,19 @@ namespace TextRPG
                 case ConsoleKey.D2:
                     game.ChangeScene(SceneGroup["Bag"]);
                     break;
+                case ConsoleKey.D3:
+                    bool result;
+                    result = game.Player.DrinkPotion();
 
+                    if(result)
+                    {
+                        ThrowMessage("포션을 마셔 체력을 회복했다.");
+                    }else
+                    {
+                        ThrowMessage("포션이 없습니다.");
+                    }
+
+                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -1072,8 +1078,8 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+
             _skills.Clear();
 
             int idx = 1;
@@ -1137,8 +1143,8 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+
             _monsters.Clear();
             int idx = 1;
             foreach (var monster in _dungeon.GetMonster())
@@ -1275,9 +1281,6 @@ namespace TextRPG
             {
                 itemNames.Add(game.Player.Inventory[i].Name);
             }
-
-            //포션 선택지 추가
-            itemNames.Add("포션 마시기");
 
             _choices = itemNames.ToArray();
         }

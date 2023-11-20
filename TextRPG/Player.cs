@@ -329,12 +329,18 @@ namespace TextRPG
         //포션먹는 매서드
         public bool DrinkPotion()
         {
+
+            //포션이 없을 때
             if(this.hasPotion<=0)
             {
                 return false;
             }
 
+            //포션 개수 감소
             this.hasPotion--;
+
+            //체력 회복 50만큼
+            Hp = Hp + 50;
 
             return true;
         }

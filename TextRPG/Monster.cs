@@ -89,7 +89,7 @@ namespace TextRPG
             _def = 5;
             _goldReward = 10;
             _expReward = 5;
-            _itemReward = new Item("거미줄", "0:0,0:0,0:0", "아무 능력도 없는 거미줄", Item.EType.Potion, 5);
+            _itemReward = new Item("거미줄", "0:0", "아무 능력도 없는 거미줄", Item.EType.Potion, 5);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\spider.txt");
         }
     }
@@ -105,7 +105,7 @@ namespace TextRPG
             _def = 10;
             _goldReward = 15;
             _expReward = 8;
-            _itemReward = new Item("박쥐날개", "1:0,0:0,0:0", "팔면 쏠쏠하다", Item.EType.Potion, 15);
+            _itemReward = new Item("박쥐날개", "0:1", "팔면 쏠쏠하다", Item.EType.Potion, 15);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\bat.txt");
         }
     }
@@ -121,7 +121,7 @@ namespace TextRPG
             _def = 30;
             _goldReward = 30;
             _expReward = 15;
-            _itemReward = new Item("독개구리의 독", "-10:0,0:0,0:0", "먹지 말고 팔자", Item.EType.Potion, 25);
+            _itemReward = new Item("독개구리의 독", "0:-10", "먹지 말고 팔자", Item.EType.Potion, 25);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\frog.txt");
         }
     }
@@ -137,7 +137,7 @@ namespace TextRPG
             _def = 30;
             _goldReward = 50;
             _expReward = 20;
-            _itemReward = new Item("그리폰 부리", "0:0,10:0,15:0", "쪼이면 아프다", Item.EType.Armor, 50);
+            _itemReward = new Item("그리폰 부리", "1:10", "쪼이면 아프다", Item.EType.Armor, 50);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\gryphon.txt");
         }
     }
@@ -153,7 +153,7 @@ namespace TextRPG
             _def = 50;
             _goldReward = 60;
             _expReward = 30;
-            _itemReward = new Item("유니콘 뿔", "0:0,13:0,12:0", "관상용으로도 추천", Item.EType.Weapon, 60);
+            _itemReward = new Item("유니콘 뿔", "2:13", "관상용으로도 추천", Item.EType.Weapon, 60);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\unicorn.txt");
         }
     }
@@ -169,21 +169,8 @@ namespace TextRPG
             _def = 70;
             _goldReward = 100;
             _expReward = 50;
-            _itemReward = new Item("드래곤 비늘", "100:0,0:0,0:0", "비싸다", Item.EType.Potion, 100);
+            _itemReward = new Item("드래곤 비늘", "0:100", "비싸다", Item.EType.Potion, 100);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\dragon.txt");
         }
     }
-
-    //class Monsters
-    //{
-    //    List<Monster> _monsterList = new List<Monster>();
-    //    public List<Monster> MonsterList { get { return _monsterList; } }
-
-    //    public Monsters()
-    //    {
-    //        JObject monsterObj = Loader.LoadMonsterData();
-    //        _monsterList = monsterObj["Monster"].ToObject<List<Monster>>();
-    //    }
-    //}
-
 }

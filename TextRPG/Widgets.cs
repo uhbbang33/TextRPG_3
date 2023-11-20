@@ -454,6 +454,88 @@ namespace TextRPG
             GetChild<Text>("Text5").text = "2. 판매";
         }
 
+        
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+    }
+
+    class ShopQuestInfoWidget : Widget
+    {
+        string _name = "";
+        int _num = 0;
+        int _reward = 0;
+
+        public ShopQuestInfoWidget(int x, int y, Quest quest) : base(x, y)
+        {
+            _maxChildrenCount = 7;
+
+            AddChild("Content", new Border(0, 0, 40, 9));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 2));
+            AddChild("Text3", new Text(2, 3));
+            AddChild("Text4", new Text(2, 5));
+            AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
+
+            _name = quest.Name;
+            _num = quest.Num;
+            _reward = quest.Reward;
+
+            Init();
+        }
+
+        public void Init()
+        {
+            GetChild<Text>("Text1").text = "마침 잘 오셨어요.";
+            GetChild<Text>("Text2").text = $"지금 [{_name}] [{_num}개]가 필요한데";
+            GetChild<Text>("Text3").text = "구해다 주실 수 있나요? ";
+            GetChild<Text>("Text4").text = $"보상: [{_reward} Gold]";
+            GetChild<Text>("Text5").text = "1. 수락";
+            GetChild<Text>("Text6").text = "2. 거절";
+        }
+
+        public void AcceptText()
+        {
+            GetChild<Text>("Text1").text = "정말 감사해요.";
+            GetChild<Text>("Text2").text = $"[{_name}] [{_num}개]를 모으시면";
+            GetChild<Text>("Text3").text = "말을 걸어주세요.";
+            GetChild<Text>("Text4").text = "";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void RefuseText()
+        {
+            GetChild<Text>("Text1").text = "아쉽네요.";
+            GetChild<Text>("Text2").text = "마음이 바뀌면";
+            GetChild<Text>("Text3").text = "말을 걸어주세요.";
+            GetChild<Text>("Text4").text = "";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void CompletedText()
+        {
+            GetChild<Text>("Text1").text = "정말 감사해요.";
+            GetChild<Text>("Text2").text = "소정의 보상을 드릴게요.";
+            GetChild<Text>("Text3").text = "";
+            GetChild<Text>("Text4").text = "나중에 또 도와주세요.";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = $"보상: [{_reward} Gold]";
+        }
+        public void IncompletedText()
+        {
+            GetChild<Text>("Text1").text = "말씀 드린 재료를";
+            GetChild<Text>("Text2").text = "아직 다 모으지 못하신 것 같아요.";
+            GetChild<Text>("Text3").text = "";
+            GetChild<Text>("Text4").text = $"[{_name}] [{_num}개]를 다 모으시면";
+            GetChild<Text>("Text5").text = "말을 걸어주세요.";
+            GetChild<Text>("Text6").text = "";
+        }
+
         protected override void Draw(int x, int y)
         {
             base.Draw(x + _x, y + _y);

@@ -55,5 +55,11 @@
       "accuracy": 0.7
     }
 
-  ]
+  ],
+  "Quest": {
+    "Name": null,
+    "Num": 0,
+    "Reward": 0,
+    "IsMonsterHuntQuest": false
+  }
 }

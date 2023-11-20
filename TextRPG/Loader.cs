@@ -58,6 +58,8 @@ namespace TextRPG
             Skill[] skills = player.Skills.ToArray();
             configData.Add("Skills", JArray.FromObject(skills));
 
+            configData.Add("Quest", JObject.FromObject(player.PlayerQuest));
+
             File.WriteAllText(path, configData.ToString());
             
             Save(player.Equipment);

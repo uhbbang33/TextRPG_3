@@ -524,7 +524,7 @@ namespace TextRPG
             _prev = parent;
             _widget = new ShopInformationDeskWidget(35, 3);
 
-            _choices = new string[] { "구입", "판매" };
+            _choices = new string[] { "구입", "판매", "퀘스트" };
             shop = new Shop();
 
 
@@ -533,6 +533,7 @@ namespace TextRPG
 
             AddScene("Buy", new BuyScene(this));
             AddScene("Sell", new SellScene(this));
+            AddScene("Quest", new ShopQuestScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -552,6 +553,18 @@ namespace TextRPG
                     game.ChangeScene(SceneGroup["Sell"]);
                     break;
 
+                case ConsoleKey.D3:
+                    if (IsQuestCompleted())
+                    {
+                        
+
+                        Thread.Sleep(2000);
+                        game.ChangeScene(_prev);
+                    }
+                    else
+                        game.ChangeScene(SceneGroup["Quest"]);
+                    break;
+
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -564,6 +577,13 @@ namespace TextRPG
             Screen.DrawTopScreen(Display);
             _widget.Draw();
             ShowGold();
+        }
+
+        bool IsQuestCompleted()
+        {
+            //GameManager.Instance.Player.Inventory
+
+            return false;
         }
     }
 
@@ -804,6 +824,79 @@ namespace TextRPG
             _playerInventory.Draw();
             ShowPagination();
             ShowGold();
+        }
+    }
+
+    class ShopQuestScene : Scene
+    {
+        ShopQuestInfoWidget _widget;
+        bool _isQuestAccepted = false;
+        Quest _quest;
+
+        public ShopQuestScene(Scene parent)
+        {
+            _name = "퀘스트";
+            _comment = "퀘스트를 수락하거나 거절합니다.";
+
+            Random random = new Random();
+            List<Quest> questList = GameManager.Instance.QuestList.Quests;
+            _quest = questList[random.Next(0, questList.Count)];
+
+            _widget = new ShopQuestInfoWidget(35, 3, _quest);
+
+            _prev = parent;
+
+            _choices = new string[] { "수락", "거절" };
+
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D1:
+                    if (!_isQuestAccepted)
+                    {
+                        _isQuestAccepted = true;
+                        GameManager.Instance.Player.SetQuest(_quest);
+
+                        _widget.AcceptText();
+                        DrawScene();
+                        Thread.Sleep(2000);
+
+                        _widget.IncompletedText();
+                    }
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D2:
+                    _isQuestAccepted = false;
+                    GameManager.Instance.Player.SetQuestNull();
+
+                    _widget.RefuseText();
+                    DrawScene();
+                    Thread.Sleep(2000);
+
+                    _widget.Init();
+                    game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
         }
     }
 

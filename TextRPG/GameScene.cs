@@ -940,12 +940,10 @@ namespace TextRPG
             _playerWidget = new UnitViewer(3, 19);
 
             _monsters = new MonsterGridBox();
-           // _monsters.SetPosition(0, 0);
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
             _choices = new string[] { "공격", "가방" };
-            AddScene("Attack", new AttackScene(this));
             AddScene("Bag", new BagScene(this));
 
             _monsterList = new List<Monster>();
@@ -974,7 +972,7 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    game.ChangeScene(SceneGroup["Attack"]);
+                    game.ChangeScene(new AttackScene(this));
                     break;
 
                 case ConsoleKey.D2:
@@ -1043,13 +1041,10 @@ namespace TextRPG
             _skills.SetPosition(0, 24);
             _skills.SetColomn(2);
             _skills.SetMargine(1, 0);
-
-            AddScene("SelectMonster", new SelectMonsterScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            // player skill 범위 밖의 입력 걸러내기
             if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + game.Player.Skills.Count)
             {
                 ThrowMessage("잘못된 입력입니다.");
@@ -1064,7 +1059,7 @@ namespace TextRPG
 
                 default:
                     _dungeon.SelectSkill((int)key - 49);
-                    game.ChangeScene(SceneGroup["SelectMonster"]);
+                    game.ChangeScene(new SelectMonsterScene(this));
                     break;
             }
         }
@@ -1188,7 +1183,7 @@ namespace TextRPG
             // switch 로 바꾸자 
             switch (state)
             {
-                case Dungeon.EDungeoState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
+                case Dungeon.EDungeoState.PlayerTurn:
                     GameManager.Instance.ChangeScene(dungdeonStartScene);
                     break;
 

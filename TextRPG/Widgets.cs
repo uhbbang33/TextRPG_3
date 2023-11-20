@@ -224,11 +224,21 @@ namespace TextRPG
 
         public void SetPlayer(Player player)
         {
+            string eqAtk;
+            string eqDef;
+            if (player.Atk - player.BaseAtk > 0)
+                eqAtk = $"( +{player.Atk - player.BaseAtk} )";
+            else
+                eqAtk = "";
+            if (player.Def - player.BaseDef > 0)
+                eqDef = $"( +{player.Def - player.BaseDef} )";
+            else
+                eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
             GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
             GetChild<Text>("ClassText").text = $"Chad ( {player.Class} )";
-            GetChild<Text>("AtkText").text = $"공격력 : {player.Atk}";
-            GetChild<Text>("DefText").text = $"방어력 : {player.Def}";
+            GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
+            GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
         }
@@ -443,7 +453,7 @@ namespace TextRPG
                 GetChild<Text>("HPText").text = "Dead";
             }
             else
-            {                
+            {
                 GetChild<Text>("HPText").text = monsterHP.ToString();
             }
         }
@@ -470,8 +480,8 @@ namespace TextRPG
             _maxChildrenCount = 3;
 
             AddChild("Content", new Border(0, 0, width, height));
-            AddChild("Text1", new Text(2,1));
-            AddChild("Text2", new Text(2,2));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 2));
         }
 
         public void SetText(string main, string sub)

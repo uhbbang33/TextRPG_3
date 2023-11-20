@@ -3,22 +3,20 @@
     internal class Shop
     {
         
-        public List<List<Item>> storePageBundle = new List<List<Item>>();
+        public List<Item> storeItems = new List<Item>();
 
         public Shop()
         {
-            LoadItemCSV(storePageBundle);
+            LoadItemCSV(storeItems);
         }
 
         //CSV를 읽어서 리스트를 넣음
-        static void LoadItemCSV(List<List<Item>> _storePageBundle)
+        static void LoadItemCSV(List<Item> _storeItems)
         {
             StreamReader itemCSV = new StreamReader(@"..\..\..\ItemData.csv");
 
             string strCSV = itemCSV.ReadToEnd();
             string[] CSVLine = strCSV.Split("\n");
-
-            List<Item> StoreItems = new List<Item>();
 
             for (int i = 0; i < CSVLine.Length; i++)
             {
@@ -61,13 +59,8 @@
 
                 Item item = new Item(_name, _status, _description, _type, _price);
 
-                StoreItems.Add(item);
+                _storeItems.Add(item);
                 
-                if (StoreItems.Count > 5 || i == CSVLine.Length - 1)
-                {
-                    _storePageBundle.Add(StoreItems);
-                    StoreItems = new List<Item>();
-                }
             }
 
         }

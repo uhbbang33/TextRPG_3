@@ -1,4 +1,7 @@
-﻿namespace TextRPG
+﻿using Microsoft.VisualBasic;
+using System.Numerics;
+
+namespace TextRPG
 {
     class Scene
     {
@@ -26,7 +29,7 @@
         static MessageBox _board = new MessageBox(33, 28, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
-        static TextBlock _pagination = new TextBlock(3, 20, 25, 3);
+        static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
         // 경고 또는 알림 창
         protected void ThrowMessage(string msg)
@@ -49,10 +52,11 @@
             _goldText.Draw();
         }
 
-
+        int pageNum;
+        int LastPage;
         protected void ShowPagination()
         {
-            _pagination.SetText("◀ 이전 Q / E 다음 ▶");
+            _pagination.SetText($"◀이전 Q  /  E 다음▶");
             _pagination.Draw();
         }
 
@@ -113,7 +117,7 @@
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사", "이어하기"};
+            _choices = new string[] { "전사", "마법사", "이어하기" };
 
             //다음으로 넘어갈 TownScene을 딕셔너리에 추가
             _next.Add("Town", new TownScene(this));
@@ -281,13 +285,22 @@
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-
+            Player player = game.Player;
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
-
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.BackwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
                 case ConsoleKey.D1:
                     game.ChangeScene(_next["Equip"]);
                     break;
@@ -304,7 +317,7 @@
             base.Update(game);
             Player player = game.Player;
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -318,6 +331,7 @@
             Screen.DrawTopScreen(Display);
 
             _inventoryWidget.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -335,16 +349,27 @@
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) return;
-
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+            Player player = game.Player;
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
 
                 default:
-                    game.Player.EquipItem((int)key - 49);
+                    int index = (int)key - 49 + (player.invenPage* 6);
+                    game.Player.EquipItem(index);
                     game.RefreshScene();
                     break;
             }
@@ -363,7 +388,7 @@
         void SetDisplay(Player player)
         {
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -375,7 +400,7 @@
         {
             List<string> lines = new List<string>();
 
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 Item item = player.Inventory[i];
                 string line = $"{item.Name}";
@@ -390,6 +415,7 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _inventoryWidget.Draw();
+            ShowPagination();
         }
     }
 
@@ -461,15 +487,15 @@
             _prev = parent;
             _shop = ((ShopScene)Prev).shop;
             _ShopItems = new GridBox();
-            SetDisplay(_shop.storePageBundle, _pagination);
-            SetOption(_shop.storePageBundle, _pagination);
+            SetDisplay();
+            SetOption();
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length)&&(key != ConsoleKey.Q && key != ConsoleKey.E)) return;
-  
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -478,20 +504,21 @@
 
                 case ConsoleKey.Q:
                     ForewardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 case ConsoleKey.E:
                     BackwardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 default:
-                    Item item = _shop.storePageBundle[_pagination][(int)key - 49];
+                    int index = ((int)key - 49) + (_pagination * 6);
+                    Item item = _shop.storeItems[index];
                     try
                     {
                         game.Player.Buy(item);
@@ -511,23 +538,23 @@
             }
         }
 
-        void SetDisplay(List<List<Item>> itembundle, int _page)
+        void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0; i < itembundle[_page].Count; ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
-                slot.SetItem(i, _shop.storePageBundle[_pagination][i]);
+                slot.SetItem(i, _shop.storeItems[i]);
                 _ShopItems.AddItem(slot);
             }
         }
 
-        void SetOption(List<List<Item>> itembundle, int _page)
+        void SetOption()
         {
             List<string> lines = new List<string>();
-            foreach (Item item in itembundle[_page])
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
-                string line = $"{item.Name}";
+                string line = $"{_shop.storeItems[i].Name}";
                 lines.Add(line);
             }
             _choices = lines.ToArray();
@@ -541,7 +568,7 @@
             ShowPagination();
             ShowGold();
         }
-        
+
         // 아이템 번들 전환 시 화면을 다시 그림
         public void ReDrawItem()
         {
@@ -552,9 +579,9 @@
         //_pagination 전환 코드
         public void ForewardItemBundle()
         {
-            if (_pagination  == 0)
+            if (_pagination == 0)
             {
-                _pagination = _shop.storePageBundle.Count - 1;
+                _pagination = (_shop.storeItems.Count / 6) - 1;
             }
             else
             {
@@ -563,13 +590,13 @@
         }
         public void BackwardItemBundle()
         {
-            if (_pagination ==  _shop.storePageBundle.Count - 1)
+            if (_pagination == (_shop.storeItems.Count / 6) - 1)
             {
                 _pagination = 0;
             }
             else
             {
-                _pagination +=  1;
+                _pagination += 1;
             }
         }
 
@@ -590,19 +617,31 @@
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) return;
-
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+            Player player = game.Player;
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
 
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+
                 default:
                     string ItemName = game.Player.Inventory[(int)key - 49].Name;
                     try
                     {
-                        game.Player.Sell((int)key - 49);
+                        int index = (int)key - 49 + (player.invenPage * 6);
+                        game.Player.Sell(index);
                     }
                     catch (IndexOutOfRangeException e)
                     {
@@ -623,7 +662,7 @@
         {
             base.Update(game);
             Player player = game.Player;
-
+            
             SetDisplay(player);
             SetOption(player);
         }
@@ -631,19 +670,21 @@
         void SetDisplay(Player player)
         {
             _playerInventory.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
                 _playerInventory.AddItem(slot);
             }
+
         }
 
         void SetOption(Player player)
         {
             List<string> lines = new List<string>();
-            foreach (Item item in player.Inventory)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
+                Item item = player.Inventory[i];
                 string line = $"{item.Name}";
                 lines.Add(line);
             }
@@ -655,6 +696,7 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _playerInventory.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -817,7 +859,7 @@
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            switch(key)
+            switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
@@ -834,7 +876,7 @@
         }
 
         public override void Update(GameManager game)
-        {   
+        {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
             _playerWidget.SetText(game.Player.Class, game.Player.Hp);
@@ -857,12 +899,12 @@
 
     class AttackScene : Scene
     {
-        protected Dungeon _dungeon;        
+        protected Dungeon _dungeon;
 
         public AttackScene(Scene parent)
         {
-            _prev = parent;            
-            _next.Add("SelectMonster", new SelectMonsterScene(this));            
+            _prev = parent;
+            _next.Add("SelectMonster", new SelectMonsterScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -884,8 +926,8 @@
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+
             // _choices = game.player.skill
             _choices = new string[] { "종베기", "횡베기" };
         }
@@ -917,7 +959,7 @@
                     break;
 
                 default:
-                    if(_dungeon.SelectMonster((int)key - 49))
+                    if (_dungeon.SelectMonster((int)key - 49))
                     {
                         game.ChangeScene(_next["MonsterTurn"]);
                     }
@@ -931,10 +973,10 @@
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
 
             List<string> monsters = new List<string>();
-            foreach(var monster in _dungeon.GetMonster())
+            foreach (var monster in _dungeon.GetMonster())
             {
                 monsters.Add(monster.Name);
             }
@@ -963,7 +1005,7 @@
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_nextScene).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_nextScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1]);
@@ -972,13 +1014,13 @@
         public override void DrawScene()
         {
             base.DrawScene();
-            
+
             battleMsg.Draw();
             Thread.Sleep(2000);
 
 
             // switch 로 바꾸자 
-            switch(state)
+            switch (state)
             {
                 case Dungeon.EDungunState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
                     GameManager.Instance.ChangeScene(_nextScene);
@@ -1059,7 +1101,7 @@
             // _choice = game.player.inventory
             List<string> itemNames = new List<string>();
 
-            for(int i = 0; i < game.Player.Inventory.Count; ++i)
+            for (int i = 0; i < game.Player.Inventory.Count; ++i)
             {
                 itemNames.Add(game.Player.Inventory[i].Name);
             }

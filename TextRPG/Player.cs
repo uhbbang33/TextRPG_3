@@ -51,6 +51,9 @@ namespace TextRPG
         int lv = 1;
         public int Lv { get { return lv; } }
 
+        string name = "...";
+        public string Name { get { return name; } }
+
         string job = "초보자";
         public string Class { get { return job; } }
 
@@ -132,6 +135,7 @@ namespace TextRPG
             //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화(이어하기)
             JObject save = Loader.LoadData(@"..\..\..\data\Player.json");
             lv = (int)save["Lv"];
+            name = save["Name"].ToString();
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -206,6 +210,7 @@ namespace TextRPG
         {
             JObject save = Loader.LoadData(@"..\..\..\data\wizardData.json");
             lv = (int)save["Lv"];
+            name = save["Name"].ToString();
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -236,6 +241,7 @@ namespace TextRPG
         {
             JObject save = Loader.LoadData(@"..\..\..\data\warriorData.json");
             lv = (int)save["Lv"];
+            name = save["Name"].ToString();
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -344,8 +350,9 @@ namespace TextRPG
 
         public string GetData()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}",
                 lv.ToString(),
+                name,
                 job,
                 atk.ToString(),
                 def.ToString(),

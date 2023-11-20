@@ -228,9 +228,9 @@ namespace TextRPG
         {
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
             GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"Chad ( {player.Class} )";
-            GetChild<Text>("AtkText").text = $"공격력 : {player.Atk}";
-            GetChild<Text>("DefText").text = $"방어력 : {player.Def}";
+            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
+            GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {player.Atk}";
+            GetChild<Text>("DefText").text = $"방어력 : {player.Def} {player.Def}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
             GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";

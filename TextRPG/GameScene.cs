@@ -143,8 +143,10 @@ namespace TextRPG
                     game.ChangeScene(SceneGroup["ClassSelect"]);
                     break;
                 case ConsoleKey.D2://이어하기
-                   
                     game.ChangeScene(SceneGroup["Town"]);
+                    break;
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }

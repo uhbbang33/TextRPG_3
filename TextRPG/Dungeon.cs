@@ -108,7 +108,7 @@ namespace TextRPG
             for (int i = 0; i < monsterCount; ++i)
             {
                 CreateMonster(difficulty);
-                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].Lv, _monsters[i].ItemReward);
             }
         }
 
@@ -180,7 +180,7 @@ namespace TextRPG
                     {
                         /* Reward. Add . Monster's */
                         // Reward - Gold. Exp, Items
-                        _reward.AddReward(10, 2, new Item("더미", "0:0", "des", Item.EType.Weapon, 10));
+                        //_reward.AddReward(10, 2, new Item("더미", "0:0", "des", Item.EType.Weapon, 10));
                         // Reward.Add(_targetMonster.DropReward());
                     }
                     msg = MakeMessage(_player, _targetMonster, dmg, bCrit);            

@@ -959,7 +959,7 @@ namespace TextRPG
             for (int i = 0; i < count; ++i)
             {
                 UnitViewer textBlock = new UnitViewer();
-                textBlock.SetSize(15, 4);
+                textBlock.SetSize(20, 4);
                 textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
                 _monsters.AddItem(textBlock);
             }
@@ -1014,12 +1014,12 @@ namespace TextRPG
             int x, y;
             for (int i = 0; i < _monsterList.Count; ++i)
             {
-                if (i == 0) { x = 14; y = 2; }
-                else if (i == 1) { x = 50; y = 2; }
-                else if (i == 2) { x = 14; y = 12; }
-                else { x = 50; y = 12; }
+                if (i == 0) { x = 19; y = 1; }
+                else if (i == 1) { x = 55; y = 1; }
+                else if (i == 2) { x = 19; y = 11; }
+                else { x = 55; y = 11; }
 
-                if (_difficulty == 2) { x = 35; y = 2; }
+                if (_difficulty == 2) { x = 41; y = 4; }
 
                 for (int j = 0; j < _monsterList[i].Display.Length; ++j)
                 {

@@ -420,10 +420,10 @@ namespace TextRPG
         {
             for (int i = 0; i < _widgets.Count; ++i)
             {
-                if (i == 0) _widgets[i].SetPosition(14, 6);
-                else if( i == 1) _widgets[i].SetPosition(50, 6);
-                else if( i == 2) _widgets[i].SetPosition(14, 16);
-                else if( i == 3) _widgets[i].SetPosition(50, 16);
+                if (i == 0) _widgets[i].SetPosition(14, 5);
+                else if( i == 1) _widgets[i].SetPosition(50, 5);
+                else if( i == 2) _widgets[i].SetPosition(14, 15);
+                else if( i == 3) _widgets[i].SetPosition(50, 15);
             }
             DrawBase(x, y);
         }

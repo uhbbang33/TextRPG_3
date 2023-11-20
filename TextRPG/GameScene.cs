@@ -87,9 +87,10 @@ namespace TextRPG
         {
             _name = "타이틀";
 
-            _display = File.ReadAllLines(@"..\..\..\art\Title.txt");
+            //넘어갈 선택창 생성
+            AddScene("StartOrContinue", new StartOrContinueScene(this));
 
-            AddScene("ClassSelect", new SelectClassScene(this));
+            _display = File.ReadAllLines(@"..\..\..\art\Title.txt");
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
@@ -97,7 +98,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.Enter:
-                    game.ChangeScene(SceneGroup["ClassSelect"]);
+                    game.ChangeScene(SceneGroup["StartOrContinue"]);
                     break;
             }
         }
@@ -109,6 +110,66 @@ namespace TextRPG
         }
     }
 
+
+    class StartOrContinueScene : Scene
+    {
+        public StartOrContinueScene(Scene parent)
+        {
+            _name = "시작 화면";
+            _comment = "새로 캐릭터를 생성하거나 이어하기";
+            _prev = parent;
+
+            //선택 화면에 출력
+            _choices = new string[] { "새로하기", "이어하기" };
+
+            //다음으로 넘어갈 TownScene을 딕셔너리에 추가
+            AddScene("Town", new TownScene(this));
+            //새 캐릭터를 만드는 SelectClassScene을 추가
+            AddScene("ClassSelect", new SelectClassScene(this));
+
+            //위 화면에 출력할 아스키아트 로드
+            SetDisplay();
+        }
+
+        override public void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+                case ConsoleKey.D1://새로하기
+                    game.Player.SetWarrior();
+                    game.ChangeScene(SceneGroup["ClassSelect"]);
+                    break;
+                case ConsoleKey.D2://이어하기
+                   
+                    game.ChangeScene(SceneGroup["Town"]);
+                    break;
+            }
+        }
+
+        //아스키 아트 로드
+        void SetDisplay()
+        {
+            //_display = File.ReadAllLines(@"..\..\..\art\새그림.txt");
+        }
+
+
+        public override void DrawScene()
+        {
+            //씬 이름과 설명 출력
+            base.DrawScene();
+
+            //선택창을 위해 화면 분할
+            Screen.Split();
+            //화면 맨 위부터 화면 그리기
+            Screen.DrawTopScreen(Display, 2);
+        }
+    }
+
+
+
     //직업 선택 씬
     class SelectClassScene : Scene
     {
@@ -119,10 +180,7 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사", "이어하기"};
-
-            //다음으로 넘어갈 TownScene을 딕셔너리에 추가
-            AddScene("Town", new TownScene(this));
+            _choices = new string[] { "전사", "마법사"};
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -143,10 +201,6 @@ namespace TextRPG
                     game.Player.SetWizard();
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
-                case ConsoleKey.D3://이어하기
-                    game.ChangeScene(SceneGroup["Town"]);
-                    break;
-
             }
         }
 
@@ -197,7 +251,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.D0:
-                    game.ChangeScene(_prev);
+                    game.ChangeScene(_prev.Prev);
                     break;
 
                 case ConsoleKey.D1:

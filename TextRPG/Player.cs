@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Numerics;
 
 namespace TextRPG
 {
@@ -314,6 +315,19 @@ namespace TextRPG
         public void ReceiveGold(int gold)
         {
             _gold += gold;
+        }
+
+        //포션먹는 매서드
+        public bool DrinkPotion()
+        {
+            if(this.hasPotion<=0)
+            {
+                return false;
+            }
+
+            this.hasPotion--;
+
+            return true;
         }
 
         public bool Rest()

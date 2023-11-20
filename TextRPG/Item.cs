@@ -71,12 +71,13 @@ namespace TextRPG
         public float accuracy;
         public int cost;
 
-        public Skill(string name, string desc, int damage, float accuracy)
+        public Skill(string name, string desc, float damage, float accuracy, int cost)
         {
             this.name = name;
             this.desc = desc;
             this.damage = damage;
             this.accuracy = accuracy;
+            this.cost = cost;
         }
     }
 }

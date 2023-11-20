@@ -53,7 +53,7 @@ namespace TextRPG
         public int Lv { get { return lv; } }
 
         string name = "...";
-        public string Name { get { return name; } }
+        public string Name { get { return name; } set { name = Name; } }
 
         string job = "초보자";
         public string Class { get { return job; } }
@@ -209,11 +209,11 @@ namespace TextRPG
         }
 
         //클래스 선택창에서 마법사 직업을 골랐을 때, 기존 데이터 덮어씌우기
-        public void SetWizard()
+        public void SetWizard(String getName)
         {
             JObject save = Loader.LoadData(@"..\..\..\data\wizardData.json");
             lv = (int)save["Lv"];
-            name = save["Name"].ToString();
+            name = getName;
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -240,11 +240,11 @@ namespace TextRPG
         }
 
         //클래스 선택창에서 전사 직업을 골랐을 때, 기존 데이터 덮어씌우기
-        public void SetWarrior()
+        public void SetWarrior(String getName)
         {
             JObject save = Loader.LoadData(@"..\..\..\data\warriorData.json");
             lv = (int)save["Lv"];
-            name = save["Name"].ToString();
+            name = getName;
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];

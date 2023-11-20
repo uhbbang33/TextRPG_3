@@ -239,7 +239,7 @@ namespace TextRPG
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
             GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"Chad ( {player.Class} )";
+            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";

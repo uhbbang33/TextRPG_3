@@ -139,7 +139,6 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://새로하기
-                    game.Player.SetWarrior();
                     game.ChangeScene(SceneGroup["ClassSelect"]);
                     break;
                 case ConsoleKey.D2://이어하기
@@ -196,14 +195,11 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://전사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWarrior();
+                    game.Player.SetWarrior(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWizard();
-                    game.ChangeScene(SceneGroup["Town"]);
-                    break;
-                case ConsoleKey.D3:
+                    game.Player.SetWizard(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 default:
@@ -223,22 +219,35 @@ namespace TextRPG
         {
             //씬 이름과 설명 출력
             base.DrawScene();
-
             //선택창을 위해 화면 분할
             Screen.Split();
             //화면 맨 위부터 화면 그리기
             Screen.DrawTopScreen(Display, 2);
         }
 
-    }
-
-    class GetNameScene : Scene
-    {
-        public GetNameScene(Scene parent)
+        private string GetName()
         {
+            Screen.Clear();
 
+            _display = new string[] { "닉네임을 정해주세요 = " };
+
+            //화면 해당 좌표에 출력
+            Screen.DrawScreen(Display, 20, 20);
+
+            //이름 입력 받기
+            string name = Console.ReadLine();
+
+            //길이 제한 10자 초과와 빈칸일 경우 다시 받기
+            if (name != "" && name.Length > 10)
+            {
+                ThrowMessage("10글자 이하로 다시 입력하세요");
+                return GetName();
+            }
+
+            return name;
         }
     }
+
 
     class TownScene : Scene
     {
@@ -979,10 +988,11 @@ namespace TextRPG
                     bool result;
                     result = game.Player.DrinkPotion();
 
-                    if(result)
+                    if (result)
                     {
                         ThrowMessage("포션을 마셔 체력을 회복했다.");
-                    }else
+                    }
+                    else
                     {
                         ThrowMessage("포션이 없습니다.");
                     }
@@ -1162,6 +1172,8 @@ namespace TextRPG
             _monsters.Draw();
         }
     }
+
+
 
     class BattleScene : Scene
     {

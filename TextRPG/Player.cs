@@ -358,8 +358,9 @@ namespace TextRPG
         }
 
         // Attack
-        public int Attack(int SID, Monster monster) // SID : Skill ID
+        public int Attack(int SID, Monster monster, out bool bCrit) // SID : Skill ID
         {
+            bCrit = false;
             int atkOffset = (int)Math.Ceiling(0.1f * Atk);
 
             Random random = new Random();
@@ -367,6 +368,7 @@ namespace TextRPG
 
             if(random.NextDouble() < _crit)
             {
+                bCrit = true;
                 dmg *= 2;
             }
 

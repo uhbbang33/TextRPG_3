@@ -1,13 +1,13 @@
 {
   "Lv": 1,
-  "Class": "전사",
+  "Class": "마법사",
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
   "Gold": 1500,
-  "Critical": 15.0,
+  "Critical": 0.0,
   "HasPotion": 0,
   "Inventory": [
     {
@@ -23,9 +23,9 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "검",
+      "Name": "완드",
       "Value": 5,
-      "Description": "흔한 검이다.",
+      "Description": "흔한 마법봉이다.",
       "Price": 3
     }
   ],

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.Metrics;
+using System.Text;
 
 namespace TextRPG
 {
@@ -247,21 +248,23 @@ namespace TextRPG
             AddChild("Background", new Border(0, 0, width, height));
             AddChild("Content", new Border(2, 1, width - 4, height - 2));
 
-            AddChild("LvLabel", new Text(5, 2));
-            AddChild("LvText", new Text(25, 3));
+            //AddChild("LvLabel", new Text(5, 2));
+            //AddChild("LvText", new Text(25, 3));
 
-            AddChild("EXPLabel", new Text(5, 4));
-            AddChild("EXPText", new Text(13, 5));
+            AddChild("EXPLabel", new Text(5, 2));
+            AddChild("EXPText", new Text(25, 5));
 
-            AddChild("HPLabel", new Text(5, 6));
-            AddChild("HPText", new Text(25, 7));
+            AddChild("ItemLabel", new Text(5, 4));
 
-            AddChild("GoldLabel", new Text(5, 8));
-            AddChild("GoldText", new Text(17, 9));
+            //AddChild("HPLabel", new Text(5, 6));
+            //AddChild("HPText", new Text(25, 7));
 
-            AddChild("LevelUpText", new Text(5, 11));
-            AddChild("AtkText", new Text(25, 13));
-            AddChild("DefText", new Text(25, 15));
+            AddChild("GoldLabel", new Text(5, 17));
+            AddChild("GoldText", new Text(23, 18));
+
+            //AddChild("LevelUpText", new Text(5, 11));
+            //AddChild("AtkText", new Text(25, 13));
+            //AddChild("DefText", new Text(25, 15));
         }
 
         protected override void Draw(int x, int y)
@@ -269,10 +272,32 @@ namespace TextRPG
             base.Draw(_x + x, _y + y);
         }
 
+        public void SetResult(Reward reward)
+        {
+            GetChild<Text>("EXPLabel").text = $"경험치 --------------------";
+            GetChild<Text>("EXPText").text = $"+ {reward.Exp, 3}";
+
+            GetChild<Text>("ItemLabel").text = $"아이템 --------------------";
+            ShowItems(reward.Items);
+
+            GetChild<Text>("GoldLabel").text = $"골드 ----------------------";
+            GetChild<Text>("GoldText").text = $"+ {reward.Gold,5} G";
+        }
+
+        void ShowItems(List<Item> items)
+        {
+            for(int i = 0; i < items.Count; ++i)
+            {
+                AddChild($"Item{i}", new Text(5, 5 + i));
+                string str = $"{items[i].Name} x 1";
+                GetChild<Text>($"Item{i}").text = $"{str, 25}";
+            }            
+        }
+
         public void SetResult(Record before, Record after)
         {
-            GetChild<Text>("LvLabel").text = $"레벨 --------------------------";
-            GetChild<Text>("LvText").text = $"{before.lv,3} --> {after.lv,3}";
+            //GetChild<Text>("LvLabel").text = $"레벨 --------------------------";
+            //GetChild<Text>("LvText").text = $"{before.lv,3} --> {after.lv,3}";
 
             GetChild<Text>("EXPLabel").text = $"경험치 ------------------------";
             GetChild<Text>("EXPText").text = $"{before.exp,3} / {before.maxExp,3} --> {after.exp,3} / {after.maxExp,3}";
@@ -409,35 +434,38 @@ namespace TextRPG
     {
         public UnitViewer() : base()
         {
-            _maxChildrenCount = 3;
+            _maxChildrenCount = 10;
 
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
-            AddChild("HPText", new Text(2, 2));
+            AddChild("LvText", new Text(10, 1));
+            AddChild("HPText", new Text(10, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
         }
 
         public UnitViewer(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 3;
+            _maxChildrenCount = 10;
 
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
+            AddChild("LvText", new Text(10, 1));
             AddChild("HPText", new Text(2, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
         }
 
         public UnitViewer(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            _maxChildrenCount = 3;
+            _maxChildrenCount = 10;
 
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
+            AddChild("LvText", new Text(10, 1));
             AddChild("HPText", new Text(2, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
         }
 
-        public void SetText(string monsterName, int monsterHP)
+        public void SetText(string monsterName, int monsterHP, int monsterLv)
         {
             GetChild<Text>("NameText").text = monsterName;
             if (monsterHP <= 0)
@@ -449,6 +477,7 @@ namespace TextRPG
             else
             {                
                 GetChild<Text>("HPText").text = monsterHP.ToString();
+                GetChild<Text>("LvText").text = $"Lv. {monsterLv, 3}";
             }
         }
 
@@ -471,17 +500,19 @@ namespace TextRPG
     {
         public BattleWidget(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            _maxChildrenCount = 3;
+            _maxChildrenCount = 4;
 
             AddChild("Content", new Border(0, 0, width, height));
-            AddChild("Text1", new Text(2,1));
-            AddChild("Text2", new Text(2,2));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 2));
+            AddChild("Text3", new Text(2, 3));
         }
 
-        public void SetText(string main, string sub)
+        public void SetText(string main, string mid, string sub)
         {
             GetChild<Text>("Text1").text = main;
-            GetChild<Text>("Text2").text = sub;
+            GetChild<Text>("Text2").text = mid;
+            GetChild<Text>("Text3").text = sub;
         }
 
         protected override void Draw(int x, int y)

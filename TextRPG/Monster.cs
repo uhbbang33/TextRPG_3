@@ -39,6 +39,8 @@ namespace TextRPG
 
         protected float _evasion;
 
+        protected int _lv;
+        public int Lv { get { return _lv; } }
 
         public Monster()
         {
@@ -83,7 +85,7 @@ namespace TextRPG
             _maxHp = 10;
             _hp = MaxHp;
             _atk = 10;
-            _def = 30;
+            _def = 1;
             _goldReward = 50;
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\bat.txt");
         }

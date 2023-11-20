@@ -7,7 +7,7 @@
   "Exp": 5,
   "MaxExp": 50,
   "Gold": 1500,
-  "Critical": 15.0,
+  "Critical": 0.0,
   "HasPotion": 0,
   "Inventory": [
     {

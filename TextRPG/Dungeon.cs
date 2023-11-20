@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,6 +65,7 @@ namespace TextRPG
         public Record beforeRecord;
         public Record afterRecord;
         Reward _reward;
+        public Reward Reward { get { return _reward; } }
 
         List<Monster> _monsters;
         Queue<Monster> _monsterOrder;
@@ -98,42 +100,62 @@ namespace TextRPG
             _reward = new Reward();
 
             // 랜덤한 몬스터 수 결정
-            int monsterCount = Random.Next(1, 5);
+            //int monsterCount = Random.Next(1, 5);
+            int monsterCount;
+            if (difficulty == 2) monsterCount = 1;
+            else monsterCount = Random.Next(1, 5);
 
-            for(int i = 0; i < monsterCount; ++i)
+            for (int i = 0; i < monsterCount; ++i)
             {
-                int MID = Random.Next(0, 7);
-                CreateMonster(MID);
+                CreateMonster(difficulty);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
             }
         }
 
-        void CreateMonster(int MID)
+        void CreateMonster(int difficulty)
         {
-            switch (MID)
+            int MID;
+            if (difficulty == 0)
             {
-                case 0:
-                    _monsters.Add(new Bat());
-                    break;
-
-                case 1:
-                    _monsters.Add(new Centaurs());
-                    break;
-
-                case 2:
-                    _monsters.Add(new Gryphon());
-                    break;
-
-                case 3:
-                    _monsters.Add(new Dragon());
-                    break;
-
-                case 4:
-                    _monsters.Add(new Aardvark());
-                    break;
-
-                case 5:
-                    _monsters.Add(new Unicorn());                    
-                    break;
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Spider());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 1)
+            {
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Frog());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 2)
+            {
+                MID = Random.Next(0, 3);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Dragon());
+                        break;
+                    case 1:
+                        _monsters.Add(new Gryphon());
+                        break;
+                    case 2:
+                        _monsters.Add(new Unicorn());
+                        break;
+                }
             }
         }
 
@@ -152,7 +174,8 @@ namespace TextRPG
             switch (state)
             {
                 case EDungeoState.PlayerTurn:
-                    dmg = Attack();
+                    bool bCrit = false;
+                    dmg = Attack(out bCrit);
                     if(CheckTargetMonsterIsAlive() == false)
                     {
                         /* Reward. Add . Monster's */
@@ -160,18 +183,18 @@ namespace TextRPG
                         _reward.AddReward(10, 2, new Item("더미", "0:0", "des", Item.EType.Weapon, 10));
                         // Reward.Add(_targetMonster.DropReward());
                     }
-                    msg = MakeMessage(_player, _targetMonster, dmg);            
+                    msg = MakeMessage(_player, _targetMonster, dmg, bCrit);            
                     break;
 
                 case EDungeoState.MonsterAllDeath:
-                    msg = new string[] { "모든 몬스터를 쓰러트렸습니다.", "보상을 획득합니다." };
+                    msg = new string[] { "모든 몬스터를 쓰러트렸습니다.", "", "보상을 획득합니다." };
                     state = EDungeoState.Clear;
                     break;
 
                 case EDungeoState.MonsterTurn:
                     Monster monster = _monsterOrder.Dequeue();
                     dmg = monster.Attack(_player);
-                    msg = MakeMessage(_targetMonster, _player, dmg);
+                    msg = MakeMessage(monster, _player, dmg);
 
                     if (CheckPlayerIsAlive())
                     {
@@ -186,14 +209,16 @@ namespace TextRPG
             return state;
         }
 
-        string[] MakeMessage(Player attacker, Monster deffender, int dmg)
+        string[] MakeMessage(Player attacker, Monster deffender, int dmg, bool bCrit)
         {
-            string[] msg = new string[2];
+            string[] msg = new string[3];
             string skillName = attacker.Skills[_selectedSkillIndex].name;
             msg[0] = $"{attacker.Class} 의 {skillName}!!";
 
-            if (dmg == 0) msg[1] = "빗나갔습니다.";
-            else msg[1] = $"{deffender.Name} 을(를) 맞췄습니다. 데미지 : {dmg} ]";
+            if (dmg == 0) msg[2] = "빗나갔습니다.";
+            else msg[2] = $"{deffender.Name} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
+
+            if (bCrit) msg[1] = "치명적인 일격!!";
 
             return msg;
         }
@@ -215,11 +240,11 @@ namespace TextRPG
 
         string[] MakeMessage(Monster attacker, Player deffender, int dmg)
         {
-            string[] msg = new string[2];
+            string[] msg = new string[3];
             msg[0] = $"{attacker.Name} 의 공격!!";
 
-            if (dmg == 0) msg[1] = "빗나갔습니다.";
-            else msg[1] = $"{deffender.Class} 을(를) 맞췄습니다. 데미지 : {dmg} ]";
+            if (dmg == 0) msg[2] = "빗나갔습니다.";
+            else msg[2] = $"{deffender.Class} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
 
             return msg;
         }
@@ -249,9 +274,9 @@ namespace TextRPG
             return true;
         }
 
-        int Attack()
+        int Attack(out bool bCrit)
         {
-            int dmg = _player.Attack(_selectedSkillIndex, _targetMonster);
+            int dmg = _player.Attack(_selectedSkillIndex, _targetMonster, out bCrit);
             
             if(SetMonsterOrder())
             {

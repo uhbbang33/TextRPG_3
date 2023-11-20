@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Numerics;
 
 namespace TextRPG
@@ -153,10 +154,12 @@ namespace TextRPG
 
             _equipManager = new EquipManager();
 
-            foreach (var item in _inventory)
+            for(int i = 0; i < _inventory.Count; ++i)
             {
-                if (item.bEquip)
-                    _equipManager.Wear(item);
+                if (_inventory[i].bEquip)
+                {
+                    EquipItem(i);
+                }
             }
         }
 
@@ -282,7 +285,7 @@ namespace TextRPG
             {
                 throw new GoldShortageException();
             }
-            else if (_inventory.Count == 5 && item.type != Item.EType.Potion)// _inventory.Max)
+            else if (_inventory.Count == 40 && item.type != Item.EType.Potion)// _inventory.Max)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -365,8 +368,9 @@ namespace TextRPG
         }
 
         // Attack
-        public int Attack(int SID, Monster monster) // SID : Skill ID
+        public int Attack(int SID, Monster monster, out bool bCrit) // SID : Skill ID
         {
+            bCrit = false;
             int atkOffset = (int)Math.Ceiling(0.1f * Atk);
 
             Random random = new Random();
@@ -374,6 +378,7 @@ namespace TextRPG
 
             if(random.NextDouble() < _crit)
             {
+                bCrit = true;
                 dmg *= 2;
             }
 
@@ -400,5 +405,34 @@ namespace TextRPG
             }
             return dmg;
         }
+
+        public int invenPage = 0;
+        public void ResetPage()
+        {
+            invenPage = 0;
+        }
+        public void ForwardPage()
+        {
+            if (invenPage == 0)
+            {
+                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6)-1;
+            }
+            else
+            {
+                invenPage -= 1;
+            }
+        }
+        public void BackwardPage()
+        {
+            if (invenPage >=  (int)Math.Ceiling((double)Inventory.Count / 6)- 1)
+            {
+                invenPage = 0;
+            }
+            else
+            {
+                invenPage += 1;
+            }
+        }
+
     }
 }

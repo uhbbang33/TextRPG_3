@@ -1,4 +1,10 @@
-﻿namespace TextRPG
+
+﻿using Microsoft.VisualBasic;
+using System.Numerics;
+﻿using static TextRPG.Dungeon;
+
+
+namespace TextRPG
 {
     class Scene
     {
@@ -23,10 +29,10 @@
         protected string[] _display = { };
         public string[] Display { get { return _display; } }
 
-        static MessageBox _board = new MessageBox(33, 28, 40, 5);
+        static MessageBox _board = new MessageBox(33, 33, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
-        static TextBlock _pagination = new TextBlock(3, 20, 25, 3);
+        static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
         protected void AddScene(string name, Scene scene)
         {
@@ -57,9 +63,11 @@
             _goldText.Draw();
         }
 
+        int pageNum;
+        int LastPage;
         protected void ShowPagination()
         {
-            _pagination.SetText("◀ 이전 Q / E 다음 ▶");
+            _pagination.SetText($"◀이전 Q  /  E 다음▶");
             _pagination.Draw();
         }
 
@@ -180,7 +188,7 @@
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사" };
+            _choices = new string[] { "전사", "마법사"};
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -200,6 +208,12 @@
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
                     game.Player.SetWizard();
                     game.ChangeScene(SceneGroup["Town"]);
+                    break;
+                case ConsoleKey.D3:
+                    game.ChangeScene(SceneGroup["Town"]);
+                    break;
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -254,8 +268,7 @@
 
         override public void HandleInput(GameManager game, ConsoleKey key)
         {
-            // 맵이 늘어날 때 마다 스위치 추가하는거 불편한데 . . . 
-            // Dictionary 말고 List 로 할까 
+             
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -280,6 +293,10 @@
 
                 case ConsoleKey.D5:
                     game.ChangeScene(SceneGroup["Temple"]);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -314,6 +331,10 @@
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -350,13 +371,22 @@
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-
+            Player player = game.Player;
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
-
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.BackwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
                 case ConsoleKey.D1:
                     game.ChangeScene(SceneGroup["Equip"]);
                     break;
@@ -364,6 +394,10 @@
                 case ConsoleKey.D2:
                     game.Player.SortInventory();
                     game.RefreshScene();
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -373,7 +407,7 @@
             base.Update(game);
             Player player = game.Player;
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -387,6 +421,7 @@
             Screen.DrawTopScreen(Display);
 
             _inventoryWidget.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -404,16 +439,32 @@
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) return;
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
+            Player player = game.Player;
 
             switch (key)
             {
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
 
                 default:
-                    game.Player.EquipItem((int)key - 49);
+                    int index = (int)key - 49 + (player.invenPage* 6);
+                    game.Player.EquipItem(index);
                     game.RefreshScene();
                     break;
             }
@@ -432,7 +483,7 @@
         void SetDisplay(Player player)
         {
             _inventoryWidget.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
@@ -444,7 +495,7 @@
         {
             List<string> lines = new List<string>();
 
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 Item item = player.Inventory[i];
                 string line = $"{item.Name}";
@@ -459,6 +510,7 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _inventoryWidget.Draw();
+            ShowPagination();
         }
     }
 
@@ -487,8 +539,6 @@
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            base.HandleInput(game, key);
-
             // Set Display
             switch (key)
             {
@@ -502,6 +552,10 @@
 
                 case ConsoleKey.D2:
                     game.ChangeScene(SceneGroup["Sell"]);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -530,15 +584,19 @@
             _prev = parent;
             _shop = ((ShopScene)Prev).shop;
             _ShopItems = new GridBox();
-            SetDisplay(_shop.storePageBundle, _pagination);
-            SetOption(_shop.storePageBundle, _pagination);
+            SetDisplay();
+            SetOption();
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
 
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -547,20 +605,21 @@
 
                 case ConsoleKey.Q:
                     ForewardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 case ConsoleKey.E:
                     BackwardItemBundle();
-                    SetDisplay(_shop.storePageBundle, _pagination);
-                    SetOption(_shop.storePageBundle, _pagination);
+                    SetDisplay();
+                    SetOption();
                     DrawScene();
                     break;
 
                 default:
-                    Item item = _shop.storePageBundle[_pagination][(int)key - 49];
+                    int index = ((int)key - 49) + (_pagination * 6);
+                    Item item = _shop.storeItems[index];
                     try
                     {
                         game.Player.Buy(item);
@@ -580,23 +639,23 @@
             }
         }
 
-        void SetDisplay(List<List<Item>> itembundle, int _page)
+        void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0; i < itembundle[_page].Count; ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
-                slot.SetItem(i, _shop.storePageBundle[_pagination][i]);
+                slot.SetItem(i, _shop.storeItems[i]);
                 _ShopItems.AddItem(slot);
             }
         }
 
-        void SetOption(List<List<Item>> itembundle, int _page)
+        void SetOption()
         {
             List<string> lines = new List<string>();
-            foreach (Item item in itembundle[_page])
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
-                string line = $"{item.Name}";
+                string line = $"{_shop.storeItems[i].Name}";
                 lines.Add(line);
             }
             _choices = lines.ToArray();
@@ -623,7 +682,7 @@
         {
             if (_pagination == 0)
             {
-                _pagination = _shop.storePageBundle.Count - 1;
+                _pagination = (_shop.storeItems.Count / 6) - 1;
             }
             else
             {
@@ -632,7 +691,7 @@
         }
         public void BackwardItemBundle()
         {
-            if (_pagination == _shop.storePageBundle.Count - 1)
+            if (_pagination == (_shop.storeItems.Count / 6) - 1)
             {
                 _pagination = 0;
             }
@@ -659,7 +718,13 @@
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) return;
+
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
+            Player player = game.Player;
 
             switch (key)
             {
@@ -667,11 +732,23 @@
                     game.ChangeScene(_prev);
                     break;
 
+                case ConsoleKey.Q:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+                case ConsoleKey.E:
+                    player.ForwardPage();
+                    Update(game);
+                    DrawScene();
+                    break;
+
                 default:
                     string ItemName = game.Player.Inventory[(int)key - 49].Name;
                     try
                     {
-                        game.Player.Sell((int)key - 49);
+                        int index = (int)key - 49 + (player.invenPage * 6);
+                        game.Player.Sell(index);
                     }
                     catch (IndexOutOfRangeException e)
                     {
@@ -692,7 +769,7 @@
         {
             base.Update(game);
             Player player = game.Player;
-
+            
             SetDisplay(player);
             SetOption(player);
         }
@@ -700,19 +777,21 @@
         void SetDisplay(Player player)
         {
             _playerInventory.Clear();
-            for (int i = 0; i < player.Inventory.Count; ++i)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, player.Inventory[i]);
                 _playerInventory.AddItem(slot);
             }
+
         }
 
         void SetOption(Player player)
         {
             List<string> lines = new List<string>();
-            foreach (Item item in player.Inventory)
+            for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
+                Item item = player.Inventory[i];
                 string line = $"{item.Name}";
                 lines.Add(line);
             }
@@ -724,6 +803,7 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _playerInventory.Draw();
+            ShowPagination();
             ShowGold();
         }
     }
@@ -756,6 +836,10 @@
                     {
                         ThrowMessage("체력을 회복했습니다.");
                     }
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -826,6 +910,10 @@
                 case ConsoleKey.D3:
                     game.ChangeScene(new HardDungeonScene(this));
                     break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -843,21 +931,25 @@
 
         public Dungeon Dungeon { get { return _dungeon; } }
 
-        GridBox _monsters;
+        MonsterGridBox _monsters;
         UnitViewer _playerWidget;
+        List<Monster> _monsterList;
+        protected int _difficulty;
 
         public BaseDungeonScene()
         {
-            _playerWidget = new UnitViewer(3, 18);
+            _playerWidget = new UnitViewer(3, 19);
 
-            _monsters = new GridBox();
-            _monsters.SetPosition(45, 0);
+            _monsters = new MonsterGridBox();
+           // _monsters.SetPosition(0, 0);
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
             _choices = new string[] { "공격", "가방" };
             AddScene("Attack", new AttackScene(this));
             AddScene("Bag", new BagScene(this));
+
+            _monsterList = new List<Monster>();
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -868,8 +960,8 @@
             for (int i = 0; i < count; ++i)
             {
                 UnitViewer textBlock = new UnitViewer();
-                textBlock.SetSize(30, 5);
-                textBlock.SetText(monsters[i].Name, monsters[i].Hp);
+                textBlock.SetSize(15, 4);
+                textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
                 _monsters.AddItem(textBlock);
             }
         }
@@ -889,6 +981,10 @@
                 case ConsoleKey.D2:
                     game.ChangeScene(SceneGroup["Bag"]);
                     break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -896,7 +992,10 @@
         {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
-            _playerWidget.SetText(game.Player.Class, game.Player.Hp);
+            _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
+            _playerWidget.SetSize(30, 4);
+
+            _monsterList = _dungeon.GetMonster().ToList();
         }
 
         public override void DrawScene()
@@ -904,18 +1003,43 @@
             base.DrawScene();
             Screen.DrawTopScreen(Display);
 
+            DrawMonster();
+
             _monsters.Draw();
             _playerWidget.Draw();
+
+        }
+
+        private void DrawMonster()
+        {
+            int x, y;
+            for (int i = 0; i < _monsterList.Count; ++i)
+            {
+                if (i == 0) { x = 14; y = 2; }
+                else if (i == 1) { x = 50; y = 2; }
+                else if (i == 2) { x = 14; y = 12; }
+                else { x = 50; y = 12; }
+
+                if (_difficulty == 2) { x = 35; y = 2; }
+
+                for (int j = 0; j < _monsterList[i].Display.Length; ++j)
+                {
+                    Console.SetCursorPosition(x, y++);
+                    Console.Write(_monsterList[i].Display[j]);
+                }
+            }
         }
     }
 
     class AttackScene : Scene
     {
         protected Dungeon _dungeon;
+
         GridBox _skills;
         public AttackScene(Scene parent)
         {
             _prev = parent;
+
             _skills = new GridBox();
             _skills.SetPosition(0, 24);
             _skills.SetColomn(2);
@@ -948,7 +1072,9 @@
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+            
+            _skills.Clear();
 
             int idx = 1;
             foreach (var skill in game.Player.Skills)
@@ -961,7 +1087,7 @@
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(Option, 3, true);
             _skills.Draw();
         }
     }
@@ -973,6 +1099,7 @@
         public SelectMonsterScene(Scene parent)
         {
             _prev = parent;
+
             _monsters = new GridBox();
             _monsters.SetPosition(0, 24);
             _monsters.SetColomn(2);
@@ -1010,21 +1137,22 @@
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+            
+            _monsters.Clear();
             int idx = 1;
             foreach (var monster in _dungeon.GetMonster())
             {
                 UnitViewer slot = new UnitViewer();
                 slot.SetSize(38, 5);
-                slot.SetText($"{idx++}. {monster.Name}", monster.Hp);
+                slot.SetText($"{idx++}. {monster.Name}", monster.Hp, monster.Lv);
                 _monsters.AddItem(slot);
             }
         }
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(Option, 3, true);
             _monsters.Draw();
         }
     }
@@ -1040,7 +1168,7 @@
         public BattleScene(Scene parent)
         {
             dungdeonStartScene = parent.Prev.Prev;
-            battleMsg = new BattleWidget(3, 28, 40, 5);
+            battleMsg = new BattleWidget(2, 25, 50, 5);
         }
 
         public override void Update(GameManager game)
@@ -1048,12 +1176,12 @@
             if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
-            battleMsg.SetText(msg[0], msg[1]);
+            battleMsg.SetText(msg[0], msg[1], msg[2]);
         }
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(Option, 3, true);
 
             battleMsg.Draw();
             Thread.Sleep(2000);
@@ -1091,8 +1219,9 @@
         ResultWidget _resultwidget;
         public RewardScene(Dungeon dungeon)
         {
-            _resultwidget = new ResultWidget(2, 0, 50, 23);
-            _resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
+            _resultwidget = new ResultWidget(2, 0, 35, 23);
+            //_resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
+            _resultwidget.SetResult(dungeon.Reward);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1132,7 +1261,7 @@
                     break;
 
                 default:
-                    // 소비 아이템만 보이게 할 것인가
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -1158,6 +1287,7 @@
     {
         public EasyDungeonScene(Scene parent)
         {
+            _difficulty = 0;
             _dungeon = new Dungeon("마을 근처", 0, 2, 2);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1168,6 +1298,7 @@
     {
         public NormalDungeonScene(Scene parent)
         {
+            _difficulty = 1;
             _dungeon = new Dungeon("성벽 외곽", 1, 7, 7);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1178,6 +1309,7 @@
     {
         public HardDungeonScene(Scene parent)
         {
+            _difficulty = 2;
             _dungeon = new Dungeon("지하 미궁", 2, 20, 14);
             _name = _dungeon.Name;
             _prev = parent;

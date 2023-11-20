@@ -64,7 +64,8 @@ namespace TextRPG
         int _deltaDef = 0;
         public int Def { get { return def + _deltaDef; } }
 
-       
+        float _crit = 0.3f;
+        public float Crit { get { return _crit; } }
 
         int hp;
         public int Hp
@@ -89,6 +90,8 @@ namespace TextRPG
         int maxHp = 100;
         int _deltaHp = 0;
         public int MaxHp { get { return maxHp + _deltaHp; } }
+
+        float _evasion = 0.2f;
 
         int _exp = 0;
         int _maxExp = 10;
@@ -137,7 +140,7 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
-            
+            _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
@@ -153,7 +156,7 @@ namespace TextRPG
             }
         }
 
-        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold)
+        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
         {
             this.lv = lv;
             this.job = job;
@@ -168,6 +171,8 @@ namespace TextRPG
             Exp = exp;
 
             _gold = gold;
+
+            _crit = critical;
         }
 
         public void EquipItem(int index)
@@ -209,6 +214,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            _crit = (float)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -237,6 +244,8 @@ namespace TextRPG
             _maxExp = (int)save["MaxExp"];
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
+            _crit = (float)save["Critical"];
+            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -308,6 +317,19 @@ namespace TextRPG
             _gold += gold;
         }
 
+        //포션먹는 매서드
+        public bool DrinkPotion()
+        {
+            if(this.hasPotion<=0)
+            {
+                return false;
+            }
+
+            this.hasPotion--;
+
+            return true;
+        }
+
         public bool Rest()
         {
             if (_gold >= 300)
@@ -322,7 +344,7 @@ namespace TextRPG
 
         public string GetData()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
                 lv.ToString(),
                 job,
                 atk.ToString(),
@@ -330,14 +352,47 @@ namespace TextRPG
                 maxHp.ToString(),
                 Exp.ToString(),
                 _maxExp.ToString(),
-                Gold.ToString()
+                Gold.ToString(),
+                _crit.ToString()
                 );
         }
 
         // Attack
-        public int Attack(Monster monster)
+        public int Attack(int SID, Monster monster, out bool bCrit) // SID : Skill ID
         {
-            int dmg = 0;
+            bCrit = false;
+            int atkOffset = (int)Math.Ceiling(0.1f * Atk);
+
+            Random random = new Random();
+            int dmg = random.Next(Atk - atkOffset, Atk + atkOffset + 1);
+
+            if(random.NextDouble() < _crit)
+            {
+                bCrit = true;
+                dmg *= 2;
+            }
+
+            dmg =  (int)(dmg * Skills[SID].damage);
+
+            dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
+
+            return dmg;
+        }
+
+        public int TakeDamage(int damage)
+        {
+            int dmg = damage - Def;
+            if (dmg < 0) dmg = 1;
+
+            Random random = new Random();
+            if (random.NextDouble() > _evasion)
+            {
+                Hp -= dmg;
+            }
+            else
+            {
+                dmg = 0;
+            }
             return dmg;
         }
 

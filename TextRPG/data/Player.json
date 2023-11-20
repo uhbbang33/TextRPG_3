@@ -1,13 +1,14 @@
 {
-  "Lv": 4,
-  "Class": "전사",
-  "Atk": 16,
-  "Def": 4,
+  "Lv": 1,
+  "Class": "마법사",
+  "Atk": 10,
+  "Def": 5,
   "MaxHP": 100,
-  "Exp": 25,
-  "MaxExp": 40,
-  "Gold": 1288,
-  "HasPotion": 1,
+  "Exp": 5,
+  "MaxExp": 50,
+  "Gold": 1500,
+  "Critical": 0.0,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,
@@ -89,32 +90,37 @@
       "Value": 12,
       "Description": "단단한 판금 갑옷이다.",
       "Price": 180
+
     }
   ],
   "Skills": [
     {
-      "name": "후드려 패기",
+      "name": "일반 공격",
       "desc": "후드려 패는 기술이다.",
-      "damage": 10,
-      "cost": 10
+      "damage": 2.0,
+      "accuracy": 1.0,
+      "cost": 0
     },
     {
-      "name": "힘차게 패기",
-      "desc": "힘차게 패는 기술이다.",
-      "damage": 11,
-      "cost": 11
+      "name": "내려 찍기",
+      "desc": "무기로 내려찍는 기술",
+      "damage": 2.0,
+      "accuracy": 0.9,
+      "cost": 0
     },
     {
-      "name": "엎드려 패기",
-      "desc": "엎드려 패는 기술이다.",
-      "damage": 7,
-      "cost": 7
+      "name": "어둠의 다크 슬래시",
+      "desc": "궁극의 기술이다.",
+      "damage": 2.0,
+      "accuracy": 0.8,
+      "cost": 0
     },
     {
-      "name": "약하게 패기",
-      "desc": "약하게 패는 기술이다.",
-      "damage": 5,
-      "cost": 5
+      "name": "뒤에서 베기",
+      "desc": "상대방의 뒤를 잡아 공격하는 기술",
+      "damage": 3.0,
+      "accuracy": 0.7,
+      "cost": 0
     }
   ]
 }

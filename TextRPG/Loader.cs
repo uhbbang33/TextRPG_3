@@ -47,6 +47,7 @@ namespace TextRPG
                 new JProperty("Exp", player.Exp),
                 new JProperty("MaxExp", player.MaxExp),
                 new JProperty("Gold", player.Gold),
+                new JProperty("Critical", player.Crit),
                 new JProperty("HasPotion", player.hasPotion)
                 );
             
@@ -56,6 +57,7 @@ namespace TextRPG
             //사용중인 플레이어 데이터를 가져와 json에 배열로 기록
             Skill[] skills = player.Skills.ToArray();
             configData.Add("Skills", JArray.FromObject(skills));
+
             File.WriteAllText(path, configData.ToString());
             
             Save(player.Equipment);

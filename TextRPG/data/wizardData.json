@@ -6,7 +6,9 @@
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1000,
+  "Gold": 1500,
+  "Critical": 15,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,
@@ -29,28 +31,28 @@
   ],
   "Skills": [
     {
-      "Name": "후드려 패기",
-      "Desc": "후드려 패는 기술이다.",
-      "Damage": 10,
-      "Cost": 10
+      "Name": "일반 공격",
+      "Desc": "손에 있는 무기로 휘두른다.",
+      "Damage": 2,
+      "accuracy": 1
     },
     {
-      "Name": "수리수리마수리",
-      "Desc": "마술로 패는 기술이다.",
-      "Damage": 11,
-      "Cost": 11
+      "Name": "매직클로",
+      "Desc": "마법으로 적을 할퀸다.",
+      "Damage": 2,
+      "accuracy": 0.9
     },
     {
-      "Name": "아브라카다브라",
-      "Desc": "마술로 패는 기술이다.",
-      "Damage": 7,
-      "Cost": 7
+      "Name": "썬더볼트",
+      "Desc": "적에게 번개 공격을 가한다.",
+      "Damage": 2,
+      "accuracy": 0.8
     },
     {
       "Name": "아베다케다브라",
-      "Desc": "마술로 패는 기술이다.",
-      "Damage": 5,
-      "Cost": 5
+      "Desc": "함부로 쓰면 안되는 금술",
+      "Damage": 3,
+      "accuracy": 0.7
     }
 
   ]

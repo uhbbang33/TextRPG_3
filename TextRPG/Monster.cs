@@ -13,7 +13,7 @@ namespace TextRPG
         string _name;
         public string Name { get { return _name; }  set { _name = value; } }
 
-        int _hp;
+        protected int _hp;
         public int Hp { get { return _hp; } }
 
         protected int _maxHp;
@@ -37,24 +37,42 @@ namespace TextRPG
         protected string[] _display;
         public string[] Display { get { return _display; } }
 
+        protected float _evasion;
+
+        protected int _lv;
+        public int Lv { get { return _lv; } }
+
         public Monster()
         {
         }
 
-        public void TakeDamage(int damage)
+        public int TakeDamage(int damage, float accuracy)
         {
-            _hp -= damage;
-            if (_hp < 0)
+            float totalAccuracy = accuracy * (1 - _evasion);
+            int dmg = damage - Def;
+            if (dmg < 0) dmg = 1;
+
+            Random random = new Random();
+            if(random.NextDouble() < totalAccuracy)
             {
-                _hp = 0;
-                _isDead = true;
+                _hp -= dmg;
+                if(_hp < 0)
+                {
+                    _hp = 0;
+                    _isDead = true;
+                }
             }
+            else
+            {
+                dmg = 0;
+            }
+            return dmg;
         }
 
         // Attack
         public int Attack(Player player)
         {
-            int dmg = 0;
+            int dmg = player.TakeDamage(Atk);
             return dmg;
         }
     }
@@ -64,9 +82,10 @@ namespace TextRPG
         public Bat()
         {
             Name = "박쥐";
-            _maxHp = 100;
+            _maxHp = 10;
+            _hp = MaxHp;
             _atk = 10;
-            _def = 30;
+            _def = 1;
             _goldReward = 50;
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\bat.txt");
         }
@@ -77,7 +96,8 @@ namespace TextRPG
         public Unicorn()
         {
             Name = "유니콘";
-            _maxHp = 100;
+            _maxHp = 30;
+            _hp = MaxHp;
             _atk = 10;
             _def = 30;
             _goldReward = 50;
@@ -90,7 +110,8 @@ namespace TextRPG
         public Aardvark()
         {
             Name = "땅돼지";
-            _maxHp = 100;
+            _maxHp = 25;
+            _hp = MaxHp;
             _atk = 10;
             _def = 30;
             _goldReward = 50;
@@ -104,6 +125,7 @@ namespace TextRPG
         {
             Name = "드래곤";
             _maxHp = 100;
+            _hp = MaxHp;
             _atk = 10;
             _def = 30;
             _goldReward = 50;
@@ -116,7 +138,8 @@ namespace TextRPG
         public Centaurs()
         {
             Name = "켄타우로스";
-            _maxHp = 100;
+            _maxHp = 50;
+            _hp = MaxHp;
             _atk = 10;
             _def = 30;
             _goldReward = 50;
@@ -129,7 +152,8 @@ namespace TextRPG
         public Gryphon()
         {
             Name = "그리폰";
-            _maxHp = 100;
+            _maxHp = 75;
+            _hp = MaxHp;
             _atk = 10;
             _def = 30;
             _goldReward = 50;

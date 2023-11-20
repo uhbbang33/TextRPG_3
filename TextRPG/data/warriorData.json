@@ -6,7 +6,9 @@
   "MaxHP": 100,
   "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1000,
+  "Gold": 1500,
+  "Critical": 15,
+  "HasPotion": 0,
   "Inventory": [
     {
       "bEquip": true,
@@ -29,28 +31,28 @@
   ],
   "Skills": [
     {
-      "name": "후드려 패기",
-      "desc": "후드려 패는 기술이다.",
-      "damage": 10,
-      "cost": 10
+      "Name": "일반 공격",
+      "Desc": "후드려 패는 기술이다.",
+      "Damage": 2,
+      "accuracy": 1
     },
     {
-      "name": "힘차게 패기",
-      "desc": "힘차게 패는 기술이다.",
-      "damage": 11,
-      "cost": 11
+      "Name": "내려 찍기",
+      "Desc": "무기로 내려찍는 기술",
+      "Damage": 2,
+      "accuracy": 0.9
     },
     {
-      "name": "엎드려 패기",
-      "desc": "엎드려 패는 기술이다.",
-      "damage": 7,
-      "cost": 7
+      "Name": "어둠의 다크 슬래시",
+      "Desc": "궁극의 기술이다.",
+      "Damage": 2,
+      "accuracy": 0.8
     },
     {
-      "name": "약하게 패기",
-      "desc": "약하게 패는 기술이다.",
-      "damage": 5,
-      "cost": 5
+      "Name": "뒤에서 베기",
+      "Desc": "상대방의 뒤를 잡아 공격하는 기술",
+      "Damage": 3,
+      "accuracy": 0.7
     }
 
   ]

@@ -9,11 +9,10 @@
             //배경, 글자색 초기화
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
-
+            Console.CursorVisible = false;
             Console.Clear();
             //콘솔창 크기 조정
             Screen.SetSize(80, 40);
-
 
             KeyInputHandler keyInputHandle = GameManager.Instance.GetInput;
             GameManager.Instance.RunGame();

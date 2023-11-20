@@ -1,12 +1,14 @@
 ﻿using Microsoft.VisualBasic;
 using System.Numerics;
+﻿using static TextRPG.Dungeon;
+
 
 namespace TextRPG
 {
     class Scene
     {
         // 해당 씬에서 넘어갈 수 있는 다음 씬
-        protected Dictionary<string, Scene> _next = new Dictionary<string, Scene>();
+        protected static Dictionary<string, Scene> SceneGroup = new Dictionary<string, Scene>();
 
         // 해당 씬의 이전 씬
         protected Scene _prev;
@@ -26,10 +28,18 @@ namespace TextRPG
         protected string[] _display = { };
         public string[] Display { get { return _display; } }
 
-        static MessageBox _board = new MessageBox(33, 28, 40, 5);
+        static MessageBox _board = new MessageBox(33, 33, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
         static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
+
+        protected void AddScene(string name, Scene scene)
+        {
+            if(SceneGroup.ContainsKey(name) == false)
+            {
+                SceneGroup.Add(name, scene);
+            }
+        }
 
         // 경고 또는 알림 창
         protected void ThrowMessage(string msg)
@@ -76,17 +86,16 @@ namespace TextRPG
         }
     }
 
-
     class TitleScene : Scene
     {
         public TitleScene()
         {
             _name = "타이틀";
 
-            _display = File.ReadAllLines(@"..\..\..\art\Title.txt");
+            //넘어갈 선택창 생성
+            AddScene("StartOrContinue", new StartOrContinueScene(this));
 
-            _next.Add("ClassSelect", new SelectClassScene(this));
-            _next.Add("Town", new TownScene(this));
+            _display = File.ReadAllLines(@"..\..\..\art\Title.txt");
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
@@ -94,7 +103,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.Enter:
-                    game.ChangeScene(_next["ClassSelect"]);
+                    game.ChangeScene(SceneGroup["StartOrContinue"]);
                     break;
             }
         }
@@ -106,10 +115,69 @@ namespace TextRPG
         }
     }
 
+
+    class StartOrContinueScene : Scene
+    {
+        public StartOrContinueScene(Scene parent)
+        {
+            _name = "시작 화면";
+            _comment = "새로 캐릭터를 생성하거나 이어하기";
+            _prev = parent;
+
+            //선택 화면에 출력
+            _choices = new string[] { "새로하기", "이어하기" };
+
+            //다음으로 넘어갈 TownScene을 딕셔너리에 추가
+            AddScene("Town", new TownScene(this));
+            //새 캐릭터를 만드는 SelectClassScene을 추가
+            AddScene("ClassSelect", new SelectClassScene(this));
+
+            //위 화면에 출력할 아스키아트 로드
+            SetDisplay();
+        }
+
+        override public void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+                case ConsoleKey.D1://새로하기
+                    game.Player.SetWarrior();
+                    game.ChangeScene(SceneGroup["ClassSelect"]);
+                    break;
+                case ConsoleKey.D2://이어하기
+                   
+                    game.ChangeScene(SceneGroup["Town"]);
+                    break;
+            }
+        }
+
+        //아스키 아트 로드
+        void SetDisplay()
+        {
+            //_display = File.ReadAllLines(@"..\..\..\art\새그림.txt");
+        }
+
+
+        public override void DrawScene()
+        {
+            //씬 이름과 설명 출력
+            base.DrawScene();
+
+            //선택창을 위해 화면 분할
+            Screen.Split();
+            //화면 맨 위부터 화면 그리기
+            Screen.DrawTopScreen(Display, 2);
+        }
+    }
+
+
+
     //직업 선택 씬
     class SelectClassScene : Scene
     {
-
         public SelectClassScene(Scene parent)
         {
             _name = "직업 선택";
@@ -117,10 +185,8 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
-            _choices = new string[] { "전사", "마법사", "이어하기" };
 
-            //다음으로 넘어갈 TownScene을 딕셔너리에 추가
-            _next.Add("Town", new TownScene(this));
+            _choices = new string[] { "전사", "마법사"};
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -134,17 +200,19 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://전사 클래스 선택 시, 플레이어 직업 반영
-                    //game.Player.SetWarrior();
-                    game.ChangeScene(_next["Town"]);
+                    game.Player.SetWarrior();
+                    game.ChangeScene(SceneGroup["Town"]);
                     break;
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
-                    //game.Player.SetWizard();
-                    game.ChangeScene(_next["Town"]);
+                    game.Player.SetWizard();
+                    game.ChangeScene(SceneGroup["Town"]);
                     break;
-                case ConsoleKey.D3://이어하기
-                    game.ChangeScene(_next["Town"]);
+                case ConsoleKey.D3:
+                    game.ChangeScene(SceneGroup["Town"]);
                     break;
-
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -168,6 +236,14 @@ namespace TextRPG
 
     }
 
+    class GetNameScene : Scene
+    {
+        public GetNameScene(Scene parent)
+        {
+
+        }
+    }
+
     class TownScene : Scene
     {
         public TownScene(Scene parent)
@@ -178,43 +254,47 @@ namespace TextRPG
 
             _choices = new string[] { "상태보기", "인벤토리", "상점", "던전 입구", "신전" };
 
-            _next.Add("Status", new StatusScene(this));
-            _next.Add("Inventory", new InventoryScene(this));
-            _next.Add("Shop", new ShopScene(this));
-            _next.Add("DungunEntrance", new DungunEntranceScene(this));
-            _next.Add("Temple", new TempleScene(this));
+
+            AddScene("Status", new StatusScene(this));
+            AddScene("Inventory", new InventoryScene(this));
+            AddScene("Shop", new ShopScene(this));
+            AddScene("DungunEntrance", new DungunEntranceScene(this));
+            AddScene("Temple", new TempleScene(this));
 
             SetDisplay();
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
         {
-            // 맵이 늘어날 때 마다 스위치 추가하는거 불편한데 . . . 
-            // Dictionary 말고 List 로 할까 
+             
             switch (key)
             {
                 case ConsoleKey.D0:
-                    game.ChangeScene(_prev);
+                    game.ChangeScene(_prev.Prev);
                     break;
 
                 case ConsoleKey.D1:
-                    game.ChangeScene(_next["Status"]);
+                    game.ChangeScene(SceneGroup["Status"]);
                     break;
 
                 case ConsoleKey.D2:
-                    game.ChangeScene(_next["Inventory"]);
+                    game.ChangeScene(SceneGroup["Inventory"]);
                     break;
 
                 case ConsoleKey.D3:
-                    game.ChangeScene(_next["Shop"]);
+                    game.ChangeScene(SceneGroup["Shop"]);
                     break;
 
                 case ConsoleKey.D4:
-                    game.ChangeScene(_next["DungunEntrance"]);
+                    game.ChangeScene(SceneGroup["DungunEntrance"]);
                     break;
 
                 case ConsoleKey.D5:
-                    game.ChangeScene(_next["Temple"]);
+                    game.ChangeScene(SceneGroup["Temple"]);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -250,6 +330,10 @@ namespace TextRPG
                 case ConsoleKey.D0:
                     game.ChangeScene(_prev);
                     break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -279,7 +363,7 @@ namespace TextRPG
             _prev = parent;
             _choices = new string[] { "장착관리", "아이템 정렬" };
             _inventoryWidget = new GridBox();
-            _next.Add("Equip", new EquipScene(this));
+            AddScene("Equip", new EquipScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -302,12 +386,16 @@ namespace TextRPG
                     DrawScene();
                     break;
                 case ConsoleKey.D1:
-                    game.ChangeScene(_next["Equip"]);
+                    game.ChangeScene(SceneGroup["Equip"]);
                     break;
 
                 case ConsoleKey.D2:
                     game.Player.SortInventory();
                     game.RefreshScene();
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -349,8 +437,13 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
             Player player = game.Player;
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -438,14 +531,12 @@ namespace TextRPG
             _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
 
 
-            _next.Add("Buy", new BuyScene(this));
-            _next.Add("Sell", new SellScene(this));
+            AddScene("Buy", new BuyScene(this));
+            AddScene("Sell", new SellScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            base.HandleInput(game, key);
-
             // Set Display
             switch (key)
             {
@@ -454,11 +545,15 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    game.ChangeScene(_next["Buy"]);
+                    game.ChangeScene(SceneGroup["Buy"]);
                     break;
 
                 case ConsoleKey.D2:
-                    game.ChangeScene(_next["Sell"]);
+                    game.ChangeScene(SceneGroup["Sell"]);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -494,8 +589,13 @@ namespace TextRPG
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
 
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
+  
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -617,8 +717,14 @@ namespace TextRPG
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             base.HandleInput(game, key);
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E)) return;
+
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
             Player player = game.Player;
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -730,6 +836,10 @@ namespace TextRPG
                         ThrowMessage("체력을 회복했습니다.");
                     }
                     break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -768,7 +878,7 @@ namespace TextRPG
             {
                 TextBlock textBlock = new TextBlock(2 + 50 * i, 1 + 3 * i, 50, 3);
                 string dungeon = Utility.MatchCharacterLength(_choices[i], 20);
-                textBlock.SetText($"{i + 1}. {dungeon} | 권장 방어력 {_recommendDef[i]}");
+                textBlock.SetText($"{i + 1}. {dungeon} | 권장 레벨 {_recommendDef[i]}");
                 _panel.AddItem(textBlock);
             }
         }
@@ -799,6 +909,10 @@ namespace TextRPG
                 case ConsoleKey.D3:
                     game.ChangeScene(new HardDungeonScene(this));
                     break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
             }
         }
 
@@ -814,23 +928,13 @@ namespace TextRPG
     {
         protected Dungeon _dungeon;
 
-        int _yLine = 2;
-
-        string[] msg;
-
         public Dungeon Dungeon { get { return _dungeon; } }
 
-        TextBlock _textBlock;
-        ResultWidget _resultWidget;
         GridBox _monsters;
         UnitViewer _playerWidget;
 
         public BaseDungeonScene()
         {
-            _textBlock = new TextBlock();
-            _textBlock.SetSize(70, 3);
-            _resultWidget = new ResultWidget(3, 1, 39, 20);
-
             _playerWidget = new UnitViewer(3, 18);
 
             _monsters = new GridBox();
@@ -838,9 +942,9 @@ namespace TextRPG
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
-            _next.Add("Attack", new AttackScene(this));
-            _next.Add("Bag", new BagScene(this));
             _choices = new string[] { "공격", "가방" };
+            AddScene("Attack", new AttackScene(this));
+            AddScene("Bag", new BagScene(this));            
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -852,7 +956,7 @@ namespace TextRPG
             {
                 UnitViewer textBlock = new UnitViewer();
                 textBlock.SetSize(30, 5);
-                textBlock.SetText(monsters[i].Name, monsters[i].Hp);
+                textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
                 _monsters.AddItem(textBlock);
             }
         }
@@ -866,11 +970,15 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    game.ChangeScene(_next["Attack"]);
+                    game.ChangeScene(SceneGroup["Attack"]);
                     break;
 
                 case ConsoleKey.D2:
-                    game.ChangeScene(_next["Bag"]);
+                    game.ChangeScene(SceneGroup["Bag"]);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -879,21 +987,16 @@ namespace TextRPG
         {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
-            _playerWidget.SetText(game.Player.Class, game.Player.Hp);
+            _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
         }
 
         public override void DrawScene()
         {
-            Screen.Clear();
-            Screen.Split();
-
-            Screen.ShowMapName(_name);
-
+            base.DrawScene();
             Screen.DrawTopScreen(Display);
+
             _monsters.Draw();
             _playerWidget.Draw();
-
-            Screen.DrawBotScreen(Option);
         }
     }
 
@@ -901,15 +1004,27 @@ namespace TextRPG
     {
         protected Dungeon _dungeon;
 
+        GridBox _skills;
         public AttackScene(Scene parent)
         {
             _prev = parent;
-            _next.Add("SelectMonster", new SelectMonsterScene(this));
+
+            _skills = new GridBox();
+            _skills.SetPosition(0, 24);
+            _skills.SetColomn(2);
+            _skills.SetMargine(1, 0);
+
+            AddScene("SelectMonster", new SelectMonsterScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
             // player skill 범위 밖의 입력 걸러내기
+            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + game.Player.Skills.Count)
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
 
             switch (key)
             {
@@ -919,29 +1034,46 @@ namespace TextRPG
 
                 default:
                     _dungeon.SelectSkill((int)key - 49);
-                    game.ChangeScene(_next["SelectMonster"]);
+                    game.ChangeScene(SceneGroup["SelectMonster"]);
                     break;
             }
         }
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+            
+            _skills.Clear();
+            int idx = 1;
+            foreach(var skill in game.Player.Skills)
+            {
+                SkillSlot slot = new SkillSlot();
+                slot.SetSkill(idx++, skill);
+                _skills.AddItem(slot);
+            }
+        }
 
-            // _choices = game.player.skill
-            _choices = new string[] { "종베기", "횡베기" };
+        public override void DrawScene()
+        {
+            Screen.DrawBotScreen(Option, 3, true);
+            _skills.Draw();
         }
     }
 
     class SelectMonsterScene : Scene
     {
         protected Dungeon _dungeon;
-
+        GridBox _monsters;
         public SelectMonsterScene(Scene parent)
         {
             _prev = parent;
-            // if has Scene ? 
-            _next.Add("MonsterTurn", new BattleScene(this));
+
+            _monsters = new GridBox();
+            _monsters.SetPosition(0, 24);
+            _monsters.SetColomn(2);
+            _monsters.SetMargine(1, 0);
+
+            AddScene("MonsterTurn", new BattleScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -961,7 +1093,7 @@ namespace TextRPG
                 default:
                     if (_dungeon.SelectMonster((int)key - 49))
                     {
-                        game.ChangeScene(_next["MonsterTurn"]);
+                        game.ChangeScene(SceneGroup["MonsterTurn"]);
                     }
                     else
                     {
@@ -973,47 +1105,51 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-
-            List<string> monsters = new List<string>();
-            foreach (var monster in _dungeon.GetMonster())
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+            
+            _monsters.Clear();
+            int idx = 1;
+            foreach(var monster in _dungeon.GetMonster())
             {
-                monsters.Add(monster.Name);
+                UnitViewer slot = new UnitViewer();
+                slot.SetSize(38, 5);
+                slot.SetText($"{idx++}. {monster.Name}", monster.Hp, monster.Lv);
+                _monsters.AddItem(slot);
             }
-            _choices = monsters.ToArray();
         }
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(Option, 3, true);
+            _monsters.Draw();
         }
     }
 
     class BattleScene : Scene
     {
-        Scene _nextScene;
+        Scene dungdeonStartScene;
         Dungeon _dungeon;
         string[] msg;
-        Dungeon.EDungunState state;
+        Dungeon.EDungeoState state;
         BattleWidget battleMsg;
 
         public BattleScene(Scene parent)
         {
-            _nextScene = parent.Prev.Prev;
-            battleMsg = new BattleWidget(3, 28, 40, 5);
+            dungdeonStartScene = parent.Prev.Prev;
+            battleMsg = new BattleWidget(2, 25, 50, 5);
         }
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_nextScene).Dungeon;
+            if(_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
-            battleMsg.SetText(msg[0], msg[1]);
+            battleMsg.SetText(msg[0], msg[1], msg[2]);
         }
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(Option, 3, true);
 
             battleMsg.Draw();
             Thread.Sleep(2000);
@@ -1022,23 +1158,24 @@ namespace TextRPG
             // switch 로 바꾸자 
             switch (state)
             {
-                case Dungeon.EDungunState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
-                    GameManager.Instance.ChangeScene(_nextScene);
+                case Dungeon.EDungeoState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
+                    GameManager.Instance.ChangeScene(dungdeonStartScene);
                     break;
 
-                case Dungeon.EDungunState.MonsterTurn:
+                case Dungeon.EDungeoState.MonsterTurn:
                     GameManager.Instance.RefreshScene();
                     break;
 
-                case Dungeon.EDungunState.PlayerDeath:
-                    GameManager.Instance.ChangeScene(_nextScene);
+                case Dungeon.EDungeoState.PlayerDeath:
+                    // Player.소생
+                    GameManager.Instance.ChangeScene(SceneGroup["Town"]);
                     break;
 
-                case Dungeon.EDungunState.MonsterAllDeath:
+                case Dungeon.EDungeoState.MonsterAllDeath:
                     GameManager.Instance.RefreshScene();
                     break;
 
-                case Dungeon.EDungunState.Clear:
+                case Dungeon.EDungeoState.Clear:
                     GameManager.Instance.ChangeScene(new RewardScene(_dungeon));
                     break;
             }
@@ -1050,8 +1187,9 @@ namespace TextRPG
         ResultWidget _resultwidget;
         public RewardScene(Dungeon dungeon)
         {
-            _resultwidget = new ResultWidget(2, 0, 50, 23);
-            _resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
+            _resultwidget = new ResultWidget(2, 0, 35, 23);
+            //_resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
+            _resultwidget.SetResult(dungeon.Reward);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1059,7 +1197,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.D0:
-                    game.ChangeScene(_prev);
+                    game.ChangeScene(SceneGroup["DungunEntrance"]);
                     break;
 
                 default:
@@ -1091,7 +1229,7 @@ namespace TextRPG
                     break;
 
                 default:
-                    // 소비 아이템만 보이게 할 것인가
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }

@@ -1,5 +1,6 @@
 {
   "Lv": 1,
+  "Name": "1",
   "Class": "마법사",
   "Atk": 10,
   "Def": 5,
@@ -87,21 +88,21 @@
       "desc": "마법으로 적을 할퀸다.",
       "damage": 2.0,
       "accuracy": 0.9,
-      "cost": 0
+      "cost": 10
     },
     {
       "name": "썬더볼트",
       "desc": "적에게 번개 공격을 가한다.",
       "damage": 2.0,
       "accuracy": 0.8,
-      "cost": 0
+      "cost": 10
     },
     {
       "name": "아베다케다브라",
       "desc": "함부로 쓰면 안되는 금술",
       "damage": 3.0,
       "accuracy": 0.7,
-      "cost": 0
+      "cost": 20
     }
   ]
 }

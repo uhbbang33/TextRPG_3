@@ -1,8 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System.Diagnostics.Metrics;
-using System.Text;
-
-namespace TextRPG
+﻿namespace TextRPG
 {
     class Widget
     {
@@ -209,21 +205,21 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 11;
+            _maxChildrenCount = 17;
 
-            AddChild("Background", new Border(0, 0, 39, 20));
-
-            AddChild("Content", new Border(2, 1, 35, 18));
-
+            AddChild("Background", new Border(0, 0, 39, 22));
+            AddChild("Content", new Border(2, 1, 35, 20));
+            AddChild("SkillContent", new Border(39, 0, 39, 22));
             AddChild("LvText", new Text(5, 2));
             AddChild("ExpText", new Text(15, 2));
             AddChild("ClassText", new Text(5, 4));
             AddChild("AtkText", new Text(5, 6));
             AddChild("DefText", new Text(5, 8));
             AddChild("HPText", new Text(5, 10));
-            AddChild("CritText", new Text(5, 12));
-            AddChild("GoldText", new Text(5, 14));
-            AddChild("PotionText", new Text(5, 16));
+            AddChild("MPText", new Text(5, 12));
+            AddChild("CritText", new Text(5, 14));
+            AddChild("GoldText", new Text(5, 16));
+            AddChild("PotionText", new Text(5, 18));
         }
 
         public void SetPlayer(Player player)
@@ -240,10 +236,11 @@ namespace TextRPG
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
             GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"Chad ( {player.Class} )";
+            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
+            GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
             GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";
@@ -276,7 +273,7 @@ namespace TextRPG
         public void SetResult(Reward reward)
         {
             GetChild<Text>("EXPLabel").text = $"경험치 --------------------";
-            GetChild<Text>("EXPText").text = $"+ {reward.Exp, 3}";
+            GetChild<Text>("EXPText").text = $"+ {reward.Exp,3}";
 
             GetChild<Text>("ItemLabel").text = $"아이템 --------------------";
             ShowItems(reward.Items);
@@ -287,13 +284,13 @@ namespace TextRPG
 
         void ShowItems(List<Item> items)
         {
-            for(int i = 0; i < items.Count; ++i)
+            for (int i = 0; i < items.Count; ++i)
             {
                 AddChild($"Item{i}", new Text(5, 5 + i));
                 string str = $"{items[i].Name} x 1";
-                str = Utility.MatchCharacterLengthToRight(str, 25,0);
+                str = Utility.MatchCharacterLengthToRight(str, 25, 0);
                 GetChild<Text>($"Item{i}").text = str;
-            }            
+            }
         }
     }
 
@@ -312,7 +309,7 @@ namespace TextRPG
         }
 
         protected override void Draw(int x, int y)
-        {   
+        {
             base.Draw(_x + x, _y + y);
 
             string[] contents = File.ReadAllLines(@"..\..\..\art\LevelUp.txt");
@@ -426,9 +423,9 @@ namespace TextRPG
             for (int i = 0; i < _widgets.Count; ++i)
             {
                 if (i == 0) _widgets[i].SetPosition(14, 6);
-                else if( i == 1) _widgets[i].SetPosition(50, 6);
-                else if( i == 2) _widgets[i].SetPosition(14, 16);
-                else if( i == 3) _widgets[i].SetPosition(50, 16);
+                else if (i == 1) _widgets[i].SetPosition(50, 6);
+                else if (i == 2) _widgets[i].SetPosition(14, 16);
+                else if (i == 3) _widgets[i].SetPosition(50, 16);
             }
             DrawBase(x, y);
         }
@@ -512,7 +509,7 @@ namespace TextRPG
             else
             {
                 GetChild<Text>("HPText").text = monsterHP.ToString();
-                GetChild<Text>("LvText").text = $"Lv. {monsterLv, 3}";
+                GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             }
         }
 

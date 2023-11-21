@@ -4,10 +4,10 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "날카로운 검",
-      "Value": 7,
-      "Description": "단단한 강철 검이다.",
-      "Price": 140
+      "Name": "완드",
+      "Value": 5,
+      "Description": "흔한 완드다.",
+      "Price": 3
     },
     {
       "bEquip": true,

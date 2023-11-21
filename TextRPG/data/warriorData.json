@@ -12,47 +12,51 @@
   "Inventory": [
     {
       "bEquip": true,
-      "_status": 2,
-      "type": 1,
-      "Name": "나무 투구",
-      "Value": 1,
-      "Description": "나무로 만들어진 투구이다.",
-      "Price": 5
-    },
-    {
-      "bEquip": true,
       "_status": 1,
       "type": 0,
       "Name": "검",
       "Value": 5,
       "Description": "흔한 검이다.",
       "Price": 3
-    }
+    },
+    {
+      "bEquip": true,
+      "_status": 2,
+      "type": 1,
+      "Name": "나무 투구",
+      "Value": 1,
+      "Description": "나무로 만들어진 투구이다.",
+      "Price": 5
+}
   ],
   "Skills": [
     {
       "Name": "일반 공격",
       "Desc": "후드려 패는 기술이다.",
       "Damage": 2,
-      "accuracy": 1
+      "accuracy": 1,
+      "cost" : 0
     },
     {
       "Name": "내려 찍기",
       "Desc": "무기로 내려찍는 기술",
       "Damage": 2,
-      "accuracy": 0.9
+      "accuracy": 0.9,
+      "cost": 10
     },
     {
       "Name": "어둠의 다크 슬래시",
       "Desc": "궁극의 기술이다.",
       "Damage": 2,
-      "accuracy": 0.8
+      "accuracy": 0.8,
+      "cost": 20
     },
     {
       "Name": "뒤에서 베기",
       "Desc": "상대방의 뒤를 잡아 공격하는 기술",
       "Damage": 3,
-      "accuracy": 0.7
+      "accuracy": 0.7,
+      "cost": 7
     }
 
   ]

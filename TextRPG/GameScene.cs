@@ -1,8 +1,3 @@
-﻿using Microsoft.VisualBasic;
-using System.Numerics;
-﻿using static TextRPG.Dungeon;
-
-
 namespace TextRPG
 {
     class Scene
@@ -35,7 +30,7 @@ namespace TextRPG
 
         protected void AddScene(string name, Scene scene)
         {
-            if(SceneGroup.ContainsKey(name) == false)
+            if (SceneGroup.ContainsKey(name) == false)
             {
                 SceneGroup.Add(name, scene);
             }
@@ -143,12 +138,13 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://새로하기
-                    game.Player.SetWarrior();
                     game.ChangeScene(SceneGroup["ClassSelect"]);
                     break;
                 case ConsoleKey.D2://이어하기
-                   
                     game.ChangeScene(SceneGroup["Town"]);
+                    break;
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -181,8 +177,7 @@ namespace TextRPG
             _prev = parent;
 
             //선택 화면에 출력
-
-            _choices = new string[] { "전사", "마법사"};
+            _choices = new string[] { "전사", "마법사" };
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -196,14 +191,11 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://전사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWarrior();
+                    game.Player.SetWarrior(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWizard();
-                    game.ChangeScene(SceneGroup["Town"]);
-                    break;
-                case ConsoleKey.D3:
+                    game.Player.SetWizard(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 default:
@@ -223,22 +215,35 @@ namespace TextRPG
         {
             //씬 이름과 설명 출력
             base.DrawScene();
-
             //선택창을 위해 화면 분할
             Screen.Split();
             //화면 맨 위부터 화면 그리기
             Screen.DrawTopScreen(Display, 2);
         }
 
-    }
-
-    class GetNameScene : Scene
-    {
-        public GetNameScene(Scene parent)
+        private string GetName()
         {
+            Screen.Clear();
 
+            _display = new string[] { "닉네임을 정해주세요 = " };
+
+            //화면 해당 좌표에 출력
+            Screen.DrawScreen(Display, 20, 20);
+
+            //이름 입력 받기
+            string name = Console.ReadLine();
+
+            //길이 제한 10자 초과와 빈칸일 경우 다시 받기
+            if (name != "" && name.Length > 10)
+            {
+                ThrowMessage("10글자 이하로 다시 입력하세요");
+                return GetName();
+            }
+
+            return name;
         }
     }
+
 
     class TownScene : Scene
     {
@@ -262,7 +267,7 @@ namespace TextRPG
 
         override public void HandleInput(GameManager game, ConsoleKey key)
         {
-             
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -433,7 +438,7 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
@@ -457,7 +462,7 @@ namespace TextRPG
                     break;
 
                 default:
-                    int index = (int)key - 49 + (player.invenPage* 6);
+                    int index = (int)key - 49 + (player.invenPage * 6);
                     game.Player.EquipItem(index);
                     game.RefreshScene();
                     break;
@@ -591,7 +596,6 @@ namespace TextRPG
                 ThrowMessage("잘못된 입력입니다.");
                 return;
             }
-  
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -637,7 +641,7 @@ namespace TextRPG
         void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, _shop.storeItems[i]);
@@ -764,7 +768,7 @@ namespace TextRPG
         {
             base.Update(game);
             Player player = game.Player;
-            
+
             SetDisplay(player);
             SetOption(player);
         }
@@ -940,13 +944,17 @@ namespace TextRPG
             _monsters = new MonsterGridBox();
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
+            // _monsters.SetPosition(0, 0);
 
             _selects = new GridBox();
             _selects.SetPosition(0, 24);
             _selects.SetColomn(2);
             _selects.SetMargine(1, 0);
 
-            _choices = new string[] { "공격", "가방" };
+
+            _choices = new string[] { "공격", "가방", "포션 마시기" };
+            AddScene("Attack", new AttackScene(this));
+            AddScene("Bag", new BagScene(this));
 
             battleMsg = new BattleWidget(2, 25, 50, 5);
 
@@ -1002,7 +1010,20 @@ namespace TextRPG
                 case ConsoleKey.D2:
                     game.ChangeScene(new BagScene(this));
                     break;
+                case ConsoleKey.D3:
+                    bool result;
+                    result = game.Player.DrinkPotion();
 
+                    if (result)
+                    {
+                        ThrowMessage("포션을 마셔 체력을 회복했다.");
+                    }
+                    else
+                    {
+                        ThrowMessage("포션이 없습니다.");
+                    }
+
+                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -1090,11 +1111,12 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+
             _skills.Clear();
+
             int idx = 1;
-            foreach(var skill in game.Player.Skills)
+            foreach (var skill in game.Player.Skills)
             {
                 SkillSlot slot = new SkillSlot();
                 slot.SetSkill(idx++, skill);
@@ -1152,11 +1174,11 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+
             _monsters.Clear();
             int idx = 1;
-            foreach(var monster in _dungeon.GetMonster())
+            foreach (var monster in _dungeon.GetMonster())
             {
                 UnitViewer slot = new UnitViewer();
                 slot.SetSize(38, 5);
@@ -1171,6 +1193,8 @@ namespace TextRPG
             _monsters.Draw();
         }
     }
+
+
 
     class BattleScene : Scene
     {
@@ -1188,6 +1212,8 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
+            //if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
+
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1], msg[2]);
         }
@@ -1341,6 +1367,7 @@ namespace TextRPG
                 }
             }
 
+
             // 사용할 수 있는 아이템이 없음을 알림 >> ChangeScene 을 호출하지 못해서 갇힘.
         }
 
@@ -1348,6 +1375,9 @@ namespace TextRPG
         {
             base.DrawScene();
             _itemBox.Draw();
+
+            _choices = itemNames.ToArray();
+
         }
     }
 

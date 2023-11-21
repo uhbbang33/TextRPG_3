@@ -12,21 +12,21 @@
   "Inventory": [
     {
       "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "완드",
+      "Value": 5,
+      "Description": "흔한 완드다.",
+      "Price": 3
+    },
+    {
+      "bEquip": true,
       "_status": 2,
       "type": 1,
       "Name": "나무 투구",
       "Value": 1,
       "Description": "나무로 만들어진 투구이다.",
       "Price": 5
-    },
-    {
-      "bEquip": true,
-      "_status": 1,
-      "type": 0,
-      "Name": "완드",
-      "Value": 5,
-      "Description": "흔한 마법봉이다.",
-      "Price": 3
     }
   ],
   "Skills": [
@@ -34,25 +34,29 @@
       "Name": "일반 공격",
       "Desc": "손에 있는 무기로 휘두른다.",
       "Damage": 2,
-      "accuracy": 1
+      "accuracy": 1,
+      "cost": 0
     },
     {
       "Name": "매직클로",
       "Desc": "마법으로 적을 할퀸다.",
       "Damage": 2,
-      "accuracy": 0.9
+      "accuracy": 0.9,
+      "cost": 10
     },
     {
       "Name": "썬더볼트",
       "Desc": "적에게 번개 공격을 가한다.",
       "Damage": 2,
-      "accuracy": 0.8
+      "accuracy": 0.8,
+      "cost": 10
     },
     {
       "Name": "아베다케다브라",
       "Desc": "함부로 쓰면 안되는 금술",
       "Damage": 3,
-      "accuracy": 0.7
+      "accuracy": 0.7,
+      "cost": 20
     }
 
   ]

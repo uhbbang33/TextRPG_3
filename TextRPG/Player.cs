@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Numerics;
 
 namespace TextRPG
 {
 
-    
- 
+
+
     class EquipManager
     {
         Item[] _equips;
@@ -52,6 +50,9 @@ namespace TextRPG
         int lv = 1;
         public int Lv { get { return lv; } }
 
+        string name = "...";
+        public string Name { get { return name; } set { name = Name; } }
+
         string job = "초보자";
         public string Class { get { return job; } }
 
@@ -67,6 +68,9 @@ namespace TextRPG
 
         float _crit = 0.3f;
         public float Crit { get { return _crit; } }
+
+        int mp = 100;
+        public int Mp { get { return mp; } set { mp -= value; } }
 
         int hp;
         public int Hp
@@ -85,12 +89,20 @@ namespace TextRPG
                     // 골드 감소
                     _gold -= (int)(_gold * 0.3f);
                 }
+
+                //포션 먹을 때, 최대 체력 이상으로 회복하지 못하게 함
+                if (hp > maxHp)
+                {
+                    hp = maxHp;
+                }
             }
         }
 
+        int maxMp = 100;
         int maxHp = 100;
         int _deltaHp = 0;
         public int MaxHp { get { return maxHp + _deltaHp; } }
+        public int MaxMp { get { return maxMp; } }
 
         float _evasion = 0.2f;
 
@@ -113,11 +125,12 @@ namespace TextRPG
 
         public int hasPotion = 0;
 
-        public Player() 
+        public Player()
         {
             //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화(이어하기)
             JObject save = Loader.LoadData(@"..\..\..\data\Player.json");
             lv = (int)save["Lv"];
+            name = save["Name"].ToString();
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -135,7 +148,7 @@ namespace TextRPG
 
             _equipManager = new EquipManager();
 
-            for(int i = 0; i < _inventory.Count; ++i)
+            for (int i = 0; i < _inventory.Count; ++i)
             {
                 if (_inventory[i].bEquip)
                 {
@@ -190,10 +203,11 @@ namespace TextRPG
         }
 
         //클래스 선택창에서 마법사 직업을 골랐을 때, 기존 데이터 덮어씌우기
-        public void SetWizard()
+        public void SetWizard(String getName)
         {
             JObject save = Loader.LoadData(@"..\..\..\data\wizardData.json");
             lv = (int)save["Lv"];
+            name = getName;
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -220,10 +234,11 @@ namespace TextRPG
         }
 
         //클래스 선택창에서 전사 직업을 골랐을 때, 기존 데이터 덮어씌우기
-        public void SetWarrior()
+        public void SetWarrior(String getName)
         {
             JObject save = Loader.LoadData(@"..\..\..\data\warriorData.json");
             lv = (int)save["Lv"];
+            name = getName;
             job = save["Class"].ToString();
             atk = (int)save["Atk"];
             def = (int)save["Def"];
@@ -271,7 +286,7 @@ namespace TextRPG
             else
             {
                 _gold -= item.Price;
-               if (item.type != Item.EType.Potion)
+                if (item.type != Item.EType.Potion)
                 {
                     _inventory.Add(item);
                 }
@@ -308,12 +323,18 @@ namespace TextRPG
         //포션먹는 매서드
         public bool DrinkPotion()
         {
-            if(this.hasPotion<=0)
+
+            //포션이 없을 때
+            if (this.hasPotion <= 0)
             {
                 return false;
             }
 
+            //포션 개수 감소
             this.hasPotion--;
+
+            //체력 회복 50만큼
+            Hp = Hp + 50;
 
             return true;
         }
@@ -332,8 +353,9 @@ namespace TextRPG
 
         public string GetData()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}",
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}",
                 lv.ToString(),
+                name,
                 job,
                 atk.ToString(),
                 def.ToString(),
@@ -354,13 +376,13 @@ namespace TextRPG
             Random random = new Random();
             int dmg = random.Next(Atk - atkOffset, Atk + atkOffset + 1);
 
-            if(random.NextDouble() < _crit)
+            if (random.NextDouble() < _crit)
             {
                 bCrit = true;
                 dmg *= (int)(dmg * 1.6f);
             }
 
-            dmg =  (int)(dmg * Skills[SID].damage);
+            dmg = (int)(dmg * Skills[SID].damage);
 
             dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
 
@@ -393,7 +415,7 @@ namespace TextRPG
         {
             if (invenPage == 0)
             {
-                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6)-1;
+                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6) - 1;
             }
             else
             {
@@ -402,7 +424,7 @@ namespace TextRPG
         }
         public void BackwardPage()
         {
-            if (invenPage >=  (int)Math.Ceiling((double)Inventory.Count / 6)- 1)
+            if (invenPage >= (int)Math.Ceiling((double)Inventory.Count / 6) - 1)
             {
                 invenPage = 0;
             }

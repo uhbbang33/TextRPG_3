@@ -642,7 +642,9 @@ namespace TextRPG
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
             AddChild("HPText", new Text(10, 2));
+            AddChild("MPText", new Text(20, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
         public UnitViewer(int x, int y) : base(x, y)
@@ -652,8 +654,10 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
-            AddChild("HPText", new Text(2, 2));
+            AddChild("HPText", new Text(10, 2));
+            AddChild("MPText", new Text(20, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
         public UnitViewer(int x, int y, int width, int height) : base(x, y, width, height)
@@ -663,15 +667,17 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
-            AddChild("HPText", new Text(2, 2));
+            AddChild("HPText", new Text(10, 2));
+            AddChild("MPText", new Text(20, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
-        public void SetText(string monsterName, int monsterHP, int monsterLv)
+        public void SetText(string name, int lv, int hp)
         {
-            GetChild<Text>("NameText").text = monsterName;
-            GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
-            if (monsterHP <= 0)
+            GetChild<Text>("NameText").text = name;
+            GetChild<Text>("LvText").text = $"Lv. {lv,3}";
+            if (hp <= 0)
             {
                 GetChild<Text>("NameText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").SetColor(ConsoleColor.Gray);
@@ -680,8 +686,14 @@ namespace TextRPG
             }
             else
             {
-                GetChild<Text>("HPText").text = monsterHP.ToString();
+                GetChild<Text>("HPText").text = hp.ToString();
             }
+        }
+
+        public void SetText(string name, int lv, int hp, int mp)
+        {
+            SetText(name, lv, hp);
+            GetChild<Text>("MPText").text = mp.ToString();
         }
 
         protected override void Draw(int x, int y)

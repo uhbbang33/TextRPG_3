@@ -608,7 +608,6 @@ namespace TextRPG
             }
         }
 
-
         public void GetExp(int exp, out bool levelUp)
         {
             levelUp = false;

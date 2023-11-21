@@ -1324,7 +1324,7 @@ namespace TextRPG
             {
                 UnitViewer textBlock = new UnitViewer();
                 textBlock.SetSize(20, 4);
-                textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
+                textBlock.SetText(monsters[i].Name, monsters[i].Lv , monsters[i].Hp);
                 _monsters.AddItem(textBlock);
             }
         }
@@ -1370,7 +1370,7 @@ namespace TextRPG
         {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
-            _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
+            _playerWidget.SetText(game.Player.Class, game.Player.Lv, game.Player.Hp, game.Player.Mp);
             _playerWidget.SetSize(30, 4);
 
             _monsterList = _dungeon.GetMonster().ToList();

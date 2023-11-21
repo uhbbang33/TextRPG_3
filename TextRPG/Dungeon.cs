@@ -7,24 +7,6 @@ using System.Threading.Tasks;
 
 namespace TextRPG
 {
-    class Record
-    {
-        public int gold = 0;
-        public int hp = 0;
-        public int exp = 0;
-        public int maxExp = 0;
-        public int lv = 0;
-
-        public void Save(Player player)
-        {
-            gold = player.Gold;
-            maxExp = player.MaxExp;
-            exp = player.Exp;
-            hp = player.Hp;
-            lv = player.Lv;
-        }
-    }
-
     class Reward
     {
         int _gold = 0;

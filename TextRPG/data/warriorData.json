@@ -5,7 +5,7 @@
   "Def": 5,
   "MaxHP": 100,
   "Exp": 5,
-  "MaxExp": 50,
+  "MaxExp": 10,
   "Gold": 1500,
   "Critical": 0.15,
   "HasPotion": 0,

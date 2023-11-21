@@ -664,16 +664,17 @@ namespace TextRPG
         public void SetText(string monsterName, int monsterHP, int monsterLv)
         {
             GetChild<Text>("NameText").text = monsterName;
+            GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             if (monsterHP <= 0)
             {
                 GetChild<Text>("NameText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").SetColor(ConsoleColor.Gray);
+                GetChild<Text>("LvText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").text = "Dead";
             }
             else
             {
                 GetChild<Text>("HPText").text = monsterHP.ToString();
-                GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             }
         }
 

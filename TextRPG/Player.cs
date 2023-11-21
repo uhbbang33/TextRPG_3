@@ -49,6 +49,7 @@ namespace TextRPG
 
     public class Player
     {
+        int _maxLv = 10;
         int lv = 1;
         public int Lv { get { return lv; } }
 
@@ -87,9 +88,6 @@ namespace TextRPG
                 if (hp < 0)
                 {
                     hp = 0;
-
-                    // 골드 감소
-                    _gold -= (int)(_gold * 0.3f);
                 }
 
                 //포션 먹을 때, 최대 체력 이상으로 회복하지 못하게 함
@@ -517,13 +515,13 @@ namespace TextRPG
             if (random.NextDouble() < _crit)
             {
                 bCrit = true;
-                dmg *= (int)(dmg * 1.6f);
+                dmg = (int)(dmg * 1.6f);
             }
 
             dmg = (int)(dmg * Skills[SID].damage);
 
             dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
-
+            if (dmg == 0) bCrit = false;
             return dmg;
         }
 
@@ -573,15 +571,19 @@ namespace TextRPG
         }
 
         public void GetExp(int exp, out bool levelUp)
-        {
+        {            
             levelUp = false;
+            if (lv == _maxLv) return;
+
             _exp += exp;
             if (_exp >= _maxExp)
             {
                 _exp -= _maxExp;
-                _maxExp = _expByLevel[++lv];
                 atk += 2;
                 def += 1;
+
+                _maxExp = ++lv == 10 ? 0 : _expByLevel[lv];
+                hp = MaxHp;
                 levelUp = true;
             }
         }
@@ -632,6 +634,17 @@ namespace TextRPG
         {
             _gold += _playerQuest.Reward;
             //_exp += _playerQuest.ExpReward;
+        }
+
+        public void Revival()
+        {
+            // 골드 감소
+            _gold /= 2;
+            // 체력 회복
+            hp = maxHp;
+            // 경험치 감소
+            _exp -= (int)(MaxExp / 10);
+            _exp = _exp < 0 ? 0 : _exp;
         }
     }
 }

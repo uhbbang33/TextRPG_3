@@ -1426,7 +1426,7 @@ namespace TextRPG
                     break;
 
                 case Dungeon.EDungeoState.GoTown:
-                    // Player.소생
+                    GameManager.Instance.Player.Revival();
                     GameManager.Instance.ChangeScene(SceneGroup["Town"]);
                     break;
             }

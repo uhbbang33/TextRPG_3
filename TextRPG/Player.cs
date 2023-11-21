@@ -88,6 +88,12 @@ namespace TextRPG
                     // 골드 감소
                     _gold -= (int)(_gold * 0.3f);
                 }
+
+                //포션 먹을 때, 최대 체력 이상으로 회복하지 못하게 함
+                if(hp>maxHp)
+                {
+                    hp = maxHp;
+                }
             }
         }
 

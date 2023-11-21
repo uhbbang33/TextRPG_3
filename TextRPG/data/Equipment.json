@@ -4,9 +4,9 @@
       "bEquip": true,
       "_status": 1,
       "type": 0,
-      "Name": "완드",
+      "Name": "검",
       "Value": 5,
-      "Description": "흔한 완드다.",
+      "Description": "흔한 검이다.",
       "Price": 3,
       "HasCount": 0
     },

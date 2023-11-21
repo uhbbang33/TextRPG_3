@@ -433,7 +433,7 @@ namespace TextRPG
     {
         public ShopInformationDeskWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 6;
+            _maxChildrenCount = 7;
 
             AddChild("Content", new Border(0, 0, 40, 9));
             AddChild("Text1", new Text(2, 1));
@@ -441,6 +441,7 @@ namespace TextRPG
             AddChild("Text3", new Text(2, 4));
             AddChild("Text4", new Text(2, 5));
             AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
 
             Init();
         }
@@ -452,6 +453,7 @@ namespace TextRPG
             GetChild<Text>("Text3").text = "무엇을 도와드릴까요?";
             GetChild<Text>("Text4").text = "1. 구입";
             GetChild<Text>("Text5").text = "2. 판매";
+            GetChild<Text>("Text6").text = "3. 퀘스트";
         }
 
         

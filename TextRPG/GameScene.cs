@@ -534,6 +534,7 @@ namespace TextRPG
             AddScene("Buy", new BuyScene(this));
             AddScene("Sell", new SellScene(this));
             AddScene("Quest", new ShopQuestScene(this));
+            AddScene("QuestComplete", new ShopQuestCompleteScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -554,9 +555,9 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D3:
-                    if (IsQuestCompleted())
+                    if (GameManager.Instance.Player.IsQuestComplete())
                     {
-                        
+                        game.ChangeScene(SceneGroup["QuestComplete"]);
 
                         Thread.Sleep(2000);
                         game.ChangeScene(_prev);
@@ -577,13 +578,6 @@ namespace TextRPG
             Screen.DrawTopScreen(Display);
             _widget.Draw();
             ShowGold();
-        }
-
-        bool IsQuestCompleted()
-        {
-            //GameManager.Instance.Player.Inventory
-
-            return false;
         }
     }
 
@@ -829,9 +823,9 @@ namespace TextRPG
 
     class ShopQuestScene : Scene
     {
-        ShopQuestInfoWidget _widget;
+        protected ShopQuestInfoWidget _widget;
         bool _isQuestAccepted = false;
-        Quest _quest;
+        protected Quest _quest;
 
         public ShopQuestScene(Scene parent)
         {
@@ -897,6 +891,23 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+        }
+    }
+
+    class ShopQuestCompleteScene : Scene
+    {
+        ShopQuestInfoWidget _widget;
+        public ShopQuestCompleteScene(Scene parent)
+        {
+            Player player = GameManager.Instance.Player;
+
+            _name = "퀘스트";
+            _comment = "퀘스트를 완료했습니다!";
+            _widget = new ShopQuestInfoWidget(35, 3, player.PlayerQuest);
+            _widget.CompletedText();
+
+            player.GetQuestReward();
+            player.SetQuestNull();
         }
     }
 

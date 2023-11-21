@@ -127,6 +127,8 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } }
         public Quest PlayerQuest { get { return _playerQuest; } }
+        
+        public bool isQuestComplte = false;
 
         public int hasPotion = 0;
 
@@ -444,5 +446,34 @@ namespace TextRPG
             _playerQuest = new Quest(null, 0, 0, false);
         }
 
+        public bool IsQuestComplete()
+        {
+            if (_playerQuest.Name == null)
+                return false;
+
+            int cnt = 0;
+            foreach (var item in _inventory)
+                if (item.Name == _playerQuest.Name)
+                {
+                    ++cnt;
+                    // 아이템 index 기억
+                    
+                }
+
+            if (cnt >= _playerQuest.Num)
+            {
+                // 아이템 삭제
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void GetQuestReward()
+        {
+            _gold += _playerQuest.Reward;
+            //_exp += _playerQuest.ExpReward;
+        }
     }
 }

@@ -54,6 +54,8 @@ namespace TextRPG
 
             try
             {
+                configData.Add("Quest", JObject.FromObject(player.PlayerQuest));
+
                 File.WriteAllText(path, configData.ToString());
             }
             catch(Exception e)

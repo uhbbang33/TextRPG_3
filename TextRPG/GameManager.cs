@@ -26,12 +26,16 @@ namespace TextRPG
         
         Scene _currentScene;
 
+        QuestList _questList;
+        public QuestList QuestList { get { return _questList; } }
+
         private GameManager()
         {
             _instance = this;
-            
-            _currentScene = new TitleScene();
+
+            _questList = new QuestList();
             _player = new Player();
+            _currentScene = new TitleScene();
         }
 
         public void RunGame()

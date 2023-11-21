@@ -1,4 +1,8 @@
-﻿using System.Text;
+using System;
+using System.Diagnostics.Metrics;
+using System.Text;
+using System.Xml.Linq;
+
 namespace TextRPG
 
 {
@@ -155,7 +159,7 @@ namespace TextRPG
             Console.Write("┏");
 
             Screen.SetCursorPosition(x + _width - 1, y);
-            Console.Write("┓");
+            Console.Write($"┓");
 
             Screen.SetCursorPosition(x, y + _height - 1);
             Console.Write("┗");
@@ -326,7 +330,7 @@ namespace TextRPG
 
         void SetText()
         {
-            GetChild<Text>("AtkText").text = "공격력이 0.5 증가합니다.";
+            GetChild<Text>("AtkText").text = "공격력이 2.0 증가합니다.";
             GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
             GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
         }
@@ -432,10 +436,10 @@ namespace TextRPG
         {
             for (int i = 0; i < _widgets.Count; ++i)
             {
-                if (i == 0) _widgets[i].SetPosition(14, 6);
-                else if (i == 1) _widgets[i].SetPosition(50, 6);
-                else if (i == 2) _widgets[i].SetPosition(14, 16);
-                else if (i == 3) _widgets[i].SetPosition(50, 16);
+                if (i == 0) _widgets[i].SetPosition(14, 5);
+                else if (i == 1) _widgets[i].SetPosition(50, 5);
+                else if (i == 2) _widgets[i].SetPosition(14, 15);
+                else if (i == 3) _widgets[i].SetPosition(50, 15);
             }
             DrawBase(x, y);
         }
@@ -445,7 +449,7 @@ namespace TextRPG
     {
         public ShopInformationDeskWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 6;
+            _maxChildrenCount = 7;
 
             AddChild("Content", new Border(0, 0, 40, 9));
             AddChild("Text1", new Text(2, 1));
@@ -453,6 +457,7 @@ namespace TextRPG
             AddChild("Text3", new Text(2, 4));
             AddChild("Text4", new Text(2, 5));
             AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
 
             Init();
         }
@@ -464,11 +469,166 @@ namespace TextRPG
             GetChild<Text>("Text3").text = "무엇을 도와드릴까요?";
             GetChild<Text>("Text4").text = "1. 구입";
             GetChild<Text>("Text5").text = "2. 판매";
+            GetChild<Text>("Text6").text = "3. 퀘스트";
+        }
+
+        
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+    }
+
+    class ShopQuestInfoWidget : Widget
+    {
+        public ShopQuestInfoWidget(int x, int y) : base(x, y)
+        {
+            _maxChildrenCount = 7;
+
+            AddChild("Content", new Border(0, 0, 40, 9));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 2));
+            AddChild("Text3", new Text(2, 3));
+            AddChild("Text4", new Text(2, 5));
+            AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
+        }
+
+        public void Init(Quest quest)
+        {
+            GetChild<Text>("Text1").text = "마침 잘 오셨어요.";
+            GetChild<Text>("Text2").text = $"지금 [{quest.Name}] [{quest.Num}개]가 필요한데";
+            GetChild<Text>("Text3").text = "구해다 주실 수 있나요? ";
+            GetChild<Text>("Text4").text = $"보상: [{quest.Reward} Gold]";
+            GetChild<Text>("Text5").text = "1. 수락";
+            GetChild<Text>("Text6").text = "2. 거절";
+        }
+
+        public void AcceptText(Quest quest)
+        {
+            GetChild<Text>("Text1").text = "정말 감사해요.";
+            GetChild<Text>("Text2").text = $"[{quest.Name}] [{quest.Num}개]를 모으시면";
+            GetChild<Text>("Text3").text = "말을 걸어주세요.";
+            GetChild<Text>("Text4").text = "";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void RefuseText()
+        {
+            GetChild<Text>("Text1").text = "아쉽네요.";
+            GetChild<Text>("Text2").text = "마음이 바뀌면";
+            GetChild<Text>("Text3").text = "말을 걸어주세요.";
+            GetChild<Text>("Text4").text = "";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void CompletedText(Quest quest)
+        {
+            GetChild<Text>("Text1").text = "정말 감사해요.";
+            GetChild<Text>("Text2").text = "소정의 보상을 드릴게요.";
+            GetChild<Text>("Text3").text = "";
+            GetChild<Text>("Text4").text = "나중에 또 도와주세요.";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = $"보상: [{quest.Reward} Gold]";
+        }
+        public void IncompletedText(Quest quest)
+        {
+            GetChild<Text>("Text1").text = "말씀 드린 재료를";
+            GetChild<Text>("Text2").text = "아직 다 모으지 못하신 것 같아요.";
+            GetChild<Text>("Text3").text = "";
+            GetChild<Text>("Text4").text = $"[{quest.Name}] [{quest.Num}개]를 다 모으시면";
+            GetChild<Text>("Text5").text = "말을 걸어주세요.";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void AlreadyHaveQuestText()
+        {
+            GetChild<Text>("Text1").text = "이미 신전 퀘스트를 가지고 계시네요.";
+            GetChild<Text>("Text2").text = "";
+            GetChild<Text>("Text3").text = "신전 퀘스트를 끝내거나 거절하시고";
+            GetChild<Text>("Text4").text = "다시 말을 걸어주세요.";
+            GetChild<Text>("Text5").text = "";
+            GetChild<Text>("Text6").text = "";
         }
 
         protected override void Draw(int x, int y)
         {
             base.Draw(x + _x, y + _y);
+        }
+    }
+
+    class TempleQuestInfoWidget : Widget
+    {
+        public TempleQuestInfoWidget(int x, int y) : base(x, y)
+        {
+            _maxChildrenCount = 11;
+
+            AddChild("Content", new Border(0, 0, 40, 9));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 3));
+            AddChild("Text3", new Text(2, 4));
+            AddChild("Text4", new Text(2, 5));
+            AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
+            AddChild("Text7", new Text(2, 8));
+            AddChild("Text8", new Text(2, 9));
+            AddChild("Text9", new Text(3, 11));
+            AddChild("Text10", new Text(13, 12));
+        }
+
+        public void Init(Quest quest)
+        {
+            GetChild<Text>("Text1").text = "\t\t공고문";
+            GetChild<Text>("Text2").text = $"현재 [{quest.Name}]의";
+            GetChild<Text>("Text3").text = "개체수가 너무 많아";
+            GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
+            GetChild<Text>("Text5").text = $"[{quest.Name}]";
+            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오면";
+            GetChild<Text>("Text7").text = $"[{quest.Reward} Gold]를";
+            GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
+            GetChild<Text>("Text9").text = "";
+            GetChild<Text>("Text10").text = "";
+        }
+
+        public void AcceptQuestText()
+        {
+            GetChild<Text>("Text10").text = "[진행중]";
+        }
+        public void AlreadyHaveQuestText()
+        {
+            GetChild<Text>("Text9").text = "[상점 퀘스트 진행중]";
+            GetChild<Text>("Text10").text = "[진행불가]";
+        }
+
+        public void QuestCompleteText()
+        {
+            GetChild<Text>("Text9").text = "[퀘스트 완료!]";
+            GetChild<Text>("Text10").text = "[보상지급]";
+        }
+        
+        public void RefuseQuestText()
+        {
+            GetChild<Text>("Text9").text = "";
+            GetChild<Text>("Text10").text = "";
+        }
+
+        
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+
+        public override void SetSize(int width, int height)
+        {
+            base.SetSize(width, height);
+            if (GetChild<Border>("Content") != null)
+            {
+                GetChild<Border>("Content").SetSize(width, height);
+            }
         }
     }
 
@@ -510,16 +670,17 @@ namespace TextRPG
         public void SetText(string monsterName, int monsterHP, int monsterLv)
         {
             GetChild<Text>("NameText").text = monsterName;
+            GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             if (monsterHP <= 0)
             {
                 GetChild<Text>("NameText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").SetColor(ConsoleColor.Gray);
+                GetChild<Text>("LvText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").text = "Dead";
             }
             else
             {
                 GetChild<Text>("HPText").text = monsterHP.ToString();
-                GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             }
         }
 
@@ -688,7 +849,7 @@ namespace TextRPG
             Console.Write("┫");
         }
 
-        public static void ShowMapName(string name, string comment = "") // 색상 설정?
+        public static void ShowMapName(string name, string comment = "") 
         {
             DeleteLine(1);
 
@@ -728,7 +889,7 @@ namespace TextRPG
         {
             ClearTopScreen();
             int y = 2;
-
+            
             for (int i = 0; i < contents.Length; ++i)
             {
                 if (space) y++;

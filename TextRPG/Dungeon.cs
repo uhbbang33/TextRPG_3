@@ -7,24 +7,6 @@ using System.Threading.Tasks;
 
 namespace TextRPG
 {
-    class Record
-    {
-        public int gold = 0;
-        public int hp = 0;
-        public int exp = 0;
-        public int maxExp = 0;
-        public int lv = 0;
-
-        public void Save(Player player)
-        {
-            gold = player.Gold;
-            maxExp = player.MaxExp;
-            exp = player.Exp;
-            hp = player.Hp;
-            lv = player.Lv;
-        }
-    }
-
     class Reward
     {
         int _gold = 0;
@@ -104,7 +86,7 @@ namespace TextRPG
             for (int i = 0; i < monsterCount; ++i)
             {
                 CreateMonster(difficulty);
-                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].Lv, _monsters[i].ItemReward);
             }
 
             float sum = 0;
@@ -314,6 +296,12 @@ namespace TextRPG
                 SetMonsterOrder();
                 return false;
             }            
+        }
+
+        public void PassPlayerTurn()
+        {
+            state = Dungeon.EDungeoState.MonsterTurn;
+            SetMonsterOrder();
         }
     }
 }

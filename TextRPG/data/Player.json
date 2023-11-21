@@ -1,16 +1,25 @@
 {
   "Lv": 1,
-  "Name": "1",
+  "Name": "asdf",
   "Class": "마법사",
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
-  "Exp": 42,
+  "Exp": 5,
   "MaxExp": 50,
-  "Gold": 1570,
+  "Gold": 1500,
   "Critical": 0.15,
-  "HasPotion": 0,
   "Inventory": [
+    {
+      "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "완드",
+      "Value": 5,
+      "Description": "흔한 완드다.",
+      "Price": 3,
+      "HasCount": 0
+    },
     {
       "bEquip": true,
       "_status": 2,
@@ -20,76 +29,6 @@
       "Description": "나무로 만들어진 투구이다.",
       "Price": 5,
       "HasCount": 0
-    },
-    {
-      "bEquip": true,
-      "_status": 1,
-      "type": 0,
-      "Name": "검",
-      "Value": 5,
-      "Description": "흔한 검이다.",
-      "Price": 3,
-      "HasCount": 0
-      "Price": 5
-    },
-    {
-      "bEquip": true,
-      "_status": 1,
-      "type": 0,
-      "Name": "완드",
-      "Value": 5,
-      "Description": "흔한 마법봉이다.",
-      "Price": 3
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "Name": "박쥐날개",
-      "Value": 1,
-      "Description": "팔면 쏠쏠하다",
-      "Price": 15
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "Name": "박쥐날개",
-      "Value": 1,
-      "Description": "팔면 쏠쏠하다",
-      "Price": 15
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "Name": "거미줄",
-      "Value": 0,
-      "Description": "아무 능력도 없는 거미줄",
-      "Price": 5
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "Name": "박쥐날개",
-      "Value": 1,
-      "Description": "팔면 쏠쏠하다",
-      "Price": 15
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "Name": "HP물약",
-      "Value": 50,
-      "Description": "HP가 50 회복된다.",
-      "Price": 20,
-      "HasCount": 1
-      "Name": "박쥐날개",
-      "Value": 1,
-      "Description": "팔면 쏠쏠하다",
-      "Price": 15
     }
   ],
   "Skills": [
@@ -121,5 +60,11 @@
       "accuracy": 0.7,
       "cost": 20
     }
-  ]
+  ],
+  "Quest": {
+    "Name": null,
+    "Num": 0,
+    "Reward": 0,
+    "IsMonsterHuntQuest": false
+  }
 }

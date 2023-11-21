@@ -1,4 +1,6 @@
-﻿namespace TextRPG
+﻿using System.Text;
+namespace TextRPG
+
 {
     class Widget
     {
@@ -243,7 +245,6 @@
             GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
-            GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";
         }
     }
 
@@ -288,8 +289,10 @@
             {
                 AddChild($"Item{i}", new Text(5, 5 + i));
                 string str = $"{items[i].Name} x 1";
+
                 str = Utility.MatchCharacterLengthToRight(str, 25, 0);
                 GetChild<Text>($"Item{i}").text = str;
+
             }
         }
     }
@@ -341,7 +344,7 @@
             AddChild("Content", new Border(0, 0, _width, _height));
 
             AddChild("ItemNameText", new Text(2, 1));
-            AddChild("ItemEffectText", new Text(20, 1));
+            AddChild("ItemEffectText", new Text(23, 1));
             AddChild("ItemDescriptionText", new Text(2, 3));
             AddChild("ItemPriceText", new Text(30, 3));
         }
@@ -350,8 +353,15 @@
         {
             string text = item.Name;
             if (item.bEquip) text = text.Insert(0, "[E]");
-            GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}";
-            GetChild<Text>("ItemEffectText").text = $"| {item.Status} + {item.Value} |";
+            if (item.type == Item.EType.Potion)//소모품이면 이름 + 개수까지
+            {
+                GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}[{item.HasCount}]";
+            }
+            else//아니면 이름만 출력
+            {
+                GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}";
+            }
+            GetChild<Text>("ItemEffectText").text = $"| {item.Status} +{item.Value} |";
             GetChild<Text>("ItemDescriptionText").text = $"{item.Description}";
             GetChild<Text>("ItemPriceText").text = $"{item.Price,5}G";
         }

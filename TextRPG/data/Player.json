@@ -18,6 +18,18 @@
       "Name": "나무 투구",
       "Value": 1,
       "Description": "나무로 만들어진 투구이다.",
+      "Price": 5,
+      "HasCount": 0
+    },
+    {
+      "bEquip": true,
+      "_status": 1,
+      "type": 0,
+      "Name": "검",
+      "Value": 5,
+      "Description": "흔한 검이다.",
+      "Price": 3,
+      "HasCount": 0
       "Price": 5
     },
     {
@@ -69,6 +81,11 @@
       "bEquip": false,
       "_status": 0,
       "type": 2,
+      "Name": "HP물약",
+      "Value": 50,
+      "Description": "HP가 50 회복된다.",
+      "Price": 20,
+      "HasCount": 1
       "Name": "박쥐날개",
       "Value": 1,
       "Description": "팔면 쏠쏠하다",

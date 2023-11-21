@@ -1,4 +1,5 @@
 namespace TextRPG
+
 {
     class Scene
     {
@@ -25,7 +26,6 @@ namespace TextRPG
 
         static MessageBox _board = new MessageBox(30, 33, 43, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
-        static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
         static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
         protected void AddScene(string name, Scene scene)
@@ -48,10 +48,6 @@ namespace TextRPG
         // 보유 골드 표시
         protected void ShowGold()
         {
-            string playerHasPotion = GameManager.Instance.Player.hasPotion.ToString();
-            _potionText.SetText($"포션 {playerHasPotion,5}EA");
-            _potionText.Draw();
-
             string playerGold = GameManager.Instance.Player.Gold.ToString();
             _goldText.SetText($"{playerGold,10} G");
             _goldText.Draw();
@@ -463,7 +459,17 @@ namespace TextRPG
 
                 default:
                     int index = (int)key - 49 + (player.invenPage * 6);
-                    game.Player.EquipItem(index);
+                    if (game.Player.Inventory[index].type == Item.EType.Potion)
+                    {
+                        game.Player.UsedHealthPotion(index);
+                        ThrowMessage($"{game.Player.Inventory[index].Value}만큼 회복했습니다.");
+                        return;
+                    }
+                    else
+                    {
+                        game.Player.EquipItem(index);
+                    }
+
                     game.RefreshScene();
                     break;
             }
@@ -681,7 +687,7 @@ namespace TextRPG
         {
             if (_pagination == 0)
             {
-                _pagination = (_shop.storeItems.Count / 6) - 1;
+                _pagination = (_shop.storeItems.Count / 6);
             }
             else
             {
@@ -690,7 +696,7 @@ namespace TextRPG
         }
         public void BackwardItemBundle()
         {
-            if (_pagination == (_shop.storeItems.Count / 6) - 1)
+            if (_pagination == (_shop.storeItems.Count / 6))
             {
                 _pagination = 0;
             }
@@ -743,10 +749,10 @@ namespace TextRPG
                     break;
 
                 default:
-                    string ItemName = game.Player.Inventory[(int)key - 49].Name;
+                    int index = (int)key - 49 + (player.invenPage * 6);
+                    string ItemName = game.Player.Inventory[index].Name;
                     try
                     {
-                        int index = (int)key - 49 + (player.invenPage * 6);
                         game.Player.Sell(index);
                     }
                     catch (IndexOutOfRangeException e)

@@ -13,7 +13,7 @@
         //CSV를 읽어서 리스트를 넣음
         static void LoadItemCSV(List<Item> _storeItems)
         {
-            StreamReader itemCSV = new StreamReader(@"..\..\..\ItemData.csv");
+            StreamReader itemCSV = new StreamReader(@"..\..\..\data\ItemData.csv");
 
             string strCSV = itemCSV.ReadToEnd();
             string[] CSVLine = strCSV.Split("\n");

@@ -42,8 +42,7 @@ namespace TextRPG
                 new JProperty("Exp", player.Exp),
                 new JProperty("MaxExp", player.MaxExp),
                 new JProperty("Gold", player.Gold),
-                new JProperty("Critical", player.Crit),
-                new JProperty("HasPotion", player.hasPotion)
+                new JProperty("Critical", player.Crit)
                 );
 
             Item[] inventory = player.Inventory.ToArray();

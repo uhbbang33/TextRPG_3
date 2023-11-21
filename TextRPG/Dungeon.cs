@@ -31,7 +31,7 @@ namespace TextRPG
         public int Gold { get { return _gold; } }
 
         int _exp = 0;
-        public int Exp { get; }
+        public int Exp { get { return _exp; } }
         
         List<Item> _Items;
         public List<Item> Items { get { return _Items; } }
@@ -62,15 +62,15 @@ namespace TextRPG
     internal class Dungeon
     {
         static Random Random;
-        public Record beforeRecord;
-        public Record afterRecord;
         Reward _reward;
+        int _lvAvg = 0;
+
         public Reward Reward { get { return _reward; } }
 
         List<Monster> _monsters;
         Queue<Monster> _monsterOrder;
 
-        public enum EDungeoState { PlayerTurn , MonsterTurn, PlayerDeath, MonsterAllDeath, Clear };
+        public enum EDungeoState { PlayerTurn , MonsterTurn, PlayerDeath, MonsterAllDeath, Clear, GoTown };
         public EDungeoState state;
 
         enum EDifficulty { Easy , Normal, Hard, Hell };
@@ -87,8 +87,6 @@ namespace TextRPG
         public Dungeon(string name, int difficulty, int def, int exp)
         {
             Random = new Random();
-            beforeRecord = new Record();
-            afterRecord = new Record();
 
             state = EDungeoState.PlayerTurn;
             _name = name;
@@ -99,45 +97,68 @@ namespace TextRPG
             _monsterOrder = new Queue<Monster>();
             _reward = new Reward();
 
-            // 랜덤한 몬스터 수 결정
-            int monsterCount = Random.Next(1, 5);
-            /*
-            for(int i = 0; i < monsterCount; ++i)
+            int monsterCount;
+            if (difficulty == 2) monsterCount = 1;
+            else monsterCount = Random.Next(1, 5);
+
+            for (int i = 0; i < monsterCount; ++i)
             {
-                int MID = Random.Next(0, 7);
-                CreateMonster(MID);
+                CreateMonster(difficulty);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
             }
-            */
-            CreateMonster(0);
+
+            float sum = 0;
+            foreach(var monster in _monsters)
+            {
+                sum += monster.Lv;
+            }
+            _lvAvg = (int)(sum / _monsters.Count);
         }
 
-        void CreateMonster(int MID)
+        void CreateMonster(int difficulty)
         {
-            switch (MID)
+            int MID;
+            if (difficulty == 0)
             {
-                case 0:
-                    _monsters.Add(new Bat());
-                    break;
-
-                case 1:
-                    _monsters.Add(new Centaurs());
-                    break;
-
-                case 2:
-                    _monsters.Add(new Gryphon());
-                    break;
-
-                case 3:
-                    _monsters.Add(new Dragon());
-                    break;
-
-                case 4:
-                    _monsters.Add(new Aardvark());
-                    break;
-
-                case 5:
-                    _monsters.Add(new Unicorn());                    
-                    break;
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Spider());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 1)
+            {
+                MID = Random.Next(0, 2);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Frog());
+                        break;
+                    case 1:
+                        _monsters.Add(new Bat());
+                        break;
+                }
+            }
+            else if(difficulty == 2)
+            {
+                MID = Random.Next(0, 3);
+                switch (MID)
+                {
+                    case 0:
+                        _monsters.Add(new Dragon());
+                        break;
+                    case 1:
+                        _monsters.Add(new Gryphon());
+                        break;
+                    case 2:
+                        _monsters.Add(new Unicorn());
+                        break;
+                }
             }
         }
 
@@ -145,13 +166,12 @@ namespace TextRPG
         {
             if(_player == null)
                 _player = player;            
-            beforeRecord.Save(_player);
         }
 
         public EDungeoState Progress(out string[] msg)
         {
             int dmg = 0;
-            msg = null;
+            msg = new string[] { $"{state.ToString()}", "What", "Problem" };
 
             switch (state)
             {
@@ -160,10 +180,7 @@ namespace TextRPG
                     dmg = Attack(out bCrit);
                     if(CheckTargetMonsterIsAlive() == false)
                     {
-                        /* Reward. Add . Monster's */
-                        // Reward - Gold. Exp, Items
-                        _reward.AddReward(10, 2, new Item("더미", "0:0", "des", Item.EType.Weapon, 10));
-                        // Reward.Add(_targetMonster.DropReward());
+                        // is monster die ? so, Add Reward from monster
                     }
                     msg = MakeMessage(_player, _targetMonster, dmg, bCrit);            
                     break;
@@ -185,9 +202,18 @@ namespace TextRPG
                             state = EDungeoState.PlayerTurn;
                         }
                     }
+                    else
+                    {
+                        state = EDungeoState.PlayerDeath;
+                    }
+                    break;
+
+                case EDungeoState.PlayerDeath:
+                    msg = new string[] { "플레이어가 사망했습니다.", "", "마을로 돌아갑니다." };
+                    state = EDungeoState.GoTown;
                     break;
             }
-
+            
             return state;
         }
 
@@ -275,6 +301,19 @@ namespace TextRPG
         public Monster[] GetMonster()
         {
             return _monsters.ToArray();
+        }
+
+        public bool RunAway()
+        {
+            int lvDif = _player.Lv - _lvAvg;
+            float percent = 0.5f + (float)(lvDif / 10);
+            if (Random.NextDouble() < percent) return true;
+            else
+            {
+                state = EDungeoState.MonsterTurn;
+                SetMonsterOrder();
+                return false;
+            }            
         }
     }
 }

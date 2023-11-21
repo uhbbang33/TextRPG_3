@@ -1,6 +1,6 @@
 ﻿using System.Text;
-
 namespace TextRPG
+
 {
     class Widget
     {
@@ -207,21 +207,21 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 11;
+            _maxChildrenCount = 17;
 
-            AddChild("Background", new Border(0, 0, 39, 20));
-
-            AddChild("Content", new Border(2, 1, 35, 18));
-
+            AddChild("Background", new Border(0, 0, 39, 22));
+            AddChild("Content", new Border(2, 1, 35, 20));
+            AddChild("SkillContent", new Border(39, 0, 39, 22));
             AddChild("LvText", new Text(5, 2));
             AddChild("ExpText", new Text(15, 2));
             AddChild("ClassText", new Text(5, 4));
             AddChild("AtkText", new Text(5, 6));
             AddChild("DefText", new Text(5, 8));
             AddChild("HPText", new Text(5, 10));
-            AddChild("CritText", new Text(5, 12));
-            AddChild("GoldText", new Text(5, 14));
-            AddChild("PotionText", new Text(5, 16));
+            AddChild("MPText", new Text(5, 12));
+            AddChild("CritText", new Text(5, 14));
+            AddChild("GoldText", new Text(5, 16));
+            AddChild("PotionText", new Text(5, 18));
         }
 
         public void SetPlayer(Player player)
@@ -238,11 +238,12 @@ namespace TextRPG
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
             GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"Chad ( {player.Class} )";
+            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
-            GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
+            GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
+            GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
         }
     }
@@ -256,23 +257,13 @@ namespace TextRPG
             AddChild("Background", new Border(0, 0, width, height));
             AddChild("Content", new Border(2, 1, width - 4, height - 2));
 
-            //AddChild("LvLabel", new Text(5, 2));
-            //AddChild("LvText", new Text(25, 3));
-
             AddChild("EXPLabel", new Text(5, 2));
-            AddChild("EXPText", new Text(25, 5));
+            AddChild("EXPText", new Text(25, 3));
 
             AddChild("ItemLabel", new Text(5, 4));
 
-            //AddChild("HPLabel", new Text(5, 6));
-            //AddChild("HPText", new Text(25, 7));
-
             AddChild("GoldLabel", new Text(5, 17));
             AddChild("GoldText", new Text(23, 18));
-
-            //AddChild("LevelUpText", new Text(5, 11));
-            //AddChild("AtkText", new Text(25, 13));
-            //AddChild("DefText", new Text(25, 15));
         }
 
         protected override void Draw(int x, int y)
@@ -298,30 +289,46 @@ namespace TextRPG
             {
                 AddChild($"Item{i}", new Text(5, 5 + i));
                 string str = $"{items[i].Name} x 1";
-                GetChild<Text>($"Item{i}").text = $"{str,25}";
+
+                str = Utility.MatchCharacterLengthToRight(str, 25, 0);
+                GetChild<Text>($"Item{i}").text = str;
+
+            }
+        }
+    }
+
+    class LevelUpWidget : Widget
+    {
+        public LevelUpWidget(int x, int y, int width, int height) : base(x, y, width, height)
+        {
+            _maxChildrenCount = 10;
+
+            AddChild("Content", new Border(0, 0, width, height));
+            AddChild("SubContent", new Border(2, 9, width - 4, height - 10));
+            AddChild("AtkText", new Text(5, 11));
+            AddChild("DefText", new Text(5, 13));
+            AddChild("RecoveryText", new Text(5, 15));
+            SetText();
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
+
+            string[] contents = File.ReadAllLines(@"..\..\..\art\LevelUp.txt");
+            for (int i = 0; i < contents.Length; ++i)
+            {
+                Console.SetCursorPosition(_x + x + 8, _y + y + 3);
+                Console.Write(contents[i]);
+                ++y;
             }
         }
 
-        public void SetResult(Record before, Record after)
+        void SetText()
         {
-            //GetChild<Text>("LvLabel").text = $"레벨 --------------------------";
-            //GetChild<Text>("LvText").text = $"{before.lv,3} --> {after.lv,3}";
-
-            GetChild<Text>("EXPLabel").text = $"경험치 ------------------------";
-            GetChild<Text>("EXPText").text = $"{before.exp,3} / {before.maxExp,3} --> {after.exp,3} / {after.maxExp,3}";
-
-            GetChild<Text>("HPLabel").text = $"체력 --------------------------";
-            GetChild<Text>("HPText").text = $"{before.hp,3} --> {after.hp,3}";
-
-            GetChild<Text>("GoldLabel").text = $"골드 --------------------------";
-            GetChild<Text>("GoldText").text = $"{before.gold,5} G --> {after.gold,5} G";
-
-            if (before.lv != after.lv)
-            {
-                GetChild<Text>("LevelUpText").text = "LEVEL UP !!";
-                GetChild<Text>("AtkText").text = $"공격력 + {2}";
-                GetChild<Text>("DefText").text = $"방어력 + {1}";
-            }
+            GetChild<Text>("AtkText").text = "공격력이 0.5 증가합니다.";
+            GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
+            GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
         }
     }
 
@@ -371,7 +378,7 @@ namespace TextRPG
         int _xMargin = 1;
         int _yMargin = 0;
         int _col = 2;
-        List<Widget> _widgets;
+        protected List<Widget> _widgets;
 
         public GridBox()
         {
@@ -406,11 +413,31 @@ namespace TextRPG
             base.Draw(x + _x, y + _y);
         }
 
+        protected void DrawBase(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+
         override public void Clear()
         {
             base.Clear();
             _widgets.Clear();
             _index = 0;
+        }
+    }
+
+    class MonsterGridBox : GridBox
+    {
+        protected override void Draw(int x, int y)
+        {
+            for (int i = 0; i < _widgets.Count; ++i)
+            {
+                if (i == 0) _widgets[i].SetPosition(14, 6);
+                else if (i == 1) _widgets[i].SetPosition(50, 6);
+                else if (i == 2) _widgets[i].SetPosition(14, 16);
+                else if (i == 3) _widgets[i].SetPosition(50, 16);
+            }
+            DrawBase(x, y);
         }
     }
 

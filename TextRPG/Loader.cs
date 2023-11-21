@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace TextRPG
@@ -16,7 +10,7 @@ namespace TextRPG
         {
             using (StreamReader file = File.OpenText(path))//@"..\..\..\Player.json"
             {
-                using(JsonTextReader reader = new JsonTextReader(file))
+                using (JsonTextReader reader = new JsonTextReader(file))
                 {
                     return (JObject)JToken.ReadFrom(reader);
                 }
@@ -40,6 +34,7 @@ namespace TextRPG
             string path = @"..\..\..\data\Player.json";
             JObject configData = new JObject(
                 new JProperty("Lv", player.Lv),
+                new JProperty("Name", player.Name),
                 new JProperty("Class", player.Class),
                 new JProperty("Atk", player.BaseAtk),
                 new JProperty("Def", player.BaseDef),
@@ -49,7 +44,7 @@ namespace TextRPG
                 new JProperty("Gold", player.Gold),
                 new JProperty("Critical", player.Crit)
                 );
-            
+
             Item[] inventory = player.Inventory.ToArray();
             configData.Add("Inventory", JArray.FromObject(inventory));
 
@@ -57,8 +52,15 @@ namespace TextRPG
             Skill[] skills = player.Skills.ToArray();
             configData.Add("Skills", JArray.FromObject(skills));
 
-            File.WriteAllText(path, configData.ToString());
-            
+            try
+            {
+                File.WriteAllText(path, configData.ToString());
+            }
+            catch(Exception e)
+            {
+                
+            }
+
             Save(player.Equipment);
         }
 

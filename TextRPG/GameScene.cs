@@ -1,4 +1,5 @@
-﻿namespace TextRPG
+namespace TextRPG
+
 {
     class Scene
     {
@@ -23,7 +24,7 @@
         protected string[] _display = { };
         public string[] Display { get { return _display; } }
 
-        static MessageBox _board = new MessageBox(33, 33, 40, 5);
+        static MessageBox _board = new MessageBox(30, 33, 43, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
@@ -105,7 +106,6 @@
         }
     }
 
-
     class StartOrContinueScene : Scene
     {
         public StartOrContinueScene(Scene parent)
@@ -134,12 +134,13 @@
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://새로하기
-                    game.Player.SetWarrior();
                     game.ChangeScene(SceneGroup["ClassSelect"]);
                     break;
                 case ConsoleKey.D2://이어하기
-
                     game.ChangeScene(SceneGroup["Town"]);
+                    break;
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
                     break;
             }
         }
@@ -162,9 +163,6 @@
             Screen.DrawTopScreen(Display, 2);
         }
     }
-
-
-
     //직업 선택 씬
     class SelectClassScene : Scene
     {
@@ -175,7 +173,6 @@
             _prev = parent;
 
             //선택 화면에 출력
-
             _choices = new string[] { "전사", "마법사" };
 
             //위 화면에 출력할 아스키아트 로드
@@ -190,14 +187,11 @@
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://전사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWarrior();
+                    game.Player.SetWarrior(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 case ConsoleKey.D2://마법사 클래스 선택 시, 플레이어 직업 반영
-                    game.Player.SetWizard();
-                    game.ChangeScene(SceneGroup["Town"]);
-                    break;
-                case ConsoleKey.D3:
+                    game.Player.SetWizard(GetName());
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
                 default:
@@ -217,22 +211,35 @@
         {
             //씬 이름과 설명 출력
             base.DrawScene();
-
             //선택창을 위해 화면 분할
             Screen.Split();
             //화면 맨 위부터 화면 그리기
             Screen.DrawTopScreen(Display, 2);
         }
 
-    }
-
-    class GetNameScene : Scene
-    {
-        public GetNameScene(Scene parent)
+        private string GetName()
         {
+            Screen.Clear();
 
+            _display = new string[] { "닉네임을 정해주세요 = " };
+
+            //화면 해당 좌표에 출력
+            Screen.DrawScreen(Display, 20, 20);
+
+            //이름 입력 받기
+            string name = Console.ReadLine();
+
+            //길이 제한 10자 초과와 빈칸일 경우 다시 받기
+            if (name != "" && name.Length > 10)
+            {
+                ThrowMessage("10글자 이하로 다시 입력하세요");
+                return GetName();
+            }
+
+            return name;
         }
     }
+
 
     class TownScene : Scene
     {
@@ -462,6 +469,7 @@
                     {
                         game.Player.EquipItem(index);
                     }
+
                     game.RefreshScene();
                     break;
             }
@@ -594,7 +602,6 @@
                 ThrowMessage("잘못된 입력입니다.");
                 return;
             }
-
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -929,21 +936,43 @@
 
         public Dungeon Dungeon { get { return _dungeon; } }
 
-        GridBox _monsters;
+        MonsterGridBox _monsters;
+        GridBox _selects;
         UnitViewer _playerWidget;
+        List<Monster> _monsterList;
+        protected int _difficulty;
+        BattleWidget battleMsg;
 
         public BaseDungeonScene()
         {
-            _playerWidget = new UnitViewer(3, 18);
+            _playerWidget = new UnitViewer(3, 19);
 
-            _monsters = new GridBox();
-            _monsters.SetPosition(45, 0);
+            _monsters = new MonsterGridBox();
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
+            // _monsters.SetPosition(0, 0);
 
-            _choices = new string[] { "공격", "가방" };
+            _selects = new GridBox();
+            _selects.SetPosition(0, 24);
+            _selects.SetColomn(2);
+            _selects.SetMargine(1, 0);
+
+
+            _choices = new string[] { "공격", "가방", "포션 마시기" };
             AddScene("Attack", new AttackScene(this));
             AddScene("Bag", new BagScene(this));
+
+            battleMsg = new BattleWidget(2, 25, 50, 5);
+
+            for (int i = 0; i < _choices.Length; ++i)
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.SetSize(38, 5);
+                textBlock.SetText($"{i+1}. {_choices[i]}");
+                _selects.AddItem(textBlock);
+            }
+            
+            _monsterList = new List<Monster>();
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -954,7 +983,7 @@
             for (int i = 0; i < count; ++i)
             {
                 UnitViewer textBlock = new UnitViewer();
-                textBlock.SetSize(30, 5);
+                textBlock.SetSize(15, 4);
                 textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
                 _monsters.AddItem(textBlock);
             }
@@ -965,17 +994,42 @@
             switch (key)
             {
                 case ConsoleKey.D0:
-                    game.ChangeScene(_prev);
+                    if(_dungeon.RunAway())
+                    {
+                        game.ChangeScene(_prev);
+                    }
+                    else
+                    {
+                        Screen.DrawBotScreen(new string[] { });
+                        battleMsg.SetText("도망가는 것에 실패했습니다.", "", "");
+                        battleMsg.Draw();
+                        Thread.Sleep(1000);
+                        game.ChangeScene(new BattleScene(this, _dungeon));
+                    }
+                    
                     break;
 
                 case ConsoleKey.D1:
-                    game.ChangeScene(SceneGroup["Attack"]);
+                    game.ChangeScene(new AttackScene(this));
                     break;
 
                 case ConsoleKey.D2:
-                    game.ChangeScene(SceneGroup["Bag"]);
+                    game.ChangeScene(new BagScene(this));
                     break;
+                case ConsoleKey.D3:
+                    bool result;
+                    result = game.Player.DrinkPotion();
 
+                    if (result)
+                    {
+                        ThrowMessage("포션을 마셔 체력을 회복했다.");
+                    }
+                    else
+                    {
+                        ThrowMessage("포션이 없습니다.");
+                    }
+
+                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -987,15 +1041,41 @@
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
             _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
+            _playerWidget.SetSize(30, 4);
+
+            _monsterList = _dungeon.GetMonster().ToList();
         }
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(new string[] { });
             Screen.DrawTopScreen(Display);
+            _selects.Draw();
+
+            DrawMonster();
 
             _monsters.Draw();
             _playerWidget.Draw();
+        }
+
+        private void DrawMonster()
+        {
+            int x, y;
+            for (int i = 0; i < _monsterList.Count; ++i)
+            {
+                if (i == 0) { x = 14; y = 2; }
+                else if (i == 1) { x = 50; y = 2; }
+                else if (i == 2) { x = 14; y = 12; }
+                else { x = 50; y = 12; }
+
+                if (_difficulty == 2) { x = 35; y = 2; }
+
+                for (int j = 0; j < _monsterList[i].Display.Length; ++j)
+                {
+                    Console.SetCursorPosition(x, y++);
+                    Console.Write(_monsterList[i].Display[j]);
+                }
+            }
         }
     }
 
@@ -1012,13 +1092,10 @@
             _skills.SetPosition(0, 24);
             _skills.SetColomn(2);
             _skills.SetMargine(1, 0);
-
-            AddScene("SelectMonster", new SelectMonsterScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            // player skill 범위 밖의 입력 걸러내기
             if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + game.Player.Skills.Count)
             {
                 ThrowMessage("잘못된 입력입니다.");
@@ -1033,7 +1110,7 @@
 
                 default:
                     _dungeon.SelectSkill((int)key - 49);
-                    game.ChangeScene(SceneGroup["SelectMonster"]);
+                    game.ChangeScene(new SelectMonsterScene(this));
                     break;
             }
         }
@@ -1043,6 +1120,7 @@
             if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
 
             _skills.Clear();
+
             int idx = 1;
             foreach (var skill in game.Player.Skills)
             {
@@ -1071,8 +1149,6 @@
             _monsters.SetPosition(0, 24);
             _monsters.SetColomn(2);
             _monsters.SetMargine(1, 0);
-
-            AddScene("MonsterTurn", new BattleScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1092,7 +1168,7 @@
                 default:
                     if (_dungeon.SelectMonster((int)key - 49))
                     {
-                        game.ChangeScene(SceneGroup["MonsterTurn"]);
+                        game.ChangeScene(new BattleScene(this.Prev.Prev, _dungeon));
                     }
                     else
                     {
@@ -1124,23 +1200,25 @@
         }
     }
 
+
+
     class BattleScene : Scene
     {
-        Scene dungdeonStartScene;
         Dungeon _dungeon;
         string[] msg;
         Dungeon.EDungeoState state;
         BattleWidget battleMsg;
 
-        public BattleScene(Scene parent)
+        public BattleScene(Scene parent, Dungeon dungeon)
         {
-            dungdeonStartScene = parent.Prev.Prev;
+            _prev = parent;            
+            _dungeon = dungeon;
             battleMsg = new BattleWidget(2, 25, 50, 5);
         }
 
         public override void Update(GameManager game)
         {
-            if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
+            //if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1], msg[2]);
@@ -1153,12 +1231,10 @@
             battleMsg.Draw();
             Thread.Sleep(2000);
 
-
-            // switch 로 바꾸자 
             switch (state)
             {
-                case Dungeon.EDungeoState.PlayerTurn: // 몬스터의 공격이 끝난 후 플레이어의 차례
-                    GameManager.Instance.ChangeScene(dungdeonStartScene);
+                case Dungeon.EDungeoState.PlayerTurn:
+                    GameManager.Instance.ChangeScene(_prev);
                     break;
 
                 case Dungeon.EDungeoState.MonsterTurn:
@@ -1166,8 +1242,7 @@
                     break;
 
                 case Dungeon.EDungeoState.PlayerDeath:
-                    // Player.소생
-                    GameManager.Instance.ChangeScene(SceneGroup["Town"]);
+                    GameManager.Instance.RefreshScene();
                     break;
 
                 case Dungeon.EDungeoState.MonsterAllDeath:
@@ -1177,6 +1252,11 @@
                 case Dungeon.EDungeoState.Clear:
                     GameManager.Instance.ChangeScene(new RewardScene(_dungeon));
                     break;
+
+                case Dungeon.EDungeoState.GoTown:
+                    // Player.소생
+                    GameManager.Instance.ChangeScene(SceneGroup["Town"]);
+                    break;
             }
         }
     }
@@ -1184,11 +1264,17 @@
     class RewardScene : Scene
     {
         ResultWidget _resultwidget;
+        Reward _reward;
+        LevelUpWidget _lvUpWidget;
+        bool isLvUp;
         public RewardScene(Dungeon dungeon)
         {
+            _name = "탐험 결과";
             _resultwidget = new ResultWidget(2, 0, 35, 23);
-            //_resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
-            _resultwidget.SetResult(dungeon.Reward);
+            _reward = dungeon.Reward;
+            _resultwidget.SetResult(_reward);
+
+            _lvUpWidget = new LevelUpWidget(41, 0, 35, 23);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1204,23 +1290,57 @@
             }
         }
 
+        public override void Update(GameManager game)
+        {
+            Player player = game.Player;
+            
+            foreach(var item in _reward.Items)
+            {
+                player.Inventory.Add(item);
+            }
+
+            player.GetExp(_reward.Exp, out isLvUp);
+            player.Gold += _reward.Gold;
+        }
+
         public override void DrawScene()
         {
             base.DrawScene();
             Screen.DrawTopScreen(Display);
-            _resultwidget.Draw();
+            _resultwidget.Draw();            
+            if (isLvUp)
+            {
+                Thread.Sleep(1000);
+                _lvUpWidget.Draw();
+            }
         }
     }
 
     class BagScene : Scene
     {
+        GridBox _itemBox;
+        List<int> _itemIndex;
+
         public BagScene(Scene parent)
         {
             _prev = parent;
+            
+            _itemBox = new GridBox();
+            _itemBox.SetPosition(0, 24);
+            _itemBox.SetColomn(2);
+            _itemBox.SetMargine(1, 0);
+
+            _itemIndex = new List<int>();
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
+            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _itemIndex.Count)
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -1228,21 +1348,42 @@
                     break;
 
                 default:
-                    ThrowMessage("잘못된 입력입니다.");
+                    int index = _itemIndex[(int)key - 49];
+                    // game.Player.Inventory[index].Use;
                     break;
             }
         }
 
         public override void Update(GameManager game)
         {
-            // _choice = game.player.inventory
-            List<string> itemNames = new List<string>();
+            _itemBox.Clear();
+            _itemIndex.Clear();
+
+            int idx = 0;
 
             for (int i = 0; i < game.Player.Inventory.Count; ++i)
             {
-                itemNames.Add(game.Player.Inventory[i].Name);
+                if (game.Player.Inventory[i].type == Item.EType.Potion)
+                {
+                    ItemSlot textBlock = new ItemSlot();
+                    textBlock.SetSize(38, 5);
+                    textBlock.SetItem(idx++, game.Player.Inventory[i]);
+                    _itemIndex.Add(i);
+                    _itemBox.AddItem(textBlock);
+                }
             }
+
+
+            // 사용할 수 있는 아이템이 없음을 알림 >> ChangeScene 을 호출하지 못해서 갇힘.
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            _itemBox.Draw();
+
             _choices = itemNames.ToArray();
+
         }
     }
 
@@ -1250,6 +1391,7 @@
     {
         public EasyDungeonScene(Scene parent)
         {
+            _difficulty = 0;
             _dungeon = new Dungeon("마을 근처", 0, 2, 2);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1260,6 +1402,7 @@
     {
         public NormalDungeonScene(Scene parent)
         {
+            _difficulty = 1;
             _dungeon = new Dungeon("성벽 외곽", 1, 7, 7);
             _name = _dungeon.Name;
             _prev = parent;
@@ -1270,6 +1413,7 @@
     {
         public HardDungeonScene(Scene parent)
         {
+            _difficulty = 2;
             _dungeon = new Dungeon("지하 미궁", 2, 20, 14);
             _name = _dungeon.Name;
             _prev = parent;

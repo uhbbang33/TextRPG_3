@@ -11,9 +11,9 @@ namespace TextRPG
 {
     public class Item
     {
-        public enum EStatus { HP, ATK, DEF };
+        public enum EStatus { HP, ATK, DEF, MP };
         public enum EType { Weapon, Armor, Potion  }
-        string[] _statusWord = { " 체력 ", "공격력", "방어력" };
+        string[] _statusWord = { " 체력 ", "공격력", "방어력", "마나" };
 
         string _name;
         public string Name { get { return _name; } set { _name = value; } }

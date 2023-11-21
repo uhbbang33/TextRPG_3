@@ -1706,7 +1706,6 @@ namespace TextRPG
                         Thread.Sleep(1000);
                         game.RefreshScene();
                     }
-
                     break;
             }
         }
@@ -1758,6 +1757,10 @@ namespace TextRPG
                 case Item.EStatus.HP:
                     msg[2] = $"체력을 {item.Value} 만큼 회복했습니다.";
                     break;
+
+                case Item.EStatus.MP:
+                    msg[2] = $"마나를 {item.Value} 만큼 회복했습니다.";
+                    break;
             }
             return msg;
         }
@@ -1778,6 +1781,10 @@ namespace TextRPG
 
                 case Item.EStatus.HP:
                     msg[2] = "체력이 이미 최대치 입니다.";
+                    break;
+
+                case Item.EStatus.MP:
+                    msg[2] = "마나가 이미 최대치 입니다.";
                     break;
             }
             return msg;

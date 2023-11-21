@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System;
+using System.Diagnostics.Metrics;
 using System.Text;
+using System.Xml.Linq;
 
 namespace TextRPG
 {
@@ -541,6 +543,72 @@ namespace TextRPG
         protected override void Draw(int x, int y)
         {
             base.Draw(x + _x, y + _y);
+        }
+    }
+
+    class TempleQuestInfoWidget : Widget
+    {
+        string _name = "";
+        int _num = 0;
+        int _reward = 0;
+
+        public TempleQuestInfoWidget(int x, int y, Quest quest) : base(x, y)
+        {
+            _maxChildrenCount = 11;
+
+            AddChild("Content", new Border(0, 0, 40, 9));
+            AddChild("Text1", new Text(2, 1));
+            AddChild("Text2", new Text(2, 3));
+            AddChild("Text3", new Text(2, 4));
+            AddChild("Text4", new Text(2, 5));
+            AddChild("Text5", new Text(2, 6));
+            AddChild("Text6", new Text(2, 7));
+            AddChild("Text7", new Text(2, 8));
+            AddChild("Text8", new Text(2, 9));
+            AddChild("Text9", new Text(15, 11));
+
+            _name = quest.Name;
+            _num = quest.Num;
+            _reward = quest.Reward;
+
+            Init();
+        }
+
+        public void Init()
+        {
+            GetChild<Text>("Text1").text = "\t\t공고문";
+            GetChild<Text>("Text2").text = $"현재 [{_name}]의";
+            GetChild<Text>("Text3").text = "개체수가 너무 많아";
+            GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
+            GetChild<Text>("Text5").text = $"[{_name}]";
+            GetChild<Text>("Text6").text = $"[{_num}마리]를 잡아오면";
+            GetChild<Text>("Text7").text = $"[{_reward} Gold]를";
+            GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
+            GetChild<Text>("Text9").text = "";
+        }
+
+        public void AcceptQuest()
+        {
+            GetChild<Text>("Text9").text = "[진행중]";
+        }
+
+        public void RefuseQuest()
+        {
+            GetChild<Text>("Text9").text = "";
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(x + _x, y + _y);
+        }
+
+        public override void SetSize(int width, int height)
+        {
+            base.SetSize(width, height);
+            if (GetChild<Border>("Content") != null)
+            {
+                GetChild<Border>("Content").SetSize(width, height);
+            }
         }
     }
 

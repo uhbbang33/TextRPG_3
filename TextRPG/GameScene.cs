@@ -821,6 +821,7 @@ namespace TextRPG
         protected ShopQuestInfoWidget _widget;
         bool _isQuestAccepted = false;
         protected Quest _quest;
+        Player player;
 
         public ShopQuestScene(Scene parent)
         {
@@ -828,7 +829,7 @@ namespace TextRPG
             _comment = "퀘스트를 수락하거나 거절합니다.";
 
             Random random = new Random();
-            List<Quest> questList = GameManager.Instance.QuestList.Quests;
+            List<Quest> questList = GameManager.Instance.QuestList.ShopQuests;
             _quest = questList[random.Next(0, questList.Count)];
 
             _widget = new ShopQuestInfoWidget(35, 3, _quest);
@@ -838,6 +839,8 @@ namespace TextRPG
             _choices = new string[] { "수락", "거절" };
 
             _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
+            player = GameManager.Instance.Player;
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -849,10 +852,9 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    if (!_isQuestAccepted)
+                    if (player.PlayerQuest.Name == null)
                     {
-                        _isQuestAccepted = true;
-                        GameManager.Instance.Player.SetQuest(_quest);
+                        player.SetQuest(_quest);
 
                         _widget.AcceptText();
                         DrawScene();
@@ -864,8 +866,7 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D2:
-                    _isQuestAccepted = false;
-                    GameManager.Instance.Player.SetQuestNull();
+                    player.SetQuestNull();
 
                     _widget.RefuseText();
                     DrawScene();
@@ -937,7 +938,9 @@ namespace TextRPG
             _comment = "체력을 회복할 수 있습니다.";
             _prev = parent;
             SetDisplay();
-            _choices = new string[] { "회복하기 ( 300 G )" };
+            _choices = new string[] { "회복하기 ( 300 G )", "퀘스트" };
+
+            AddScene("TempleQuest", new TempleQuestScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -958,7 +961,9 @@ namespace TextRPG
                         ThrowMessage("체력을 회복했습니다.");
                     }
                     break;
-
+                case ConsoleKey.D2:
+                    game.ChangeScene(SceneGroup["TempleQuest"]);
+                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -975,6 +980,67 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display, 5);
 
+            ShowGold();
+        }
+    }
+
+    class TempleQuestScene : Scene
+    {
+        TempleQuestInfoWidget _widget;
+        Player player;
+        protected Quest _quest;
+
+        public TempleQuestScene(Scene parent)
+        {
+            _name = "신전 공고문";
+            _comment = "퀘스트를 받을 수 있습니다.";
+            _prev = parent;
+
+            Random random = new Random();
+            List<Quest> questList = GameManager.Instance.QuestList.TempleQuests;
+            _quest = questList[random.Next(0, questList.Count)];
+
+            _choices = new string[] { "수락", "거절" };
+            _display = File.ReadAllLines(@"..\..\..\art\parchment.txt");
+            player = GameManager.Instance.Player;
+
+            _widget = new TempleQuestInfoWidget(8, 3, _quest);
+            _widget.SetSize(25, 14);
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D1:
+                    if (player.PlayerQuest.Name == null)
+                    {
+                        player.SetQuest(_quest);
+                        _widget.AcceptQuest();
+                        DrawScene();
+                    }
+                    break;
+
+                case ConsoleKey.D2:
+                    player.SetQuestNull();
+                    _widget.RefuseQuest();
+                    DrawScene();
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
             ShowGold();
         }
     }

@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel.Design;
+
 namespace TextRPG
 
 {
@@ -824,29 +827,23 @@ namespace TextRPG
 
     class ShopQuestScene : Scene
     {
-        protected ShopQuestInfoWidget _widget;
-        bool _isQuestAccepted = false;
-        protected Quest _quest;
-        Player player;
+        ShopQuestInfoWidget _widget;
+        Quest _quest;
+        Player _player;
+        List<Quest> _questList;
 
         public ShopQuestScene(Scene parent)
         {
             _name = "퀘스트";
             _comment = "퀘스트를 수락하거나 거절합니다.";
-
-            Random random = new Random();
-            List<Quest> questList = GameManager.Instance.QuestList.ShopQuests;
-            _quest = questList[random.Next(0, questList.Count)];
-
-            _widget = new ShopQuestInfoWidget(35, 3, _quest);
-
             _prev = parent;
-
             _choices = new string[] { "수락", "거절" };
-
             _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
 
-            player = GameManager.Instance.Player;
+            _player = GameManager.Instance.Player;
+            _questList = GameManager.Instance.QuestList.ShopQuests;
+            
+            _widget = new ShopQuestInfoWidget(35, 3);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -858,28 +855,27 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    if (player.PlayerQuest.Name == null)
+                    if (_player.PlayerQuest.Name == null)
                     {
-                        player.SetQuest(_quest);
-
-                        _widget.AcceptText();
+                        _player.SetQuest(_quest);
+                        _widget.AcceptText(_quest);
                         DrawScene();
-                        Thread.Sleep(2000);
-
-                        _widget.IncompletedText();
                     }
-                    game.ChangeScene(_prev);
+                    else
+                        game.ChangeScene(_prev);
                     break;
 
                 case ConsoleKey.D2:
-                    player.SetQuestNull();
+                    if (!_player.PlayerQuest.IsMonsterHuntQuest)
+                    {
+                        _player.SetQuestNull();
 
-                    _widget.RefuseText();
-                    DrawScene();
-                    Thread.Sleep(2000);
-
-                    _widget.Init();
-                    game.ChangeScene(_prev);
+                        _widget.RefuseText();
+                        DrawScene();
+                        //Thread.Sleep(2000);
+                    }
+                    else
+                        game.ChangeScene(_prev);
                     break;
 
                 default:
@@ -888,11 +884,47 @@ namespace TextRPG
             }
         }
 
+        public override void Update(GameManager game)
+        {
+            base.Update(game);
+
+            Quest playerQuest = game.Player.PlayerQuest;
+
+            // 플레이어가 Quest를 안가지고 있을 때
+            if (playerQuest.Name == null)
+            {
+                CreateQuest();
+                _widget.Init(_quest);
+            }
+            // 플레이어가 상점 퀘스트를 가지고 있을 때
+            else if (!playerQuest.IsMonsterHuntQuest
+                && playerQuest.Name != null)
+            {
+                // 현재 상점 퀘스트는 플레이어가 가지고 있는 퀘스트
+                _quest = new Quest(playerQuest.Name, playerQuest.Num,
+                    playerQuest.Reward, playerQuest.IsMonsterHuntQuest);
+                // 아직 완료되지 않았음을 알려주는 widget
+                _widget.IncompletedText(_quest);
+            }
+            // 플레이어가 신전 퀘스트를 가지고 있을 때
+            else if (playerQuest.IsMonsterHuntQuest)
+            {
+                _widget.AlreadyHaveQuestText();
+            }
+        }
+
         public override void DrawScene()
         {
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+        }
+
+        public void CreateQuest()
+        {
+            Random random = new Random();
+            _quest = _questList[random.Next(0, _questList.Count)];
+            _player.ShouldCreateShopQuest = false;
         }
     }
 
@@ -906,13 +938,7 @@ namespace TextRPG
             _comment = "퀘스트를 완료했습니다!";
             _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
 
-            Player player = GameManager.Instance.Player;
-
-            _widget = new ShopQuestInfoWidget(35, 3, player.PlayerQuest);
-            _widget.CompletedText();
-
-            player.GetQuestReward();
-            player.SetQuestNull();
+            _widget = new ShopQuestInfoWidget(35, 3);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -928,6 +954,16 @@ namespace TextRPG
                     break;
             }
         }
+
+        public override void Update(GameManager game)
+        {
+            base.Update(game);
+
+            _widget.CompletedText(game.Player.PlayerQuest);
+            game.Player.GetQuestReward();
+            game.Player.SetQuestNull();
+        }
+
         public override void DrawScene()
         {
             base.DrawScene();
@@ -946,6 +982,7 @@ namespace TextRPG
             SetDisplay();
             _choices = new string[] { "회복하기 ( 300 G )", "퀘스트" };
 
+            AddScene("TempleQuestComplete", new TempleQuestScene(this));
             AddScene("TempleQuest", new TempleQuestScene(this));
         }
 
@@ -968,7 +1005,10 @@ namespace TextRPG
                     }
                     break;
                 case ConsoleKey.D2:
-                    game.ChangeScene(SceneGroup["TempleQuest"]);
+                    if (GameManager.Instance.Player.IsTempleQuestComplete())
+                        game.ChangeScene(SceneGroup["TempleQuestComplete"]);
+                    else
+                        game.ChangeScene(SceneGroup["TempleQuest"]);
                     break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
@@ -993,8 +1033,9 @@ namespace TextRPG
     class TempleQuestScene : Scene
     {
         TempleQuestInfoWidget _widget;
-        Player player;
+        Player _player;
         protected Quest _quest;
+        List<Quest> _questList;
 
         public TempleQuestScene(Scene parent)
         {
@@ -1002,16 +1043,14 @@ namespace TextRPG
             _comment = "퀘스트를 받을 수 있습니다.";
             _prev = parent;
 
-            Random random = new Random();
-            List<Quest> questList = GameManager.Instance.QuestList.TempleQuests;
-            _quest = questList[random.Next(0, questList.Count)];
-
             _choices = new string[] { "수락", "거절" };
             _display = File.ReadAllLines(@"..\..\..\art\parchment.txt");
-            player = GameManager.Instance.Player;
+            _player = GameManager.Instance.Player;
 
-            _widget = new TempleQuestInfoWidget(8, 3, _quest);
+            _widget = new TempleQuestInfoWidget(8, 3);
             _widget.SetSize(25, 14);
+
+            _questList = GameManager.Instance.QuestList.TempleQuests;
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1023,18 +1062,28 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    if (player.PlayerQuest.Name == null)
+                    if (_player.PlayerQuest.Name == null)
                     {
-                        player.SetQuest(_quest);
-                        _widget.AcceptQuest();
+                        _player.SetQuest(_quest);
+                        _widget.AcceptQuestText();
                         DrawScene();
                     }
+                    //else if (!_player.PlayerQuest.IsMonsterHuntQuest)
+                    //{
+                    //    _widget.AlreadyHaveQuestText();
+                    //    DrawScene();
+                    //    _widget.RefuseQuestText();
+                    //}
                     break;
 
                 case ConsoleKey.D2:
-                    player.SetQuestNull();
-                    _widget.RefuseQuest();
-                    DrawScene();
+                    if (_player.PlayerQuest.IsMonsterHuntQuest)
+                    {
+                        _player.SetQuestNull();
+                        _widget.RefuseQuestText();
+                        DrawScene();
+                    }
+                    
                     break;
 
                 default:
@@ -1042,12 +1091,99 @@ namespace TextRPG
                     break;
             }
         }
+
+        public override void Update(GameManager game)
+        {
+            base.Update(game);
+
+            Quest playerQuest = game.Player.PlayerQuest;
+
+            // 플레이어가 Quest를 안가지고 있을 때
+            if (playerQuest.Name == null)
+            {
+                CreateQuest();
+                _widget.Init(_quest);
+            }
+            // 플레이어가 신전 퀘스트를 가지고 있을 때
+            else if (playerQuest.IsMonsterHuntQuest
+                && playerQuest.Name != null)
+            {
+                // 현재 신전 퀘스트는 플레이어가 가지고 있는 퀘스트
+                _quest = new Quest(playerQuest.Name, playerQuest.Num,
+                    playerQuest.Reward, playerQuest.IsMonsterHuntQuest);
+
+                _widget.Init(_quest);
+                // 진행중 text
+                _widget.AcceptQuestText();
+            }
+            // 플레이어가 상점 퀘스트를 가지고 있을 때
+            else if (!playerQuest.IsMonsterHuntQuest)
+            {
+                _widget.AlreadyHaveQuestText();
+            }
+
+        }
+
         public override void DrawScene()
         {
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
             ShowGold();
+        }
+
+        public void CreateQuest()
+        {
+            Random random = new Random();
+            _quest = _questList[random.Next(0, _questList.Count)];
+            _player.ShouldCreateShopQuest = false;
+        }
+    }
+
+    class TempleQuestCompleteScene : Scene
+    {
+        ShopQuestInfoWidget _widget;
+        public TempleQuestCompleteScene(Scene parent)
+        {
+            _prev = parent;
+            _name = "퀘스트";
+            _comment = "퀘스트를 완료했습니다!";
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
+            Player player = GameManager.Instance.Player;
+
+            _widget = new ShopQuestInfoWidget(35, 3);
+
+            player.GetQuestReward();
+            player.SetQuestNull();
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+
+        public override void Update(GameManager game)
+        {
+            base.Update(game);
+
+            _widget.CompletedText(game.Player.PlayerQuest);
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
         }
     }
 

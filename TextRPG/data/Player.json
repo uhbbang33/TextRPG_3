@@ -64,6 +64,7 @@
   "Quest": {
     "Name": null,
     "Num": 0,
-    "Reward": 0
+    "Reward": 0,
+    "IsMonsterHuntQuest": false
   }
 }

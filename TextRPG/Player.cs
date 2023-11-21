@@ -119,11 +119,15 @@ namespace TextRPG
         List<Skill> _skills = new List<Skill>();
         EquipManager _equipManager;
         int _gold = 0;
+        Quest _playerQuest = new Quest("",0,0,false);
 
         public List<Item> Inventory { get { return _inventory; } }
         public List<Skill> Skills { get { return _skills; } }
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } set { _gold = value; } }
+        public Quest PlayerQuest { get { return _playerQuest; } }
+        
+        public bool isQuestComplte = false;
 
         public Player()
         {
@@ -154,6 +158,8 @@ namespace TextRPG
                     EquipItem(i);
                 }
             }
+
+            _playerQuest = save["Quest"].ToObject<Quest>();
         }
 
         public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
@@ -228,6 +234,7 @@ namespace TextRPG
                 if (item.bEquip)
                     _equipManager.Wear(item);
             }
+            _playerQuest = save["Quest"].ToObject<Quest>();
 
         }
 
@@ -258,6 +265,8 @@ namespace TextRPG
                 if (item.bEquip)
                     _equipManager.Wear(item);
             }
+            _playerQuest = save["Quest"].ToObject<Quest>();
+
         }
 
         public void SortInventory()
@@ -558,5 +567,52 @@ namespace TextRPG
             }
         }
 
+        public void SetQuest(Quest quest)
+        {
+            _playerQuest = quest;
+        }
+
+        public void SetQuestNull()
+        {
+            _playerQuest = new Quest(null, 0, 0, false);
+        }
+
+        public bool IsShopQuestComplete()
+        {
+            if (_playerQuest.Name == null)
+                return false;
+
+            int cnt = 0;
+            foreach (var item in _inventory)
+                if (item.Name == _playerQuest.Name)
+                {
+                    ++cnt;
+                    // 아이템 index 기억
+                    
+                }
+
+            if (cnt >= _playerQuest.Num)
+            {
+                // 아이템 삭제
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsTempleQuestComplete()
+        {
+            // 던전이 끝날 때 cnt ++?
+            // 머지 이후 구현
+
+            return false;
+        }
+
+        public void GetQuestReward()
+        {
+            _gold += _playerQuest.Reward;
+            //_exp += _playerQuest.ExpReward;
+        }
     }
 }

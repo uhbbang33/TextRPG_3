@@ -104,7 +104,7 @@ namespace TextRPG
             for (int i = 0; i < monsterCount; ++i)
             {
                 CreateMonster(difficulty);
-                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].ExpReward, _monsters[i].ItemReward);
+                _reward.AddReward(_monsters[i].GoldReward, _monsters[i].Lv, _monsters[i].ItemReward);
             }
 
             float sum = 0;

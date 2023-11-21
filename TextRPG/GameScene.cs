@@ -531,7 +531,7 @@ namespace TextRPG
             _prev = parent;
             _widget = new ShopInformationDeskWidget(35, 3);
 
-            _choices = new string[] { "구입", "판매" };
+            _choices = new string[] { "구입", "판매", "퀘스트" };
             shop = new Shop();
 
 
@@ -540,6 +540,8 @@ namespace TextRPG
 
             AddScene("Buy", new BuyScene(this));
             AddScene("Sell", new SellScene(this));
+            AddScene("Quest", new ShopQuestScene(this));
+            AddScene("QuestComplete", new ShopQuestCompleteScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -557,6 +559,13 @@ namespace TextRPG
 
                 case ConsoleKey.D2:
                     game.ChangeScene(SceneGroup["Sell"]);
+                    break;
+
+                case ConsoleKey.D3:
+                    if (GameManager.Instance.Player.IsShopQuestComplete())
+                        game.ChangeScene(SceneGroup["QuestComplete"]);
+                    else
+                        game.ChangeScene(SceneGroup["Quest"]);
                     break;
 
                 default:
@@ -813,6 +822,120 @@ namespace TextRPG
         }
     }
 
+    class ShopQuestScene : Scene
+    {
+        protected ShopQuestInfoWidget _widget;
+        bool _isQuestAccepted = false;
+        protected Quest _quest;
+        Player player;
+
+        public ShopQuestScene(Scene parent)
+        {
+            _name = "퀘스트";
+            _comment = "퀘스트를 수락하거나 거절합니다.";
+
+            Random random = new Random();
+            List<Quest> questList = GameManager.Instance.QuestList.ShopQuests;
+            _quest = questList[random.Next(0, questList.Count)];
+
+            _widget = new ShopQuestInfoWidget(35, 3, _quest);
+
+            _prev = parent;
+
+            _choices = new string[] { "수락", "거절" };
+
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
+            player = GameManager.Instance.Player;
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D1:
+                    if (player.PlayerQuest.Name == null)
+                    {
+                        player.SetQuest(_quest);
+
+                        _widget.AcceptText();
+                        DrawScene();
+                        Thread.Sleep(2000);
+
+                        _widget.IncompletedText();
+                    }
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D2:
+                    player.SetQuestNull();
+
+                    _widget.RefuseText();
+                    DrawScene();
+                    Thread.Sleep(2000);
+
+                    _widget.Init();
+                    game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
+        }
+    }
+
+    class ShopQuestCompleteScene : Scene
+    {
+        ShopQuestInfoWidget _widget;
+        public ShopQuestCompleteScene(Scene parent)
+        {
+            _prev = parent;
+            _name = "퀘스트";
+            _comment = "퀘스트를 완료했습니다!";
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
+            Player player = GameManager.Instance.Player;
+
+            _widget = new ShopQuestInfoWidget(35, 3, player.PlayerQuest);
+            _widget.CompletedText();
+
+            player.GetQuestReward();
+            player.SetQuestNull();
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
+        }
+    }
+
     class TempleScene : Scene
     {
         public TempleScene(Scene parent)
@@ -821,7 +944,9 @@ namespace TextRPG
             _comment = "체력을 회복할 수 있습니다.";
             _prev = parent;
             SetDisplay();
-            _choices = new string[] { "회복하기 ( 300 G )" };
+            _choices = new string[] { "회복하기 ( 300 G )", "퀘스트" };
+
+            AddScene("TempleQuest", new TempleQuestScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -842,7 +967,9 @@ namespace TextRPG
                         ThrowMessage("체력을 회복했습니다.");
                     }
                     break;
-
+                case ConsoleKey.D2:
+                    game.ChangeScene(SceneGroup["TempleQuest"]);
+                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -859,6 +986,67 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display, 5);
 
+            ShowGold();
+        }
+    }
+
+    class TempleQuestScene : Scene
+    {
+        TempleQuestInfoWidget _widget;
+        Player player;
+        protected Quest _quest;
+
+        public TempleQuestScene(Scene parent)
+        {
+            _name = "신전 공고문";
+            _comment = "퀘스트를 받을 수 있습니다.";
+            _prev = parent;
+
+            Random random = new Random();
+            List<Quest> questList = GameManager.Instance.QuestList.TempleQuests;
+            _quest = questList[random.Next(0, questList.Count)];
+
+            _choices = new string[] { "수락", "거절" };
+            _display = File.ReadAllLines(@"..\..\..\art\parchment.txt");
+            player = GameManager.Instance.Player;
+
+            _widget = new TempleQuestInfoWidget(8, 3, _quest);
+            _widget.SetSize(25, 14);
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                case ConsoleKey.D1:
+                    if (player.PlayerQuest.Name == null)
+                    {
+                        player.SetQuest(_quest);
+                        _widget.AcceptQuest();
+                        DrawScene();
+                    }
+                    break;
+
+                case ConsoleKey.D2:
+                    player.SetQuestNull();
+                    _widget.RefuseQuest();
+                    DrawScene();
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
             ShowGold();
         }
     }
@@ -983,7 +1171,7 @@ namespace TextRPG
             for (int i = 0; i < count; ++i)
             {
                 UnitViewer textBlock = new UnitViewer();
-                textBlock.SetSize(15, 4);
+                textBlock.SetSize(20, 4);
                 textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
                 _monsters.AddItem(textBlock);
             }
@@ -1063,12 +1251,12 @@ namespace TextRPG
             int x, y;
             for (int i = 0; i < _monsterList.Count; ++i)
             {
-                if (i == 0) { x = 14; y = 2; }
-                else if (i == 1) { x = 50; y = 2; }
-                else if (i == 2) { x = 14; y = 12; }
-                else { x = 50; y = 12; }
+                if (i == 0) { x = 19; y = 1; }
+                else if (i == 1) { x = 55; y = 1; }
+                else if (i == 2) { x = 19; y = 11; }
+                else { x = 55; y = 11; }
 
-                if (_difficulty == 2) { x = 35; y = 2; }
+                if (_difficulty == 2) { x = 41; y = 4; }
 
                 for (int j = 0; j < _monsterList[i].Display.Length; ++j)
                 {

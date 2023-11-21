@@ -28,7 +28,7 @@ namespace TextRPG
         protected string[] _display = { };
         public string[] Display { get { return _display; } }
 
-        static MessageBox _board = new MessageBox(33, 33, 40, 5);
+        static MessageBox _board = new MessageBox(30, 33, 43, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
         static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
         static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
@@ -115,7 +115,6 @@ namespace TextRPG
         }
     }
 
-
     class StartOrContinueScene : Scene
     {
         public StartOrContinueScene(Scene parent)
@@ -172,9 +171,6 @@ namespace TextRPG
             Screen.DrawTopScreen(Display, 2);
         }
     }
-
-
-
     //직업 선택 씬
     class SelectClassScene : Scene
     {
@@ -931,9 +927,11 @@ namespace TextRPG
         public Dungeon Dungeon { get { return _dungeon; } }
 
         MonsterGridBox _monsters;
+        GridBox _selects;
         UnitViewer _playerWidget;
         List<Monster> _monsterList;
         protected int _difficulty;
+        BattleWidget battleMsg;
 
         public BaseDungeonScene()
         {
@@ -943,9 +941,23 @@ namespace TextRPG
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
 
-            _choices = new string[] { "공격", "가방" };
-            AddScene("Bag", new BagScene(this));
+            _selects = new GridBox();
+            _selects.SetPosition(0, 24);
+            _selects.SetColomn(2);
+            _selects.SetMargine(1, 0);
 
+            _choices = new string[] { "공격", "가방" };
+
+            battleMsg = new BattleWidget(2, 25, 50, 5);
+
+            for (int i = 0; i < _choices.Length; ++i)
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.SetSize(38, 5);
+                textBlock.SetText($"{i+1}. {_choices[i]}");
+                _selects.AddItem(textBlock);
+            }
+            
             _monsterList = new List<Monster>();
         }
 
@@ -968,7 +980,19 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.D0:
-                    game.ChangeScene(_prev);
+                    if(_dungeon.RunAway())
+                    {
+                        game.ChangeScene(_prev);
+                    }
+                    else
+                    {
+                        Screen.DrawBotScreen(new string[] { });
+                        battleMsg.SetText("도망가는 것에 실패했습니다.", "", "");
+                        battleMsg.Draw();
+                        Thread.Sleep(1000);
+                        game.ChangeScene(new BattleScene(this, _dungeon));
+                    }
+                    
                     break;
 
                 case ConsoleKey.D1:
@@ -976,7 +1000,7 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D2:
-                    game.ChangeScene(SceneGroup["Bag"]);
+                    game.ChangeScene(new BagScene(this));
                     break;
 
                 default:
@@ -997,14 +1021,14 @@ namespace TextRPG
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            Screen.DrawBotScreen(new string[] { });
             Screen.DrawTopScreen(Display);
+            _selects.Draw();
 
             DrawMonster();
 
             _monsters.Draw();
             _playerWidget.Draw();
-
         }
 
         private void DrawMonster()
@@ -1097,8 +1121,6 @@ namespace TextRPG
             _monsters.SetPosition(0, 24);
             _monsters.SetColomn(2);
             _monsters.SetMargine(1, 0);
-
-            AddScene("MonsterTurn", new BattleScene(this));
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1118,7 +1140,7 @@ namespace TextRPG
                 default:
                     if (_dungeon.SelectMonster((int)key - 49))
                     {
-                        game.ChangeScene(SceneGroup["MonsterTurn"]);
+                        game.ChangeScene(new BattleScene(this.Prev.Prev, _dungeon));
                     }
                     else
                     {
@@ -1152,22 +1174,20 @@ namespace TextRPG
 
     class BattleScene : Scene
     {
-        Scene dungdeonStartScene;
         Dungeon _dungeon;
         string[] msg;
         Dungeon.EDungeoState state;
         BattleWidget battleMsg;
 
-        public BattleScene(Scene parent)
+        public BattleScene(Scene parent, Dungeon dungeon)
         {
-            dungdeonStartScene = parent.Prev.Prev;
+            _prev = parent;            
+            _dungeon = dungeon;
             battleMsg = new BattleWidget(2, 25, 50, 5);
         }
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
-
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1], msg[2]);
         }
@@ -1179,12 +1199,10 @@ namespace TextRPG
             battleMsg.Draw();
             Thread.Sleep(2000);
 
-
-            // switch 로 바꾸자 
             switch (state)
             {
                 case Dungeon.EDungeoState.PlayerTurn:
-                    GameManager.Instance.ChangeScene(dungdeonStartScene);
+                    GameManager.Instance.ChangeScene(_prev);
                     break;
 
                 case Dungeon.EDungeoState.MonsterTurn:
@@ -1192,8 +1210,7 @@ namespace TextRPG
                     break;
 
                 case Dungeon.EDungeoState.PlayerDeath:
-                    // Player.소생
-                    GameManager.Instance.ChangeScene(SceneGroup["Town"]);
+                    GameManager.Instance.RefreshScene();
                     break;
 
                 case Dungeon.EDungeoState.MonsterAllDeath:
@@ -1203,6 +1220,11 @@ namespace TextRPG
                 case Dungeon.EDungeoState.Clear:
                     GameManager.Instance.ChangeScene(new RewardScene(_dungeon));
                     break;
+
+                case Dungeon.EDungeoState.GoTown:
+                    // Player.소생
+                    GameManager.Instance.ChangeScene(SceneGroup["Town"]);
+                    break;
             }
         }
     }
@@ -1210,11 +1232,17 @@ namespace TextRPG
     class RewardScene : Scene
     {
         ResultWidget _resultwidget;
+        Reward _reward;
+        LevelUpWidget _lvUpWidget;
+        bool isLvUp;
         public RewardScene(Dungeon dungeon)
         {
+            _name = "탐험 결과";
             _resultwidget = new ResultWidget(2, 0, 35, 23);
-            //_resultwidget.SetResult(dungeon.beforeRecord, dungeon.afterRecord);
-            _resultwidget.SetResult(dungeon.Reward);
+            _reward = dungeon.Reward;
+            _resultwidget.SetResult(_reward);
+
+            _lvUpWidget = new LevelUpWidget(41, 0, 35, 23);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1230,23 +1258,57 @@ namespace TextRPG
             }
         }
 
+        public override void Update(GameManager game)
+        {
+            Player player = game.Player;
+            
+            foreach(var item in _reward.Items)
+            {
+                player.Inventory.Add(item);
+            }
+
+            player.GetExp(_reward.Exp, out isLvUp);
+            player.Gold += _reward.Gold;
+        }
+
         public override void DrawScene()
         {
             base.DrawScene();
             Screen.DrawTopScreen(Display);
-            _resultwidget.Draw();
+            _resultwidget.Draw();            
+            if (isLvUp)
+            {
+                Thread.Sleep(1000);
+                _lvUpWidget.Draw();
+            }
         }
     }
 
     class BagScene : Scene
     {
+        GridBox _itemBox;
+        List<int> _itemIndex;
+
         public BagScene(Scene parent)
         {
             _prev = parent;
+            
+            _itemBox = new GridBox();
+            _itemBox.SetPosition(0, 24);
+            _itemBox.SetColomn(2);
+            _itemBox.SetMargine(1, 0);
+
+            _itemIndex = new List<int>();
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
+            if (key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _itemIndex.Count)
+            {
+                ThrowMessage("잘못된 입력입니다.");
+                return;
+            }
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -1254,21 +1316,38 @@ namespace TextRPG
                     break;
 
                 default:
-                    ThrowMessage("잘못된 입력입니다.");
+                    int index = _itemIndex[(int)key - 49];
+                    // game.Player.Inventory[index].Use;
                     break;
             }
         }
 
         public override void Update(GameManager game)
         {
-            // _choice = game.player.inventory
-            List<string> itemNames = new List<string>();
+            _itemBox.Clear();
+            _itemIndex.Clear();
+
+            int idx = 0;
 
             for (int i = 0; i < game.Player.Inventory.Count; ++i)
             {
-                itemNames.Add(game.Player.Inventory[i].Name);
+                if (game.Player.Inventory[i].type == Item.EType.Potion)
+                {
+                    ItemSlot textBlock = new ItemSlot();
+                    textBlock.SetSize(38, 5);
+                    textBlock.SetItem(idx++, game.Player.Inventory[i]);
+                    _itemIndex.Add(i);
+                    _itemBox.AddItem(textBlock);
+                }
             }
-            _choices = itemNames.ToArray();
+
+            // 사용할 수 있는 아이템이 없음을 알림 >> ChangeScene 을 호출하지 못해서 갇힘.
+        }
+
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            _itemBox.Draw();
         }
     }
 

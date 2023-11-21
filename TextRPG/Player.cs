@@ -99,22 +99,7 @@ namespace TextRPG
         public int MaxExp { get { return _maxExp; } }
         int[] _expByLevel = { 0, 10, 20, 30, 40, 50, 70, 95, 120, 200 };
 
-        public int Exp
-        {
-            get { return _exp; }
-            set
-            {
-                _exp = value;
-                if (_exp >= _maxExp)
-                {
-                    _exp -= _maxExp;
-                    ++lv;
-                    _maxExp = _expByLevel[lv];
-                    atk += 2;
-                    def += 1;
-                }
-            }
-        }
+        public int Exp { get { return _exp; } }
 
         List<Item> _inventory = new List<Item>();
         List<Skill> _skills = new List<Skill>();
@@ -124,7 +109,7 @@ namespace TextRPG
         public List<Item> Inventory { get { return _inventory; } }
         public List<Skill> Skills { get { return _skills; } }
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
-        public int Gold { get { return _gold; } }
+        public int Gold { get { return _gold; } set { _gold = value; } }
 
         public int hasPotion = 0;
 
@@ -139,7 +124,7 @@ namespace TextRPG
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
             _maxExp = (int)save["MaxExp"];
-            Exp = (int)save["Exp"];
+            _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
@@ -171,7 +156,7 @@ namespace TextRPG
             hp = maxHp;
 
             _maxExp = maxExp;
-            Exp = exp;
+            _exp = exp;
 
             _gold = gold;
 
@@ -215,7 +200,7 @@ namespace TextRPG
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
             _maxExp = (int)save["MaxExp"];
-            Exp = (int)save["Exp"];
+            _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
@@ -245,7 +230,7 @@ namespace TextRPG
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
             _maxExp = (int)save["MaxExp"];
-            Exp = (int)save["Exp"];
+            _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
             hasPotion = (int)save["HasPotion"];
@@ -279,7 +264,7 @@ namespace TextRPG
             {
                 throw new GoldShortageException();
             }
-            else if (_inventory.Count == 40 && item.type != Item.EType.Potion)// _inventory.Max)
+            else if (_inventory.Count == 40 && item.type != Item.EType.Potion)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -372,7 +357,7 @@ namespace TextRPG
             if(random.NextDouble() < _crit)
             {
                 bCrit = true;
-                dmg *= 2;
+                dmg *= (int)(dmg * 1.6f);
             }
 
             dmg =  (int)(dmg * Skills[SID].damage);
@@ -424,6 +409,20 @@ namespace TextRPG
             else
             {
                 invenPage += 1;
+            }
+        }
+
+        public void GetExp(int exp, out bool levelUp)
+        {
+            levelUp = false;
+            _exp += exp;
+            if (_exp >= _maxExp)
+            {
+                _exp -= _maxExp;
+                _maxExp = _expByLevel[++lv];
+                atk += 2;
+                def += 1;
+                levelUp = true;
             }
         }
 

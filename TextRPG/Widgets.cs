@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using Microsoft.VisualBasic;
+using System.Diagnostics.Metrics;
 using System.Text;
 
 namespace TextRPG
@@ -243,7 +244,7 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
-            GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
+            GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
             GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";
         }
@@ -258,23 +259,13 @@ namespace TextRPG
             AddChild("Background", new Border(0, 0, width, height));
             AddChild("Content", new Border(2, 1, width - 4, height - 2));
 
-            //AddChild("LvLabel", new Text(5, 2));
-            //AddChild("LvText", new Text(25, 3));
-
             AddChild("EXPLabel", new Text(5, 2));
-            AddChild("EXPText", new Text(25, 5));
+            AddChild("EXPText", new Text(25, 3));
 
             AddChild("ItemLabel", new Text(5, 4));
 
-            //AddChild("HPLabel", new Text(5, 6));
-            //AddChild("HPText", new Text(25, 7));
-
             AddChild("GoldLabel", new Text(5, 17));
             AddChild("GoldText", new Text(23, 18));
-
-            //AddChild("LevelUpText", new Text(5, 11));
-            //AddChild("AtkText", new Text(25, 13));
-            //AddChild("DefText", new Text(25, 15));
         }
 
         protected override void Draw(int x, int y)
@@ -300,30 +291,44 @@ namespace TextRPG
             {
                 AddChild($"Item{i}", new Text(5, 5 + i));
                 string str = $"{items[i].Name} x 1";
-                GetChild<Text>($"Item{i}").text = $"{str, 25}";
+                str = Utility.MatchCharacterLengthToRight(str, 25,0);
+                GetChild<Text>($"Item{i}").text = str;
             }            
         }
+    }
 
-        public void SetResult(Record before, Record after)
+    class LevelUpWidget : Widget
+    {
+        public LevelUpWidget(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            //GetChild<Text>("LvLabel").text = $"레벨 --------------------------";
-            //GetChild<Text>("LvText").text = $"{before.lv,3} --> {after.lv,3}";
+            _maxChildrenCount = 10;
 
-            GetChild<Text>("EXPLabel").text = $"경험치 ------------------------";
-            GetChild<Text>("EXPText").text = $"{before.exp,3} / {before.maxExp,3} --> {after.exp,3} / {after.maxExp,3}";
+            AddChild("Content", new Border(0, 0, width, height));
+            AddChild("SubContent", new Border(2, 9, width - 4, height - 10));
+            AddChild("AtkText", new Text(5, 11));
+            AddChild("DefText", new Text(5, 13));
+            AddChild("RecoveryText", new Text(5, 15));
+            SetText();
+        }
 
-            GetChild<Text>("HPLabel").text = $"체력 --------------------------";
-            GetChild<Text>("HPText").text = $"{before.hp,3} --> {after.hp,3}";
+        protected override void Draw(int x, int y)
+        {   
+            base.Draw(_x + x, _y + y);
 
-            GetChild<Text>("GoldLabel").text = $"골드 --------------------------";
-            GetChild<Text>("GoldText").text = $"{before.gold,5} G --> {after.gold,5} G";
-
-            if (before.lv != after.lv)
+            string[] contents = File.ReadAllLines(@"..\..\..\art\LevelUp.txt");
+            for (int i = 0; i < contents.Length; ++i)
             {
-                GetChild<Text>("LevelUpText").text = "LEVEL UP !!";
-                GetChild<Text>("AtkText").text = $"공격력 + {2}";
-                GetChild<Text>("DefText").text = $"방어력 + {1}";
+                Console.SetCursorPosition(_x + x + 8, _y + y + 3);
+                Console.Write(contents[i]);
+                ++y;
             }
+        }
+
+        void SetText()
+        {
+            GetChild<Text>("AtkText").text = "공격력이 0.5 증가합니다.";
+            GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
+            GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
         }
     }
 

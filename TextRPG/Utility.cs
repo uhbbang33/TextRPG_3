@@ -17,5 +17,16 @@ namespace TextRPG
             sb.Append("".PadRight(pad - offset));
             return sb.ToString();
         }
+
+        public static string MatchCharacterLengthToRight(string text, int length, int offset)
+        {
+            int len = Encoding.Default.GetBytes(text).Length;
+            int pad = length - len / 3 * 2 - len % 3;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("".PadLeft(pad - offset));
+            sb.Append(text);
+            return sb.ToString();
+        }
     }
 }

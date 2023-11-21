@@ -58,8 +58,6 @@ namespace TextRPG
             this.type = type;
             _price = price;
         }
-
-        //public static operator ==
     }
 
     //json파일에서 불러온 스킬들을 담을 클래스

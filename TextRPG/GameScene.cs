@@ -1574,6 +1574,7 @@ namespace TextRPG
 
                 case Dungeon.EDungeoState.MonsterAllDeath:
                     GameManager.Instance.RefreshScene();
+                    GameManager.Instance.Player.GetMp(10);
                     break;
 
                 case Dungeon.EDungeoState.Clear:

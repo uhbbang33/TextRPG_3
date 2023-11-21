@@ -241,12 +241,12 @@ namespace TextRPG
             else
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
-            GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
+            GetChild<Text>("ExpText").text = $"경험치 : [ {player.Exp} / {player.MaxExp} ]";
+            GetChild<Text>("ClassText").text = $"이름 : {player.Name} ( {player.Class} )";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
-            GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
+            GetChild<Text>("MPText").text = $" 마나 : {player.Mp} / {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
         }

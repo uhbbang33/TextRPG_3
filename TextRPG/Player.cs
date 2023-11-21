@@ -3,10 +3,9 @@ using System;
 using System.Numerics;
 
 
+
 namespace TextRPG
 {
-
-
 
     class EquipManager
     {
@@ -52,7 +51,24 @@ namespace TextRPG
     {
         int _maxLv = 10;
         int lv = 1;
-        public int Lv { get { return lv; } }
+        public int Lv
+        {
+            get
+            {
+                return lv;
+            }
+            set
+            {
+                lv = value;
+
+                //최대 레벨은 10
+                if (lv > 10)
+                    lv = 10;
+
+                //최대 경험치를 레벨마다 다르게
+                MaxExp = _expByLevel[lv - 1];
+            }
+        }
 
         string name = "...";
         public string Name { get { return name; } set { name = Name; } }
@@ -73,8 +89,24 @@ namespace TextRPG
         float _crit = 0.3f;
         public float Crit { get { return _crit; } }
 
-        int mp = 100;
-        public int Mp { get { return mp; } set { mp -= value; } }
+        int mp = 50;
+        public int Mp
+        {
+            get
+            {
+                return mp;
+            }
+            set
+            {
+                mp = value;
+
+                //최대 마나를 초과하여 회복하지 못하게 함
+                if (mp > maxMp)
+                {
+                    mp = maxMp;
+                }
+            }
+        }
 
         int hp;
         public int Hp
@@ -91,7 +123,7 @@ namespace TextRPG
                     hp = 0;
                 }
 
-                //포션 먹을 때, 최대 체력 이상으로 회복하지 못하게 함
+                //최대 체력을 초과하여 회복하지 못하게 함
                 if (hp > maxHp)
                 {
                     hp = maxHp;
@@ -99,7 +131,7 @@ namespace TextRPG
             }
         }
 
-        int maxMp = 100;
+        int maxMp = 50;
         int maxHp = 100;
         int _deltaHp = 0;
         public int MaxHp { get { return maxHp + _deltaHp; } }
@@ -109,8 +141,8 @@ namespace TextRPG
 
         int _exp = 0;
         int _maxExp = 10;
-        public int MaxExp { get { return _maxExp; } }
-        int[] _expByLevel = { 0, 10, 20, 30, 40, 50, 70, 95, 120, 200 };
+        public int MaxExp { get { return _maxExp; } set { _maxExp = value; } }
+        int[] _expByLevel = { 50, 60, 80, 110, 150, 200, 270, 365, 485, 600 };
 
         public int Exp { get { return _exp; } }
 
@@ -118,6 +150,7 @@ namespace TextRPG
         List<Skill> _skills = new List<Skill>();
         EquipManager _equipManager;
         int _gold = 0;
+
         Quest _playerQuest;
 
         public List<Item> Inventory { get { return _inventory; } }
@@ -125,8 +158,8 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } set { _gold = value; } }
         public Quest PlayerQuest { get { return _playerQuest; } }
-        
         public bool ShouldCreateShopQuest = false;
+
 
         public Player()
         {
@@ -445,7 +478,7 @@ namespace TextRPG
                 _inventory[index].HasCount -= 1;
             }
             else
-            {              
+            {
                 BuffTurn = turn;
                 switch (_inventory[index].Status)
                 {
@@ -464,11 +497,11 @@ namespace TextRPG
                 _inventory.RemoveAt(index);
             }
         }
-        
+
         //버프 턴 감소 및 수치 초기화
         public void SubtractorBuffTurn()
         {
-            if(BuffTurn > 0)
+            if (BuffTurn > 0)
             {
                 BuffTurn -= 1;
             }
@@ -575,25 +608,31 @@ namespace TextRPG
             }
         }
 
-        public void GetExp(int exp, out bool levelUp)
-        {            
-            levelUp = false;
-            if (lv == _maxLv) return;
 
+        public void GetExp(int exp, out bool levelUp)
+        {
+            levelUp = false;
             _exp += exp;
+
             if (_exp >= _maxExp)
             {
                 _exp -= _maxExp;
                 atk += 2;
                 def += 1;
 
-                _maxExp = ++lv == 10 ? 0 : _expByLevel[lv];
                 hp = MaxHp;
                 levelUp = true;
             }
         }
 
+        //전투 끝나고 마나 회복을 위한 함수
+        public void GetMp(int mp)
+        {
+            Mp += mp;
+        }
+
         #region Quest 관련 함수
+
         public void SetQuest(Quest quest)
         {
             _playerQuest = quest;
@@ -615,8 +654,10 @@ namespace TextRPG
                 if (_inventory[i].Name == _playerQuest.Name)
                 {
                     ++cnt;
+
                     // 퀘스트 아이템 인덱스 indexList에 추가
                     indexList.Add(i);
+
                 }
 
             if (cnt >= _playerQuest.Num)

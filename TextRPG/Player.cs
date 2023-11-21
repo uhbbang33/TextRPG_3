@@ -362,12 +362,32 @@ namespace TextRPG
             _gold += gold;
         }
 
+        public bool UseItem(int index)
+        {
+            Item item = _inventory[index];
+            switch(item._status)
+            {
+                case Item.EStatus.ATK:
+                    break;
+
+                case Item.EStatus.DEF:
+                    break;
+
+                case Item.EStatus.HP:
+                    if (Hp == MaxHp) return false;
+                    Hp += item.Value;
+                    break;
+            }
+
+            --item.HasCount;
+            if (item.HasCount == 0) _inventory.RemoveAt(index);
+            return true;
+        }
+
         //HP 포션 사용
         public void UsedHealthPotion(int index)
         {
-
             if (_inventory[index].HasCount > 1)
-
             {
                 hp += _inventory[index].Value;
                 _inventory[index].HasCount -= 1;
@@ -455,7 +475,6 @@ namespace TextRPG
                 BuffAtk = 0;
                 BuffDef = 0;
             }
-
         }
 
         public bool Rest()

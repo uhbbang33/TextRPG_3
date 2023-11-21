@@ -1138,17 +1138,14 @@ namespace TextRPG
             _monsters = new MonsterGridBox();
             _monsters.SetColomn(1);
             _monsters.SetMargine(1, 0);
-            // _monsters.SetPosition(0, 0);
-
+            
             _selects = new GridBox();
             _selects.SetPosition(0, 24);
             _selects.SetColomn(2);
             _selects.SetMargine(1, 0);
 
 
-            _choices = new string[] { "공격", "가방", "포션 마시기" };
-            AddScene("Attack", new AttackScene(this));
-            AddScene("Bag", new BagScene(this));
+            _choices = new string[] { "공격", "가방" };
 
             battleMsg = new BattleWidget(2, 25, 50, 5);
 
@@ -1184,6 +1181,10 @@ namespace TextRPG
                 case ConsoleKey.D0:
                     if(_dungeon.RunAway())
                     {
+                        Screen.DrawBotScreen(new string[] { });
+                        battleMsg.SetText("성공적으로 도망쳤습니다.", "", "");
+                        battleMsg.Draw();
+                        Thread.Sleep(1000);
                         game.ChangeScene(_prev);
                     }
                     else
@@ -1375,8 +1376,6 @@ namespace TextRPG
         }
     }
 
-
-
     class BattleScene : Scene
     {
         Dungeon _dungeon;
@@ -1393,8 +1392,6 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            //if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
-
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1], msg[2]);
         }
@@ -1495,17 +1492,23 @@ namespace TextRPG
     {
         GridBox _itemBox;
         List<int> _itemIndex;
+        BattleWidget battleMsg;
+        Dungeon _dungeon;
 
         public BagScene(Scene parent)
         {
             _prev = parent;
-            
+
+            _dungeon = ((BaseDungeonScene)parent).Dungeon;
+
             _itemBox = new GridBox();
             _itemBox.SetPosition(0, 24);
             _itemBox.SetColomn(2);
             _itemBox.SetMargine(1, 0);
 
             _itemIndex = new List<int>();
+
+            battleMsg = new BattleWidget(2, 25, 50, 5);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1524,7 +1527,28 @@ namespace TextRPG
 
                 default:
                     int index = _itemIndex[(int)key - 49];
-                    // game.Player.Inventory[index].Use;
+                    Screen.DrawBotScreen(new string[] { });
+                    Item item = game.Player.Inventory[index];
+                    if (game.Player.UseItem(index))
+                    {
+                        Screen.DrawBotScreen(Option);
+                        string[] msg = MakeSuccessMessage(item);
+                        battleMsg.SetText(msg[0], msg[1], msg[2]);
+                        battleMsg.Draw();
+                        Thread.Sleep(1000);
+                        _dungeon.PassPlayerTurn();
+                        game.ChangeScene(new BattleScene(Prev, _dungeon));
+                    }
+                    else
+                    {
+                        Screen.DrawBotScreen(Option);
+                        string[] msg = MakeFailMessage(item);
+                        battleMsg.SetText(msg[0], msg[1], msg[2]);
+                        battleMsg.Draw();
+                        Thread.Sleep(1000);
+                        game.RefreshScene();
+                    }
+
                     break;
             }
         }
@@ -1554,10 +1578,51 @@ namespace TextRPG
 
         public override void DrawScene()
         {
-            base.DrawScene();
+            //base.DrawScene();
+            Screen.DrawBotScreen(Option);
             _itemBox.Draw();
-            
-            //_choices = itemNames.ToArray();
+        }
+
+        string[] MakeSuccessMessage(Item item)
+        {
+            string[] msg = new string[3];
+            msg[0] = $"{item.Name} 을(를) 사용합니다.";
+            msg[1] = "";
+
+            switch(item._status)
+            {
+                case Item.EStatus.ATK:
+                    break;
+
+                case Item.EStatus.DEF:
+                    break;
+
+                case Item.EStatus.HP:
+                    msg[2] = $"체력을 {item.Value} 만큼 회복했습니다.";
+                    break;
+            }
+            return msg;
+        }
+
+        string[] MakeFailMessage(Item item)
+        {
+            string[] msg = new string[3];
+            msg[0] = $"{item.Name} 을(를) 사용에 실패했습니다.";
+            msg[1] = "";
+
+            switch (item._status)
+            {
+                case Item.EStatus.ATK:
+                    break;
+
+                case Item.EStatus.DEF:
+                    break;
+
+                case Item.EStatus.HP:
+                    msg[2] = "체력이 이미 최대치 입니다.";
+                    break;
+            }
+            return msg;
         }
     }
 

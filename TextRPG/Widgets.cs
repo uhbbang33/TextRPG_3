@@ -330,7 +330,7 @@ namespace TextRPG
 
         void SetText()
         {
-            GetChild<Text>("AtkText").text = "공격력이 0.5 증가합니다.";
+            GetChild<Text>("AtkText").text = "공격력이 2.0 증가합니다.";
             GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
             GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
         }
@@ -842,7 +842,7 @@ namespace TextRPG
             Console.Write("┫");
         }
 
-        public static void ShowMapName(string name, string comment = "") // 색상 설정?
+        public static void ShowMapName(string name, string comment = "") 
         {
             DeleteLine(1);
 

@@ -315,5 +315,11 @@ namespace TextRPG
                 return false;
             }            
         }
+
+        public void PassPlayerTurn()
+        {
+            state = Dungeon.EDungeoState.MonsterTurn;
+            SetMonsterOrder();
+        }
     }
 }

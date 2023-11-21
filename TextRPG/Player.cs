@@ -617,6 +617,7 @@ namespace TextRPG
             if (_exp >= _maxExp)
             {
                 _exp -= _maxExp;
+                Lv += 1;
                 atk += 2;
                 def += 1;
 

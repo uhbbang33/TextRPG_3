@@ -26,7 +26,7 @@ namespace TextRPG
 
         static MessageBox _board = new MessageBox(30, 33, 43, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
-        static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
+        static TextBlock _pagination = new TextBlock(3, 20, 26, 3);
 
         protected void AddScene(string name, Scene scene)
         {
@@ -53,11 +53,17 @@ namespace TextRPG
             _goldText.Draw();
         }
 
-        int pageNum;
-        int LastPage;
         protected void ShowPagination()
         {
-            _pagination.SetText($"◀이전 Q  /  E 다음▶");
+            int currentPage = GameManager.Instance.Player.invenPage + 1;
+            int lastPage = GameManager.Instance.Player.Inventory.Count / 6 + 1;
+            _pagination.SetText($"◀이전 Q ({currentPage}/{lastPage}) E 다음▶");
+            _pagination.Draw();
+        }
+
+        protected void ShowPagination(int currentPage, int lastPage)
+        {
+            _pagination.SetText($"◀이전 Q ({currentPage}/{lastPage}) E 다음▶");
             _pagination.Draw();
         }
 
@@ -461,8 +467,7 @@ namespace TextRPG
                     int index = (int)key - 49 + (player.invenPage * 6);
                     if (game.Player.Inventory[index].type == Item.EType.Potion)
                     {
-                        game.Player.UsedHealthPotion(index);
-                        ThrowMessage($"{game.Player.Inventory[index].Value}만큼 회복했습니다.");
+                        ThrowMessage("포션은 장비할 수 없습니다.");
                         return;
                     }
                     else
@@ -671,7 +676,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _ShopItems.Draw();
-            ShowPagination();
+            ShowPagination(_pagination + 1, _shop.storeItems.Count / 6 + 1);
             ShowGold();
         }
 
@@ -968,10 +973,10 @@ namespace TextRPG
             {
                 TextBlock textBlock = new TextBlock();
                 textBlock.SetSize(38, 5);
-                textBlock.SetText($"{i+1}. {_choices[i]}");
+                textBlock.SetText($"{i + 1}. {_choices[i]}");
                 _selects.AddItem(textBlock);
             }
-            
+
             _monsterList = new List<Monster>();
         }
 
@@ -994,7 +999,7 @@ namespace TextRPG
             switch (key)
             {
                 case ConsoleKey.D0:
-                    if(_dungeon.RunAway())
+                    if (_dungeon.RunAway())
                     {
                         game.ChangeScene(_prev);
                     }
@@ -1006,7 +1011,7 @@ namespace TextRPG
                         Thread.Sleep(1000);
                         game.ChangeScene(new BattleScene(this, _dungeon));
                     }
-                    
+
                     break;
 
                 case ConsoleKey.D1:
@@ -1211,7 +1216,7 @@ namespace TextRPG
 
         public BattleScene(Scene parent, Dungeon dungeon)
         {
-            _prev = parent;            
+            _prev = parent;
             _dungeon = dungeon;
             battleMsg = new BattleWidget(2, 25, 50, 5);
         }
@@ -1293,10 +1298,10 @@ namespace TextRPG
         public override void Update(GameManager game)
         {
             Player player = game.Player;
-            
-            foreach(var item in _reward.Items)
+
+            foreach (var item in _reward.Items)
             {
-                player.Inventory.Add(item);
+                player.MergeIfConsumable(item);
             }
 
             player.GetExp(_reward.Exp, out isLvUp);
@@ -1307,7 +1312,7 @@ namespace TextRPG
         {
             base.DrawScene();
             Screen.DrawTopScreen(Display);
-            _resultwidget.Draw();            
+            _resultwidget.Draw();
             if (isLvUp)
             {
                 Thread.Sleep(1000);
@@ -1324,7 +1329,7 @@ namespace TextRPG
         public BagScene(Scene parent)
         {
             _prev = parent;
-            
+
             _itemBox = new GridBox();
             _itemBox.SetPosition(0, 24);
             _itemBox.SetColomn(2);
@@ -1382,8 +1387,12 @@ namespace TextRPG
             base.DrawScene();
             _itemBox.Draw();
 
+<<<<<<< Updated upstream
             _choices = itemNames.ToArray();
 
+=======
+            //_choices = itemNames.ToArray();
+>>>>>>> Stashed changes
         }
     }
 

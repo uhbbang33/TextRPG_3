@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Numerics;
 
 
 namespace TextRPG
@@ -282,34 +283,7 @@ namespace TextRPG
             }
             else
             {
-                //해당 아이템이 무기라면 리스트에 추가
-                if (item.type == Item.EType.Weapon || item.type == Item.EType.Weapon)
-                {
-                    _inventory.Add(item);
-                }
-                //해당 아이템이 소모품 && 해당 아이템을 이미 보유중 이라면 개수만 추가
-                else
-                {
-                    bool hasPotion = false;
-                    int potionIndex = 0;
-                    for (int i = 0; i < _inventory.Count; i++)
-                    {
-                        if (_inventory[i].Name == item.Name)
-                        {
-                            hasPotion = true;
-                            potionIndex = i;
-                            break;
-                        }
-                    }
-                    if (hasPotion)
-                    {
-                        _inventory[potionIndex].HasCount += 1;
-                    }
-                    else
-                    {
-                        _inventory.Add(item);
-                    }
-                }
+                MergeIfConsumable(item);
                 _gold -= item.Price;
             }
         }
@@ -339,6 +313,37 @@ namespace TextRPG
                     {
                         _inventory.RemoveAt(index);
                     }
+                }
+            }
+        }
+
+        //아이템이 소모품이라면 아이템을 합침
+        public void MergeIfConsumable(Item item)
+        {
+            if (item.type != Item.EType.Potion)
+            {
+                Inventory.Add(item);
+            }
+            else
+            {
+                int index = 0;
+                bool isHave = false;
+                for (int i = 0; i < Inventory.Count; i++)
+                {
+                    if (item.Name == Inventory[i].Name)
+                    {
+                        isHave = true;
+                        index = i;
+                        break;
+                    }
+                }
+                if (isHave)
+                {
+                    Inventory[index].HasCount++;
+                }
+                else if (!isHave)
+                {
+                    Inventory.Add(item);
                 }
             }
         }
@@ -515,9 +520,9 @@ namespace TextRPG
             }
             return dmg;
         }
-
+        //인벤토리 페이지 번호 변경하는 메소드
         public int invenPage = 0;
-        public void ResetPage()
+        public void PageNum()
         {
             invenPage = 0;
         }

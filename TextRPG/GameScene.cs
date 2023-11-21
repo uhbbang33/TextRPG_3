@@ -1204,20 +1204,6 @@ namespace TextRPG
                 case ConsoleKey.D2:
                     game.ChangeScene(new BagScene(this));
                     break;
-                case ConsoleKey.D3:
-                    bool result;
-                    result = game.Player.DrinkPotion();
-
-                    if (result)
-                    {
-                        ThrowMessage("포션을 마셔 체력을 회복했다.");
-                    }
-                    else
-                    {
-                        ThrowMessage("포션이 없습니다.");
-                    }
-
-                    break;
                 default:
                     ThrowMessage("잘못된 입력입니다.");
                     break;
@@ -1236,6 +1222,7 @@ namespace TextRPG
 
         public override void DrawScene()
         {
+            Screen.ShowMapName(_name);
             Screen.DrawBotScreen(new string[] { });
             Screen.DrawTopScreen(Display);
             _selects.Draw();
@@ -1569,9 +1556,8 @@ namespace TextRPG
         {
             base.DrawScene();
             _itemBox.Draw();
-
-            _choices = itemNames.ToArray();
-
+            
+            //_choices = itemNames.ToArray();
         }
     }
 

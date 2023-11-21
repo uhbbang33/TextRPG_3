@@ -117,7 +117,7 @@ namespace TextRPG
         List<Skill> _skills = new List<Skill>();
         EquipManager _equipManager;
         int _gold = 0;
-        Quest _playerQuest = new Quest("",0,0,false);
+        Quest _playerQuest;
 
         public List<Item> Inventory { get { return _inventory; } }
         public List<Skill> Skills { get { return _skills; } }
@@ -125,7 +125,7 @@ namespace TextRPG
         public int Gold { get { return _gold; } set { _gold = value; } }
         public Quest PlayerQuest { get { return _playerQuest; } }
         
-        public bool isQuestComplte = false;
+        public bool ShouldCreateShopQuest = false;
 
         public Player()
         {
@@ -588,6 +588,7 @@ namespace TextRPG
             }
         }
 
+        #region Quest 관련 함수
         public void SetQuest(Quest quest)
         {
             _playerQuest = quest;
@@ -600,25 +601,35 @@ namespace TextRPG
 
         public bool IsShopQuestComplete()
         {
-            if (_playerQuest.Name == null)
+            if (_playerQuest.Name == null || _playerQuest.IsMonsterHuntQuest)
                 return false;
 
             int cnt = 0;
-            foreach (var item in _inventory)
-                if (item.Name == _playerQuest.Name)
+            List<int> indexList = new List<int>();
+            for(int i =0; i< _inventory.Count; ++i)
+                if (_inventory[i].Name == _playerQuest.Name)
                 {
                     ++cnt;
-                    // 아이템 index 기억
-                    
+                    // 퀘스트 아이템 인덱스 indexList에 추가
+                    indexList.Add(i);
                 }
 
             if (cnt >= _playerQuest.Num)
             {
-                // 아이템 삭제
-
+                // 아이템을 퀘스트num만큼만 삭제
+                cnt = _playerQuest.Num;
+                for (int i = indexList.Count - 1; i >= 0; --i)
+                {
+                    int _index = indexList[i];
+                    if(cnt > 0)
+                    {
+                        _inventory.RemoveAt(_index);
+                        --cnt;
+                    }
+                }
+                ShouldCreateShopQuest = true;
                 return true;
             }
-
             return false;
         }
 
@@ -633,9 +644,9 @@ namespace TextRPG
         public void GetQuestReward()
         {
             _gold += _playerQuest.Reward;
-            //_exp += _playerQuest.ExpReward;
         }
 
+        #endregion
         public void Revival()
         {            
             _gold /= 2;

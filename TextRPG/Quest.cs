@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Text.Json.Serialization;
 
 namespace TextRPG
 {
@@ -20,11 +21,15 @@ namespace TextRPG
         int _reward;
         public int Reward {  get { return _reward; } }
 
+        bool _isMonsterHuntQuest;
+        public bool IsMonsterHuntQuest { get {  return _isMonsterHuntQuest; } }
+
         public Quest(string name, int num, int reward, bool isMonsterHuntQuest)
         {
             _name = name;
             _num = num;
             _reward = reward;
+            _isMonsterHuntQuest = isMonsterHuntQuest;   // 변수명 변경 _isShopQuest
         }
     }
 

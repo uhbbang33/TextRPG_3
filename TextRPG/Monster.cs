@@ -86,11 +86,11 @@ namespace TextRPG
         {
             Name = "거미";
             _lv = random.Next(1, 6);
-            _maxHp = 10 + _lv;
+            _maxHp = 5 + _lv;
             _hp = MaxHp;
-            _atk = 10 + _lv;
+            _atk = 5 + _lv;
             _def = 5 + _lv;
-            _goldReward = 10 + _lv;
+            _goldReward = 5 + _lv;
             _itemReward = new Item("거미줄", "0:0", "아무 능력도 없는 거미줄", Item.EType.Potion, 5);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\spider.txt");
         }
@@ -102,11 +102,11 @@ namespace TextRPG
         {
             Name = "박쥐";
             _lv = random.Next(5, 11);
-            _maxHp = 15 + (int)(_lv * 1.2f);
+            _maxHp = 10 + (int)(_lv * 1.2f);
             _hp = MaxHp;
-            _atk = 10 + (int)(_lv * 1.2f);
+            _atk = 7 + (int)(_lv * 1.2f);
             _def = 1 + (int)(_lv * 1.2f);
-            _goldReward = 15 + _lv;
+            _goldReward = 10 + _lv;
             _itemReward = new Item("박쥐날개", "0:1", "팔면 쏠쏠하다", Item.EType.Potion, 15);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\bat.txt");
         }
@@ -118,11 +118,11 @@ namespace TextRPG
         {
             Name = "독개구리";
             _lv = random.Next(10, 16);
-            _maxHp = 25 + (int)(_lv * 1.5f);
+            _maxHp = 20 + (int)(_lv * 1.5f);
             _hp = MaxHp;
-            _atk = 20 + (int)(_lv * 1.5f);
-            _def = 30 + (int)(_lv * 1.5f);
-            _goldReward = 30 + _lv;
+            _atk = 15 + (int)(_lv * 1.5f);
+            _def = 20 + (int)(_lv * 1.5f);
+            _goldReward = 20 + _lv;
             _itemReward = new Item("독개구리의 독", "0:-10", "먹지 말고 팔자", Item.EType.Potion, 25);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\frog.txt");
         }
@@ -134,7 +134,7 @@ namespace TextRPG
         {
             Name = "그리폰";
             _lv = random.Next(20, 26);
-            _maxHp = 80 +(int)(_lv * 1.2f);
+            _maxHp = 70 +(int)(_lv * 1.2f);
             _hp = MaxHp;
             _atk = 30 + (int)(_lv * 1.2f);
             _def = 30 + (int)(_lv * 1.2f);
@@ -152,8 +152,8 @@ namespace TextRPG
             _lv = random.Next(30, 36);
             _maxHp = 60 + (int)(_lv * 1.4f);
             _hp = MaxHp;
-            _atk = 40 + (int)(_lv * 1.4f);
-            _def = 50 + (int)(_lv * 1.4f);
+            _atk = 35 + (int)(_lv * 1.4f);
+            _def = 40 + (int)(_lv * 1.4f);
             _goldReward = 60 + (int)(_lv * 1.4f);
             _itemReward = new Item("유니콘 뿔", "2:13", "관상용으로도 추천", Item.EType.Weapon, 60);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\unicorn.txt");
@@ -166,7 +166,7 @@ namespace TextRPG
         {
             Name = "드래곤";
             _lv = random.Next(40, 51);
-            _maxHp = 150 + (int)(_lv * 1.5f);
+            _maxHp = 100 + (int)(_lv * 1.5f);
             _hp = MaxHp;
             _atk = 60 + (int)(_lv * 1.5f);
             _def = 70 + (int)(_lv * 1.5f);

@@ -482,11 +482,7 @@ namespace TextRPG
 
     class ShopQuestInfoWidget : Widget
     {
-        string _name = "";
-        int _num = 0;
-        int _reward = 0;
-
-        public ShopQuestInfoWidget(int x, int y, Quest quest) : base(x, y)
+        public ShopQuestInfoWidget(int x, int y) : base(x, y)
         {
             _maxChildrenCount = 7;
 
@@ -497,28 +493,22 @@ namespace TextRPG
             AddChild("Text4", new Text(2, 5));
             AddChild("Text5", new Text(2, 6));
             AddChild("Text6", new Text(2, 7));
-
-            _name = quest.Name;
-            _num = quest.Num;
-            _reward = quest.Reward;
-
-            Init();
         }
 
-        public void Init()
+        public void Init(Quest quest)
         {
             GetChild<Text>("Text1").text = "마침 잘 오셨어요.";
-            GetChild<Text>("Text2").text = $"지금 [{_name}] [{_num}개]가 필요한데";
+            GetChild<Text>("Text2").text = $"지금 [{quest.Name}] [{quest.Num}개]가 필요한데";
             GetChild<Text>("Text3").text = "구해다 주실 수 있나요? ";
-            GetChild<Text>("Text4").text = $"보상: [{_reward} Gold]";
+            GetChild<Text>("Text4").text = $"보상: [{quest.Reward} Gold]";
             GetChild<Text>("Text5").text = "1. 수락";
             GetChild<Text>("Text6").text = "2. 거절";
         }
 
-        public void AcceptText()
+        public void AcceptText(Quest quest)
         {
             GetChild<Text>("Text1").text = "정말 감사해요.";
-            GetChild<Text>("Text2").text = $"[{_name}] [{_num}개]를 모으시면";
+            GetChild<Text>("Text2").text = $"[{quest.Name}] [{quest.Num}개]를 모으시면";
             GetChild<Text>("Text3").text = "말을 걸어주세요.";
             GetChild<Text>("Text4").text = "";
             GetChild<Text>("Text5").text = "";
@@ -535,22 +525,32 @@ namespace TextRPG
             GetChild<Text>("Text6").text = "";
         }
 
-        public void CompletedText()
+        public void CompletedText(Quest quest)
         {
             GetChild<Text>("Text1").text = "정말 감사해요.";
             GetChild<Text>("Text2").text = "소정의 보상을 드릴게요.";
             GetChild<Text>("Text3").text = "";
             GetChild<Text>("Text4").text = "나중에 또 도와주세요.";
             GetChild<Text>("Text5").text = "";
-            GetChild<Text>("Text6").text = $"보상: [{_reward} Gold]";
+            GetChild<Text>("Text6").text = $"보상: [{quest.Reward} Gold]";
         }
-        public void IncompletedText()
+        public void IncompletedText(Quest quest)
         {
             GetChild<Text>("Text1").text = "말씀 드린 재료를";
             GetChild<Text>("Text2").text = "아직 다 모으지 못하신 것 같아요.";
             GetChild<Text>("Text3").text = "";
-            GetChild<Text>("Text4").text = $"[{_name}] [{_num}개]를 다 모으시면";
+            GetChild<Text>("Text4").text = $"[{quest.Name}] [{quest.Num}개]를 다 모으시면";
             GetChild<Text>("Text5").text = "말을 걸어주세요.";
+            GetChild<Text>("Text6").text = "";
+        }
+
+        public void AlreadyHaveQuestText()
+        {
+            GetChild<Text>("Text1").text = "이미 신전 퀘스트를 가지고 계시네요.";
+            GetChild<Text>("Text2").text = "";
+            GetChild<Text>("Text3").text = "신전 퀘스트를 끝내거나 거절하시고";
+            GetChild<Text>("Text4").text = "다시 말을 걸어주세요.";
+            GetChild<Text>("Text5").text = "";
             GetChild<Text>("Text6").text = "";
         }
 
@@ -562,11 +562,7 @@ namespace TextRPG
 
     class TempleQuestInfoWidget : Widget
     {
-        string _name = "";
-        int _num = 0;
-        int _reward = 0;
-
-        public TempleQuestInfoWidget(int x, int y, Quest quest) : base(x, y)
+        public TempleQuestInfoWidget(int x, int y) : base(x, y)
         {
             _maxChildrenCount = 11;
 
@@ -579,37 +575,47 @@ namespace TextRPG
             AddChild("Text6", new Text(2, 7));
             AddChild("Text7", new Text(2, 8));
             AddChild("Text8", new Text(2, 9));
-            AddChild("Text9", new Text(15, 11));
-
-            _name = quest.Name;
-            _num = quest.Num;
-            _reward = quest.Reward;
-
-            Init();
+            AddChild("Text9", new Text(3, 11));
+            AddChild("Text10", new Text(13, 12));
         }
 
-        public void Init()
+        public void Init(Quest quest)
         {
             GetChild<Text>("Text1").text = "\t\t공고문";
-            GetChild<Text>("Text2").text = $"현재 [{_name}]의";
+            GetChild<Text>("Text2").text = $"현재 [{quest.Name}]의";
             GetChild<Text>("Text3").text = "개체수가 너무 많아";
             GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
-            GetChild<Text>("Text5").text = $"[{_name}]";
-            GetChild<Text>("Text6").text = $"[{_num}마리]를 잡아오면";
-            GetChild<Text>("Text7").text = $"[{_reward} Gold]를";
+            GetChild<Text>("Text5").text = $"[{quest.Name}]";
+            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오면";
+            GetChild<Text>("Text7").text = $"[{quest.Reward} Gold]를";
             GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
             GetChild<Text>("Text9").text = "";
+            GetChild<Text>("Text10").text = "";
         }
 
-        public void AcceptQuest()
+        public void AcceptQuestText()
         {
-            GetChild<Text>("Text9").text = "[진행중]";
+            GetChild<Text>("Text10").text = "[진행중]";
+        }
+        public void AlreadyHaveQuestText()
+        {
+            GetChild<Text>("Text9").text = "[상점 퀘스트 진행중]";
+            GetChild<Text>("Text10").text = "[진행불가]";
         }
 
-        public void RefuseQuest()
+        public void QuestCompleteText()
+        {
+            GetChild<Text>("Text9").text = "[퀘스트 완료!]";
+            GetChild<Text>("Text10").text = "[보상지급]";
+        }
+        
+        public void RefuseQuestText()
         {
             GetChild<Text>("Text9").text = "";
+            GetChild<Text>("Text10").text = "";
         }
+
+        
 
         protected override void Draw(int x, int y)
         {

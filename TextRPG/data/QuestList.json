@@ -2,35 +2,41 @@
   "ShopQuestList": [
     {
       "Name": "박쥐날개",
-      "Num": 4,
-      "Reward": 50
+      "Num": 1,
+      "Reward": 50,
+      "IsMonsterHuntQuest": false
     },
     {
       "Name": "거미줄",
       "Num": 3,
-      "Reward": 30
+      "Reward": 30,
+      "IsMonsterHuntQuest": false
     },
     {
       "Name": "독개구리의 독",
       "Num": 4,
-      "Reward": 100
+      "Reward": 100,
+      "IsMonsterHuntQuest": false
     }
   ],
   "TempleQuestList": [
     {
       "Name": "거미",
       "Num": 2,
-      "Reward": 20
+      "Reward": 20,
+      "IsMonsterHuntQuest": true
     },
     {
       "Name": "박쥐",
       "Num": 5,
-      "Reward": 60
+      "Reward": 60,
+      "IsMonsterHuntQuest": true
     },
     {
       "Name": "독개구리",
       "Num": 4,
-      "Reward": 100
+      "Reward": 100,
+      "IsMonsterHuntQuest": true
     }
   ]
 }

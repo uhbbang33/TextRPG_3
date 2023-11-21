@@ -208,21 +208,21 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 11;
+            _maxChildrenCount = 17;
 
-            AddChild("Background", new Border(0, 0, 39, 20));
-
-            AddChild("Content", new Border(2, 1, 35, 18));
-
+            AddChild("Background", new Border(0, 0, 39, 22));
+            AddChild("Content", new Border(2, 1, 35, 20));
+            AddChild("SkillContent", new Border(39, 0, 39, 22));
             AddChild("LvText", new Text(5, 2));
             AddChild("ExpText", new Text(15, 2));
             AddChild("ClassText", new Text(5, 4));
             AddChild("AtkText", new Text(5, 6));
             AddChild("DefText", new Text(5, 8));
             AddChild("HPText", new Text(5, 10));
-            AddChild("CritText", new Text(5, 12));
-            AddChild("GoldText", new Text(5, 14));
-            AddChild("PotionText", new Text(5, 16));
+            AddChild("MPText", new Text(5, 12));
+            AddChild("CritText", new Text(5, 14));
+            AddChild("GoldText", new Text(5, 16));
+            AddChild("PotionText", new Text(5, 18));
         }
 
         public void SetPlayer(Player player)
@@ -243,6 +243,7 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
+            GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
             GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";

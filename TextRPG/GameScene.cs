@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System.Numerics;
-﻿using static TextRPG.Dungeon;
-
-
-namespace TextRPG
+﻿namespace TextRPG
 {
     class Scene
     {
@@ -30,12 +25,11 @@ namespace TextRPG
 
         static MessageBox _board = new MessageBox(33, 33, 40, 5);
         static TextBlock _goldText = new TextBlock(63, 20, 15, 3);
-        static TextBlock _potionText = new TextBlock(48, 20, 15, 3);
         static TextBlock _pagination = new TextBlock(3, 20, 24, 3);
 
         protected void AddScene(string name, Scene scene)
         {
-            if(SceneGroup.ContainsKey(name) == false)
+            if (SceneGroup.ContainsKey(name) == false)
             {
                 SceneGroup.Add(name, scene);
             }
@@ -53,10 +47,6 @@ namespace TextRPG
         // 보유 골드 표시
         protected void ShowGold()
         {
-            string playerHasPotion = GameManager.Instance.Player.hasPotion.ToString();
-            _potionText.SetText($"포션 {playerHasPotion,5}EA");
-            _potionText.Draw();
-
             string playerGold = GameManager.Instance.Player.Gold.ToString();
             _goldText.SetText($"{playerGold,10} G");
             _goldText.Draw();
@@ -148,7 +138,7 @@ namespace TextRPG
                     game.ChangeScene(SceneGroup["ClassSelect"]);
                     break;
                 case ConsoleKey.D2://이어하기
-                   
+
                     game.ChangeScene(SceneGroup["Town"]);
                     break;
             }
@@ -186,7 +176,7 @@ namespace TextRPG
 
             //선택 화면에 출력
 
-            _choices = new string[] { "전사", "마법사"};
+            _choices = new string[] { "전사", "마법사" };
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -266,7 +256,7 @@ namespace TextRPG
 
         override public void HandleInput(GameManager game, ConsoleKey key)
         {
-             
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -437,7 +427,7 @@ namespace TextRPG
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) &&(key != ConsoleKey.Q && key != ConsoleKey.E))
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
@@ -461,8 +451,17 @@ namespace TextRPG
                     break;
 
                 default:
-                    int index = (int)key - 49 + (player.invenPage* 6);
-                    game.Player.EquipItem(index);
+                    int index = (int)key - 49 + (player.invenPage * 6);
+                    if (game.Player.Inventory[index].type == Item.EType.Potion)
+                    {
+                        game.Player.UsedHealthPotion(index);
+                        ThrowMessage($"{game.Player.Inventory[index].Value}만큼 회복했습니다.");
+                        return;
+                    }
+                    else
+                    {
+                        game.Player.EquipItem(index);
+                    }
                     game.RefreshScene();
                     break;
             }
@@ -595,7 +594,7 @@ namespace TextRPG
                 ThrowMessage("잘못된 입력입니다.");
                 return;
             }
-  
+
             switch (key)
             {
                 case ConsoleKey.D0:
@@ -641,7 +640,7 @@ namespace TextRPG
         void SetDisplay()
         {
             _ShopItems.Clear();
-            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i  < 6 + (_pagination * 6); ++i)
+            for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
                 ItemSlot slot = new ItemSlot();
                 slot.SetItem(i, _shop.storeItems[i]);
@@ -681,7 +680,7 @@ namespace TextRPG
         {
             if (_pagination == 0)
             {
-                _pagination = (_shop.storeItems.Count / 6) - 1;
+                _pagination = (_shop.storeItems.Count / 6);
             }
             else
             {
@@ -690,7 +689,7 @@ namespace TextRPG
         }
         public void BackwardItemBundle()
         {
-            if (_pagination == (_shop.storeItems.Count / 6) - 1)
+            if (_pagination == (_shop.storeItems.Count / 6))
             {
                 _pagination = 0;
             }
@@ -743,10 +742,10 @@ namespace TextRPG
                     break;
 
                 default:
-                    string ItemName = game.Player.Inventory[(int)key - 49].Name;
+                    int index = (int)key - 49 + (player.invenPage * 6);
+                    string ItemName = game.Player.Inventory[index].Name;
                     try
                     {
-                        int index = (int)key - 49 + (player.invenPage * 6);
                         game.Player.Sell(index);
                     }
                     catch (IndexOutOfRangeException e)
@@ -768,7 +767,7 @@ namespace TextRPG
         {
             base.Update(game);
             Player player = game.Player;
-            
+
             SetDisplay(player);
             SetOption(player);
         }
@@ -944,7 +943,7 @@ namespace TextRPG
 
             _choices = new string[] { "공격", "가방" };
             AddScene("Attack", new AttackScene(this));
-            AddScene("Bag", new BagScene(this));            
+            AddScene("Bag", new BagScene(this));
         }
 
         protected void SetMonsterCount(Monster[] monsters)
@@ -1041,11 +1040,11 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)_prev).Dungeon;
+
             _skills.Clear();
             int idx = 1;
-            foreach(var skill in game.Player.Skills)
+            foreach (var skill in game.Player.Skills)
             {
                 SkillSlot slot = new SkillSlot();
                 slot.SetSkill(idx++, skill);
@@ -1105,11 +1104,11 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
-            
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)Prev.Prev).Dungeon;
+
             _monsters.Clear();
             int idx = 1;
-            foreach(var monster in _dungeon.GetMonster())
+            foreach (var monster in _dungeon.GetMonster())
             {
                 UnitViewer slot = new UnitViewer();
                 slot.SetSize(38, 5);
@@ -1141,7 +1140,7 @@ namespace TextRPG
 
         public override void Update(GameManager game)
         {
-            if(_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
+            if (_dungeon == null) _dungeon = ((BaseDungeonScene)dungdeonStartScene).Dungeon;
 
             state = _dungeon.Progress(out msg);
             battleMsg.SetText(msg[0], msg[1], msg[2]);

@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Numerics;
+using System;
 
 namespace TextRPG
 {
 
-    
- 
+
+
     class EquipManager
     {
         Item[] _equips;
@@ -125,9 +125,7 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } }
 
-        public int hasPotion = 0;
-
-        public Player() 
+        public Player()
         {
             //저장돼있는 플레이어 정보를 가져와 형변환 후 변수 초기화(이어하기)
             JObject save = Loader.LoadData(@"..\..\..\data\Player.json");
@@ -141,7 +139,6 @@ namespace TextRPG
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
-            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -215,7 +212,6 @@ namespace TextRPG
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
-            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -245,7 +241,6 @@ namespace TextRPG
             Exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
             _crit = (float)save["Critical"];
-            hasPotion = (int)save["HasPotion"];
 
             //스킬 불러와 리스트에 저장
             _skills = save["Skills"].ToObject<List<Skill>>();
@@ -282,15 +277,35 @@ namespace TextRPG
             }
             else
             {
-                _gold -= item.Price;
-               if (item.type != Item.EType.Potion)
+                //해당 아이템이 무기라면 리스트에 추가
+                if (item.type == Item.EType.Weapon || item.type == Item.EType.Weapon)
                 {
                     _inventory.Add(item);
                 }
+                //해당 아이템이 소모품 && 해당 아이템을 이미 보유중 이라면 개수만 추가
                 else
                 {
-                    hasPotion += 1;
+                    bool hasPotion = false;
+                    int potionIndex = 0;
+                    for (int i = 0; i < _inventory.Count; i++)
+                    {
+                        if (_inventory[i].Name == item.Name)
+                        {
+                            hasPotion = true;
+                            potionIndex = i;
+                            break;
+                        }
+                    }
+                    if (hasPotion)
+                    {
+                        _inventory[potionIndex].HasCount += 1;
+                    }
+                    else
+                    {
+                        _inventory.Add(item);
+                    }
                 }
+                _gold -= item.Price;
             }
         }
 
@@ -303,7 +318,23 @@ namespace TextRPG
             else
             {
                 _gold += _inventory[index].Price;
-                _inventory.RemoveAt(index);
+                //해당 아이템이 장비 아이템이라면 바로 제거
+                if (_inventory[index].type == Item.EType.Weapon || _inventory[index].type == Item.EType.Armor)
+                {
+                    _inventory.RemoveAt(index);
+                }
+                //해당 아이템이 장비 아이템이 아니라면 보유 개수를 확인 후 제거
+                else
+                {
+                    if (_inventory[index].HasCount > 1)
+                    {
+                        _inventory[index].HasCount -= 1;
+                    }
+                    else
+                    {
+                        _inventory.RemoveAt(index);
+                    }
+                }
             }
         }
 
@@ -317,17 +348,98 @@ namespace TextRPG
             _gold += gold;
         }
 
-        //포션먹는 매서드
-        public bool DrinkPotion()
+        //HP 포션 사용
+        public void UsedHealthPotion(int index)
         {
-            if(this.hasPotion<=0)
+
+            if (_inventory[index].HasCount > 1)
             {
-                return false;
+                hp += _inventory[index].Value;
+                _inventory[index].HasCount -= 1;
             }
+            else
+            {
+                hp += _inventory[index].Value;
+                _inventory.RemoveAt(index);
+            }
+        }
+        //MP 포션 사용
+        public void UsedManaPotion(int index, int mp)
+        {
 
-            this.hasPotion--;
+            if (_inventory[index].HasCount > 1)
+            {
+                mp += _inventory[index].Value;
+                _inventory[index].HasCount -= 1;
+            }
+            else
+            {
+                mp += _inventory[index].Value;
+                _inventory.RemoveAt(index);
+            }
+        }
+        //버프 아이템 변수
+        int BuffTurn;
+        int BuffHP;
+        int BuffAtk;
+        int BuffDef;
 
-            return true;
+        //버프 아이템 사용
+        public void UsedPotion(int index, int turn)
+        {
+            if (_inventory[index].HasCount > 1)
+            {
+                BuffTurn = turn;
+                switch (_inventory[index].Status)
+                {
+                    case "체력":
+                        BuffHP += _inventory[index].Value;
+                        break;
+
+                    case "공격력":
+                        BuffAtk += _inventory[index].Value;
+                        break;
+
+                    case "방어력":
+                        BuffDef += _inventory[index].Value;
+                        break;
+                }
+                _inventory[index].HasCount -= 1;
+            }
+            else
+            {              
+                BuffTurn = turn;
+                switch (_inventory[index].Status)
+                {
+                    case "체력":
+                        BuffHP += _inventory[index].Value;
+                        break;
+
+                    case "공격력":
+                        BuffAtk += _inventory[index].Value;
+                        break;
+
+                    case "방어력":
+                        BuffDef += _inventory[index].Value;
+                        break;
+                }
+                _inventory.RemoveAt(index);
+            }
+        }
+        
+        //버프 턴 감소 및 수치 초기화
+        public void SubtractorBuffTurn()
+        {
+            if(BuffTurn > 0)
+            {
+                BuffTurn -= 1;
+            }
+            else
+            {
+                BuffHP = 0;
+                BuffAtk = 0;
+                BuffDef = 0;
+            }
         }
 
         public bool Rest()
@@ -366,13 +478,13 @@ namespace TextRPG
             Random random = new Random();
             int dmg = random.Next(Atk - atkOffset, Atk + atkOffset + 1);
 
-            if(random.NextDouble() < _crit)
+            if (random.NextDouble() < _crit)
             {
                 bCrit = true;
                 dmg *= 2;
             }
 
-            dmg =  (int)(dmg * Skills[SID].damage);
+            dmg = (int)(dmg * Skills[SID].damage);
 
             dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
 
@@ -405,7 +517,7 @@ namespace TextRPG
         {
             if (invenPage == 0)
             {
-                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6)-1;
+                invenPage = (int)Math.Ceiling((double)Inventory.Count / 6) - 1;
             }
             else
             {
@@ -414,7 +526,7 @@ namespace TextRPG
         }
         public void BackwardPage()
         {
-            if (invenPage >=  (int)Math.Ceiling((double)Inventory.Count / 6)- 1)
+            if (invenPage >= (int)Math.Ceiling((double)Inventory.Count / 6) - 1)
             {
                 invenPage = 0;
             }

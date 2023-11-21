@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-using System.Text;
+﻿using System.Text;
 
 namespace TextRPG
 {
@@ -245,7 +244,6 @@ namespace TextRPG
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
             GetChild<Text>("CritText").text = $" 치명타 : {player.Crit} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
-            GetChild<Text>("PotionText").text = $" 포션 : {player.hasPotion} 개";
         }
     }
 
@@ -285,7 +283,7 @@ namespace TextRPG
         public void SetResult(Reward reward)
         {
             GetChild<Text>("EXPLabel").text = $"경험치 --------------------";
-            GetChild<Text>("EXPText").text = $"+ {reward.Exp, 3}";
+            GetChild<Text>("EXPText").text = $"+ {reward.Exp,3}";
 
             GetChild<Text>("ItemLabel").text = $"아이템 --------------------";
             ShowItems(reward.Items);
@@ -296,12 +294,12 @@ namespace TextRPG
 
         void ShowItems(List<Item> items)
         {
-            for(int i = 0; i < items.Count; ++i)
+            for (int i = 0; i < items.Count; ++i)
             {
                 AddChild($"Item{i}", new Text(5, 5 + i));
                 string str = $"{items[i].Name} x 1";
-                GetChild<Text>($"Item{i}").text = $"{str, 25}";
-            }            
+                GetChild<Text>($"Item{i}").text = $"{str,25}";
+            }
         }
 
         public void SetResult(Record before, Record after)
@@ -339,7 +337,7 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, _width, _height));
 
             AddChild("ItemNameText", new Text(2, 1));
-            AddChild("ItemEffectText", new Text(20, 1));
+            AddChild("ItemEffectText", new Text(23, 1));
             AddChild("ItemDescriptionText", new Text(2, 3));
             AddChild("ItemPriceText", new Text(30, 3));
         }
@@ -348,8 +346,15 @@ namespace TextRPG
         {
             string text = item.Name;
             if (item.bEquip) text = text.Insert(0, "[E]");
-            GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}";
-            GetChild<Text>("ItemEffectText").text = $"| {item.Status} + {item.Value} |";
+            if (item.type == Item.EType.Potion)//소모품이면 이름 + 개수까지
+            {
+                GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}[{item.HasCount}]";
+            }
+            else//아니면 이름만 출력
+            {
+                GetChild<Text>("ItemNameText").text = $"{index + 1}. {text}";
+            }
+            GetChild<Text>("ItemEffectText").text = $"| {item.Status} +{item.Value} |";
             GetChild<Text>("ItemDescriptionText").text = $"{item.Description}";
             GetChild<Text>("ItemPriceText").text = $"{item.Price,5}G";
         }
@@ -487,7 +492,7 @@ namespace TextRPG
             else
             {
                 GetChild<Text>("HPText").text = monsterHP.ToString();
-                GetChild<Text>("LvText").text = $"Lv. {monsterLv, 3}";
+                GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
             }
         }
 

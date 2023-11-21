@@ -33,6 +33,9 @@ namespace TextRPG
         int _price;
         public int Price { get { return _price; } set { _price = value; } }
 
+        int _hasCount;
+        public int HasCount { get { return _hasCount; } set { _hasCount = value; } }
+
         static Item _null = new Item();
         public static Item NULL { get { return _null; } }
 
@@ -43,6 +46,22 @@ namespace TextRPG
             _price = 0;
         }
 
+        public Item(string name, string status, string description, EType type, Int32 price, int hasValue)
+        {
+            string[] msg = status.Split(',');
+            for (int i = 0; i < msg.Length; ++i)
+            {
+                string[] data = msg[i].Split(':');
+                _status = (EStatus)(int.Parse(data[0]));
+                _val = int.Parse(data[1]);
+            }
+
+            _name = name;
+            _description = description;
+            this.type = type;
+            _price = price;
+            _hasCount = hasValue;
+        }
         public Item(string name, string status, string description, EType type, Int32 price)
         {
             string[] msg = status.Split(',');
@@ -57,6 +76,7 @@ namespace TextRPG
             _description = description;
             this.type = type;
             _price = price;
+            _hasCount = 1;
         }
 
         //public static operator ==

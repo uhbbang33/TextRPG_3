@@ -555,7 +555,7 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D3:
-                    if (GameManager.Instance.Player.IsQuestComplete())
+                    if (GameManager.Instance.Player.IsShopQuestComplete())
                         game.ChangeScene(SceneGroup["QuestComplete"]);
                     else
                         game.ChangeScene(SceneGroup["Quest"]);

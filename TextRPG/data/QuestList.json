@@ -3,28 +3,34 @@
     {
       "Name": "박쥐날개",
       "Num": 4,
-      "Reward": 50,
-      "IsMonsterHuntQuest": false
+      "Reward": 50
     },
     {
       "Name": "거미줄",
       "Num": 3,
-      "Reward": 30,
-      "IsMonsterHuntQuest": false
+      "Reward": 30
     },
     {
       "Name": "독개구리의 독",
       "Num": 4,
-      "Reward": 100,
-      "IsMonsterHuntQuest": false
+      "Reward": 100
     }
   ],
   "TempleQuestList": [
     {
       "Name": "거미",
       "Num": 2,
-      "Reward": 20,
-      "IsMonsterHuntQuest": true // 없어도 될듯
+      "Reward": 20
+    },
+    {
+      "Name": "박쥐",
+      "Num": 5,
+      "Reward": 60
+    },
+    {
+      "Name": "독개구리",
+      "Num": 4,
+      "Reward": 100
     }
   ]
 }

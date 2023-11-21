@@ -20,15 +20,11 @@ namespace TextRPG
         int _reward;
         public int Reward {  get { return _reward; } }
 
-        bool _isMonsterHuntQuest;
-        public bool IsMonsterHuntQuest { get { return _isMonsterHuntQuest; } }
-
         public Quest(string name, int num, int reward, bool isMonsterHuntQuest)
         {
             _name = name;
             _num = num;
             _reward = reward;
-            _isMonsterHuntQuest = isMonsterHuntQuest;
         }
     }
 

@@ -446,7 +446,7 @@ namespace TextRPG
             _playerQuest = new Quest(null, 0, 0, false);
         }
 
-        public bool IsQuestComplete()
+        public bool IsShopQuestComplete()
         {
             if (_playerQuest.Name == null)
                 return false;
@@ -466,6 +466,14 @@ namespace TextRPG
 
                 return true;
             }
+
+            return false;
+        }
+
+        public bool IsTempleQuestComplete()
+        {
+            // 던전이 끝날 때 cnt ++?
+            // 머지 이후 구현
 
             return false;
         }

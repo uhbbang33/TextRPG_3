@@ -34,8 +34,8 @@ namespace TextRPG
             _instance = this;
 
             _questList = new QuestList();
-            _currentScene = new TitleScene();
             _player = new Player();
+            _currentScene = new TitleScene();
         }
 
         public void RunGame()

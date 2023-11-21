@@ -556,12 +556,7 @@ namespace TextRPG
 
                 case ConsoleKey.D3:
                     if (GameManager.Instance.Player.IsQuestComplete())
-                    {
                         game.ChangeScene(SceneGroup["QuestComplete"]);
-
-                        Thread.Sleep(2000);
-                        game.ChangeScene(_prev);
-                    }
                     else
                         game.ChangeScene(SceneGroup["Quest"]);
                     break;
@@ -899,15 +894,38 @@ namespace TextRPG
         ShopQuestInfoWidget _widget;
         public ShopQuestCompleteScene(Scene parent)
         {
-            Player player = GameManager.Instance.Player;
-
+            _prev = parent;
             _name = "퀘스트";
             _comment = "퀘스트를 완료했습니다!";
+            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+
+            Player player = GameManager.Instance.Player;
+
             _widget = new ShopQuestInfoWidget(35, 3, player.PlayerQuest);
             _widget.CompletedText();
 
             player.GetQuestReward();
             player.SetQuestNull();
+        }
+
+        public override void HandleInput(GameManager game, ConsoleKey key)
+        {
+            switch (key)
+            {
+                case ConsoleKey.D0:
+                    game.ChangeScene(_prev);
+                    break;
+
+                default:
+                    ThrowMessage("잘못된 입력입니다.");
+                    break;
+            }
+        }
+        public override void DrawScene()
+        {
+            base.DrawScene();
+            Screen.DrawTopScreen(Display);
+            _widget.Draw();
         }
     }
 

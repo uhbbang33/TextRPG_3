@@ -158,7 +158,9 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } set { _gold = value; } }
         public Quest PlayerQuest { get { return _playerQuest; } }
-        public bool ShouldCreateShopQuest = false;
+
+        int _catchMonsterCountForQuest = 0;
+        public int CatchMonsterCountForQuest { get { return _catchMonsterCountForQuest; } }
 
 
         public Player()
@@ -192,6 +194,7 @@ namespace TextRPG
             }
 
             _playerQuest = save["Quest"].ToObject<Quest>();
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
@@ -267,7 +270,7 @@ namespace TextRPG
                     _equipManager.Wear(item);
             }
             _playerQuest = save["Quest"].ToObject<Quest>();
-
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         //클래스 선택창에서 전사 직업을 골랐을 때, 기존 데이터 덮어씌우기
@@ -298,7 +301,7 @@ namespace TextRPG
                     _equipManager.Wear(item);
             }
             _playerQuest = save["Quest"].ToObject<Quest>();
-
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         public void SortInventory()
@@ -633,7 +636,6 @@ namespace TextRPG
         }
 
         #region Quest 관련 함수
-
         public void SetQuest(Quest quest)
         {
             _playerQuest = quest;
@@ -646,7 +648,7 @@ namespace TextRPG
 
         public bool IsShopQuestComplete()
         {
-            if (_playerQuest.Name == null || _playerQuest.IsMonsterHuntQuest)
+            if (_playerQuest.Name == null || _playerQuest.IsTempleQuest)
                 return false;
 
             int cnt = 0;
@@ -674,7 +676,6 @@ namespace TextRPG
                         --cnt;
                     }
                 }
-                ShouldCreateShopQuest = true;
                 return true;
             }
             return false;
@@ -682,10 +683,29 @@ namespace TextRPG
 
         public bool IsTempleQuestComplete()
         {
-            // 던전이 끝날 때 cnt ++?
-            // 머지 이후 구현
-
+            if (_playerQuest.IsTempleQuest
+            && _playerQuest.Num <= _catchMonsterCountForQuest)
+            {
+                _catchMonsterCountForQuest = 0;
+                return true;
+            }
             return false;
+        }
+        
+        public void RefuseTempleQuest()
+        {
+            _catchMonsterCountForQuest = 0;
+            SetQuestNull();
+        }
+
+        public void IncreaseQuestMonsterCount(List<string> monsterNames)
+        {
+            if (_playerQuest.Name != null && _playerQuest.IsTempleQuest)
+                foreach (var monsterName in monsterNames)
+                {
+                    if (_playerQuest.Name == monsterName)
+                        ++_catchMonsterCountForQuest;
+                }
         }
 
         public void GetQuestReward()
@@ -694,6 +714,7 @@ namespace TextRPG
         }
 
         #endregion
+
         public void Revival()
         {            
             _gold /= 2;

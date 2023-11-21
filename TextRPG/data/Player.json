@@ -135,6 +135,6 @@
     "Name": "독개구리의 독",
     "Num": 4,
     "Reward": 100,
-    "IsMonsterHuntQuest": false
+    "IsTempleQuest": false
   }
 }

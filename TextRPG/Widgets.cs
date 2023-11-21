@@ -159,7 +159,7 @@ namespace TextRPG
             Console.Write("┏");
 
             Screen.SetCursorPosition(x + _width - 1, y);
-            Console.Write("┓");
+            Console.Write($"┓");
 
             Screen.SetCursorPosition(x, y + _height - 1);
             Console.Write("┗");
@@ -883,7 +883,7 @@ namespace TextRPG
         {
             ClearTopScreen();
             int y = 2;
-
+            
             for (int i = 0; i < contents.Length; ++i)
             {
                 if (space) y++;

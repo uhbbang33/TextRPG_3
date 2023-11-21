@@ -166,6 +166,8 @@ namespace TextRPG
     //직업 선택 씬
     class SelectClassScene : Scene
     {
+        GridBox classBorders;
+
         public SelectClassScene(Scene parent)
         {
             _name = "직업 선택";
@@ -177,6 +179,18 @@ namespace TextRPG
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
+
+            classBorders = new GridBox();
+            classBorders.SetColomn(2);
+            classBorders.SetMargine(2, 0);
+            classBorders.SetPosition(2, 1);
+            
+            for(int i = 0; i < 2; ++i)
+            {
+                Border border = new Border();
+                border.SetSize(35, 22);
+                classBorders.AddItem(border);
+            }
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
@@ -215,6 +229,7 @@ namespace TextRPG
             Screen.Split();
             //화면 맨 위부터 화면 그리기
             Screen.DrawTopScreen(Display, 2);
+            classBorders.Draw();
         }
 
         private string GetName()
@@ -239,7 +254,6 @@ namespace TextRPG
             return name;
         }
     }
-
 
     class TownScene : Scene
     {

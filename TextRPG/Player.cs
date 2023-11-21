@@ -637,12 +637,11 @@ namespace TextRPG
         }
 
         public void Revival()
-        {
-            // 골드 감소
+        {            
             _gold /= 2;
-            // 체력 회복
+            
             hp = maxHp;
-            // 경험치 감소
+            
             _exp -= (int)(MaxExp / 10);
             _exp = _exp < 0 ? 0 : _exp;
         }

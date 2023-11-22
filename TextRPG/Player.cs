@@ -651,14 +651,12 @@ namespace TextRPG
             if (_playerQuest.Name == null || _playerQuest.IsTempleQuest)
                 return false;
 
-            int cnt = 0;
             for (int i = 0; i < _inventory.Count; ++i)
                 if (_inventory[i].Name == _playerQuest.Name)
                 {
-                    cnt = _inventory[i].HasCount;
-                    if (cnt >= _playerQuest.Num)
+                    if (_inventory[i].HasCount >= _playerQuest.Num)
                     {
-                        _inventory[i].HasCount -= cnt;
+                        _inventory[i].HasCount -= _playerQuest.Num;
                         if (_inventory[i].HasCount == 0)
                             _inventory.RemoveAt(i);
                         return true;

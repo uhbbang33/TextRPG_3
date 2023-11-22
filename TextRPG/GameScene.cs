@@ -936,6 +936,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
 
         public void CreateQuest()
@@ -986,6 +987,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
     }
 
@@ -1189,6 +1191,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
     }
 

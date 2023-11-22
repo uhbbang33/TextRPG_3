@@ -590,19 +590,19 @@ namespace TextRPG
             AddChild("Text7", new Text(2, 8));
             AddChild("Text8", new Text(2, 9));
             AddChild("Text9", new Text(3, 11));
-            AddChild("Text10", new Text(13, 12));
+            AddChild("Text10", new Text(3, 12));
         }
 
         public void Init(Quest quest)
         {
             GetChild<Text>("Text1").text = "\t\t공고문";
             GetChild<Text>("Text2").text = $"현재 [{quest.Name}]의";
-            GetChild<Text>("Text3").text = "개체수가 너무 많아";
+            GetChild<Text>("Text3").text = "개체수가 매우 많아";
             GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
             GetChild<Text>("Text5").text = $"[{quest.Name}]";
-            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오면";
+            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오시면";
             GetChild<Text>("Text7").text = $"[{quest.Reward} Gold]를";
-            GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
+            GetChild<Text>("Text8").text = "지급하겠습니다.";
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
@@ -617,10 +617,10 @@ namespace TextRPG
             GetChild<Text>("Text10").text = "[진행불가]";
         }
 
-        public void QuestCompleteText()
+        public void QuestCompleteText(Quest quest)
         {
             GetChild<Text>("Text9").text = "[퀘스트 완료!]";
-            GetChild<Text>("Text10").text = "[보상지급]";
+            GetChild<Text>("Text10").text = $"[{quest.Reward}Gold 지급]";
         }
 
         public void RefuseQuestText()
@@ -628,8 +628,6 @@ namespace TextRPG
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
-
-
 
         protected override void Draw(int x, int y)
         {

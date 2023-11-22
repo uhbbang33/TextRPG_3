@@ -9,6 +9,7 @@
   "MaxExp": 10,
   "Gold": 1500,
   "Critical": 0.15,
+  "CatchMonsterCountForQuest": 0,
   "Inventory": [
     {
       "bEquip": true,

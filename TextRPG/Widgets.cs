@@ -208,7 +208,7 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 25;
+            _maxChildrenCount = 24;
 
             AddChild("Background", new Border(0, 0, 39, 22));
             AddChild("Content", new Border(2, 1, 35, 20));
@@ -318,7 +318,7 @@ namespace TextRPG
     {
         public LevelUpWidget(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            _maxChildrenCount = 10;
+            _maxChildrenCount = 11;
 
             AddChild("Content", new Border(0, 0, width, height));
             AddChild("SubContent", new Border(2, 9, width - 4, height - 10));
@@ -346,6 +346,7 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = "공격력이 2.0 증가합니다.";
             GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
             GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
+            GetChild<Text>("RecoveryText").text = "마나을 모두 회복합니다.";
         }
     }
 

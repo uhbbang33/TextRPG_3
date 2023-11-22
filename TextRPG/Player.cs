@@ -652,32 +652,18 @@ namespace TextRPG
                 return false;
 
             int cnt = 0;
-            List<int> indexList = new List<int>();
-            for(int i =0; i< _inventory.Count; ++i)
+            for (int i = 0; i < _inventory.Count; ++i)
                 if (_inventory[i].Name == _playerQuest.Name)
                 {
-                    ++cnt;
-
-                    // 퀘스트 아이템 인덱스 indexList에 추가
-                    indexList.Add(i);
-
-                }
-
-            if (cnt >= _playerQuest.Num)
-            {
-                // 아이템을 퀘스트num만큼만 삭제
-                cnt = _playerQuest.Num;
-                for (int i = indexList.Count - 1; i >= 0; --i)
-                {
-                    int _index = indexList[i];
-                    if(cnt > 0)
+                    cnt = _inventory[i].HasCount;
+                    if (cnt >= _playerQuest.Num)
                     {
-                        _inventory.RemoveAt(_index);
-                        --cnt;
+                        _inventory[i].HasCount -= cnt;
+                        if (_inventory[i].HasCount == 0)
+                            _inventory.RemoveAt(i);
+                        return true;
                     }
                 }
-                return true;
-            }
             return false;
         }
 

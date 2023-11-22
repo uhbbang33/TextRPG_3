@@ -487,6 +487,16 @@ namespace TextRPG
                         ThrowMessage("포션은 장비할 수 없습니다.");
                         return;
                     }
+                    else if (game.Player.Class == "전사" && game.Player.Inventory[index].restricted == Item.ClassRestricted.Wizard)
+                    {
+                        ThrowMessage("마법사 장비를 착용할 수 없습니다.");
+                        return;
+                    }
+                    else if (game.Player.Class == "마법사" && game.Player.Inventory[index].restricted == Item.ClassRestricted.Warrior)
+                    {
+                        ThrowMessage("전사 장비를 착용할 수 없습니다.");
+                        return;
+                    }
                     else
                     {
                         game.Player.EquipItem(index);

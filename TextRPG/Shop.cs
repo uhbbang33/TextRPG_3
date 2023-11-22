@@ -23,22 +23,36 @@
                 string[] itemSetting = CSVLine[i].Split(',');
                 string _name = itemSetting[0];
                 Item.EType _type = new Item().type;
-                if (itemSetting[1] == "Weapon")
+                if (itemSetting[2] == "Weapon")
                 {
                     _type = Item.EType.Weapon;
                 }
-                else if (itemSetting[1] == "Armor")
+                else if (itemSetting[2] == "Armor")
                 {
                     _type = Item.EType.Armor;
                 }
-                else if (itemSetting[1] == "Potion")
+                else if (itemSetting[2] == "Potion")
                 {
                     _type = Item.EType.Potion;
                 }
 
-                int _hp = int.Parse(itemSetting[2]);
-                int _atk = int.Parse(itemSetting[3]);
-                int _def = int.Parse(itemSetting[4]);
+                Item.ClassRestricted _restricted = new Item().restricted;
+                if (itemSetting[1] == "NoRestricted")
+                {
+                    _restricted = Item.ClassRestricted.NoRestricted;
+                }
+                else if (itemSetting[1] == "Warrior")
+                {
+                    _restricted = Item.ClassRestricted.Warrior;
+                }
+                else if (itemSetting[1] == "Wizard")
+                {
+                    _restricted = Item.ClassRestricted.Wizard;
+                }
+
+                int _hp = int.Parse(itemSetting[3]);
+                int _atk = int.Parse(itemSetting[4]);
+                int _def = int.Parse(itemSetting[5]);
 
                 string _status = "";
                 if (_hp != 0)
@@ -54,10 +68,10 @@
                     _status = $"2:{_def}";
                 }
 
-                string _description = itemSetting[5];
-                int _price = int.Parse(itemSetting[6]);
+                string _description = itemSetting[6];
+                int _price = int.Parse(itemSetting[7]);
 
-                Item item = new Item(_name, _status, _description, _type, _price);
+                Item item = new Item(_name,  _status, _description, _restricted ,_type, _price);
 
                 _storeItems.Add(item);
                 

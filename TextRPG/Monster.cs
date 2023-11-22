@@ -1,17 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TextRPG
+﻿namespace TextRPG
 {
     public class Monster
     {
         string _name;
-        public string Name { get { return _name; }  set { _name = value; } }
+        public string Name { get { return _name; } set { _name = value; } }
 
         protected int _hp;
         public int Hp { get { return _hp; } }
@@ -56,10 +48,10 @@ namespace TextRPG
             if (dmg < 0) dmg = 1;
 
             Random random = new Random();
-            if(random.NextDouble() < totalAccuracy)
+            if (random.NextDouble() < totalAccuracy)
             {
                 _hp -= dmg;
-                if(_hp < 0)
+                if (_hp < 0)
                 {
                     _hp = 0;
                     _isDead = true;
@@ -91,7 +83,7 @@ namespace TextRPG
             _atk = 5 + _lv;
             _def = 5 + _lv;
             _goldReward = 5 + _lv;
-            _itemReward = new Item("거미줄", "0:0", "아무 능력도 없는 거미줄", Item.EType.Potion, 5);
+            _itemReward = new Item("거미줄", "0:0", "아무 능력도 없는 거미줄", Item.ClassRestricted.NoRestricted, Item.EType.Potion, 5);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\spider.txt");
         }
     }
@@ -107,7 +99,7 @@ namespace TextRPG
             _atk = 7 + (int)(_lv * 1.2f);
             _def = 1 + (int)(_lv * 1.2f);
             _goldReward = 10 + _lv;
-            _itemReward = new Item("박쥐날개", "0:1", "팔면 쏠쏠하다", Item.EType.Potion, 15);
+            _itemReward = new Item("박쥐날개", "0:1", "팔면 쏠쏠하다", Item.ClassRestricted.NoRestricted, Item.EType.Potion, 15);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\bat.txt");
         }
     }
@@ -123,7 +115,7 @@ namespace TextRPG
             _atk = 15 + (int)(_lv * 1.5f);
             _def = 20 + (int)(_lv * 1.5f);
             _goldReward = 20 + _lv;
-            _itemReward = new Item("독개구리의 독", "0:-10", "먹지 말고 팔자", Item.EType.Potion, 25);
+            _itemReward = new Item("독개구리의 독", "0:-10", "먹지 말고 팔자", Item.ClassRestricted.NoRestricted,  Item.EType.Potion, 25);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\frog.txt");
         }
     }
@@ -134,12 +126,12 @@ namespace TextRPG
         {
             Name = "그리폰";
             _lv = random.Next(20, 26);
-            _maxHp = 70 +(int)(_lv * 1.2f);
+            _maxHp = 70 + (int)(_lv * 1.2f);
             _hp = MaxHp;
             _atk = 30 + (int)(_lv * 1.2f);
             _def = 30 + (int)(_lv * 1.2f);
             _goldReward = 50 + (int)(_lv * 1.2f);
-            _itemReward = new Item("그리폰 부리", "0:50", "쪼이면 아프다", Item.EType.Potion, 50);
+            _itemReward = new Item("그리폰 부리", "0:50", "쪼이면 아프다", Item.ClassRestricted.NoRestricted, Item.EType.Potion, 50);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\gryphon.txt");
         }
     }
@@ -155,7 +147,7 @@ namespace TextRPG
             _atk = 35 + (int)(_lv * 1.4f);
             _def = 40 + (int)(_lv * 1.4f);
             _goldReward = 60 + (int)(_lv * 1.4f);
-            _itemReward = new Item("유니콘 뿔", "0:77", "관상용으로도 추천", Item.EType.Potion, 60);
+            _itemReward = new Item("유니콘 뿔", "0:77", "관상용으로도 추천", Item.ClassRestricted.Wizard, Item.EType.Potion, 60);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\unicorn.txt");
         }
     }
@@ -171,7 +163,7 @@ namespace TextRPG
             _atk = 60 + (int)(_lv * 1.5f);
             _def = 70 + (int)(_lv * 1.5f);
             _goldReward = 100 + (int)(_lv * 1.5f);
-            _itemReward = new Item("드래곤 비늘", "0:100", "비싸다", Item.EType.Potion, 100);
+            _itemReward = new Item("드래곤 비늘", "0:100", "비싸다", Item.ClassRestricted.NoRestricted, Item.EType.Potion, 100);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\dragon.txt");
         }
     }

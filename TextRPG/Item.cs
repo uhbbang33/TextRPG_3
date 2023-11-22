@@ -11,16 +11,19 @@ namespace TextRPG
 {
     public class Item
     {
-        public enum EStatus { HP, ATK, DEF };
+        public enum EStatus { HP, ATK, DEF, MP };
         public enum EType { Weapon, Armor, Potion  }
-        string[] _statusWord = { " 체력 ", "공격력", "방어력" };
+        string[] _statusWord = { " 체력 ", "공격력", "방어력", "마나" };
 
         string _name;
         public string Name { get { return _name; } set { _name = value; } }
 
+        public enum ClassRestricted { NoRestricted, Warrior, Wizard};
+
         public bool bEquip;
         public EStatus _status;
         public EType type;
+        public ClassRestricted restricted;
         [JsonIgnore()]
         public string Status { get { return _statusWord[(int)_status]; } }
 
@@ -46,7 +49,7 @@ namespace TextRPG
             _price = 0;
         }
 
-        public Item(string name, string status, string description, EType type, Int32 price, int hasValue)
+        public Item(string name, string status, string description, ClassRestricted restricted, EType type, Int32 price, int hasCount)
         {
             string[] msg = status.Split(',');
             for (int i = 0; i < msg.Length; ++i)
@@ -59,10 +62,11 @@ namespace TextRPG
             _name = name;
             _description = description;
             this.type = type;
+            this.restricted = restricted;
             _price = price;
-            _hasCount = hasValue;
+            _hasCount = hasCount;
         }
-        public Item(string name, string status, string description, EType type, Int32 price)
+        public Item(string name, string status, string description, ClassRestricted restricted, EType type, Int32 price)
         {
             string[] msg = status.Split(',');
             for (int i = 0; i < msg.Length; ++i)
@@ -75,6 +79,7 @@ namespace TextRPG
             _name = name;
             _description = description;
             this.type = type;
+            this.restricted = restricted;
             _price = price;
             _hasCount = 1;
         }

@@ -4,10 +4,12 @@
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
+  "MaxMP": 50,
   "Exp": 5,
   "MaxExp": 10,
   "Gold": 1500,
   "Critical": 0.15,
+  "CatchMonsterCountForQuest": 0,
   "HasPotion": 0,
   "Inventory": [
     {
@@ -64,6 +66,6 @@
     "Name": null,
     "Num": 0,
     "Reward": 0,
-    "IsMonsterHuntQuest": false
+    "IsTempleQuest": false
   }
 }

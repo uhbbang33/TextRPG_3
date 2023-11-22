@@ -156,7 +156,9 @@ namespace TextRPG
         public Item[] Equipment { get { return _equipManager.EquipItems; } }
         public int Gold { get { return _gold; } set { _gold = value; } }
         public Quest PlayerQuest { get { return _playerQuest; } }
-        public bool ShouldCreateShopQuest = false;
+
+        int _catchMonsterCountForQuest = 0;
+        public int CatchMonsterCountForQuest { get { return _catchMonsterCountForQuest; } }
 
 
         public Player()
@@ -170,6 +172,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -190,25 +194,7 @@ namespace TextRPG
             }
 
             _playerQuest = save["Quest"].ToObject<Quest>();
-        }
-
-        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
-        {
-            this.lv = lv;
-            this.job = job;
-            this.atk = atk;
-
-            this.def = def;
-
-            this.maxHp = maxHp;
-            hp = maxHp;
-
-            _maxExp = maxExp;
-            _exp = exp;
-
-            _gold = gold;
-
-            _crit = critical;
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         public void EquipItem(int index)
@@ -248,6 +234,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -265,7 +253,7 @@ namespace TextRPG
                     _equipManager.Wear(item);
             }
             _playerQuest = save["Quest"].ToObject<Quest>();
-
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         //클래스 선택창에서 전사 직업을 골랐을 때, 기존 데이터 덮어씌우기
@@ -279,6 +267,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -296,7 +286,7 @@ namespace TextRPG
                     _equipManager.Wear(item);
             }
             _playerQuest = save["Quest"].ToObject<Quest>();
-
+            _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
         }
 
         public void SortInventory()
@@ -410,6 +400,11 @@ namespace TextRPG
                 case Item.EStatus.HP:
                     if (Hp == MaxHp) return false;
                     Hp += item.Value;
+                    break;
+
+                case Item.EStatus.MP:
+                    if (Mp == MaxMp) return false;
+                    Mp += item.Value;
                     break;
             }
 
@@ -622,7 +617,6 @@ namespace TextRPG
             }
         }
 
-
         public void GetExp(int exp, out bool levelUp)
         {
             levelUp = false;
@@ -648,7 +642,6 @@ namespace TextRPG
         }
 
         #region Quest 관련 함수
-
         public void SetQuest(Quest quest)
         {
             _playerQuest = quest;
@@ -661,46 +654,48 @@ namespace TextRPG
 
         public bool IsShopQuestComplete()
         {
-            if (_playerQuest.Name == null || _playerQuest.IsMonsterHuntQuest)
+            if (_playerQuest.Name == null || _playerQuest.IsTempleQuest)
                 return false;
 
-            int cnt = 0;
-            List<int> indexList = new List<int>();
             for (int i = 0; i < _inventory.Count; ++i)
                 if (_inventory[i].Name == _playerQuest.Name)
                 {
-                    ++cnt;
-
-                    // 퀘스트 아이템 인덱스 indexList에 추가
-                    indexList.Add(i);
-
-                }
-
-            if (cnt >= _playerQuest.Num)
-            {
-                // 아이템을 퀘스트num만큼만 삭제
-                cnt = _playerQuest.Num;
-                for (int i = indexList.Count - 1; i >= 0; --i)
-                {
-                    int _index = indexList[i];
-                    if (cnt > 0)
+                    if (_inventory[i].HasCount >= _playerQuest.Num)
                     {
-                        _inventory.RemoveAt(_index);
-                        --cnt;
+                        _inventory[i].HasCount -= _playerQuest.Num;
+                        if (_inventory[i].HasCount == 0)
+                            _inventory.RemoveAt(i);
+                        return true;
                     }
                 }
-                ShouldCreateShopQuest = true;
-                return true;
-            }
             return false;
         }
 
         public bool IsTempleQuestComplete()
         {
-            // 던전이 끝날 때 cnt ++?
-            // 머지 이후 구현
-
+            if (_playerQuest.IsTempleQuest
+            && _playerQuest.Num <= _catchMonsterCountForQuest)
+            {
+                _catchMonsterCountForQuest = 0;
+                return true;
+            }
             return false;
+        }
+        
+        public void RefuseTempleQuest()
+        {
+            _catchMonsterCountForQuest = 0;
+            SetQuestNull();
+        }
+
+        public void IncreaseQuestMonsterCount(List<string> monsterNames)
+        {
+            if (_playerQuest.Name != null && _playerQuest.IsTempleQuest)
+                foreach (var monsterName in monsterNames)
+                {
+                    if (_playerQuest.Name == monsterName)
+                        ++_catchMonsterCountForQuest;
+                }
         }
 
         public void GetQuestReward()
@@ -709,6 +704,7 @@ namespace TextRPG
         }
 
         #endregion
+
         public void Revival()
         {
             _gold /= 2;

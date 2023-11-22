@@ -66,6 +66,9 @@ namespace TextRPG
         Player _player;
         Monster _targetMonster;
 
+        List<string> _monsterNames;
+        public List<string> MonsterNames {  get { return _monsterNames; } }
+
         public Dungeon(string name, int difficulty, int def, int exp)
         {
             Random = new Random();
@@ -78,6 +81,7 @@ namespace TextRPG
             _monsters = new List<Monster>();
             _monsterOrder = new Queue<Monster>();
             _reward = new Reward();
+            _monsterNames = new List<string>();
 
             int monsterCount;
             if (difficulty == 2) monsterCount = 1;
@@ -87,6 +91,7 @@ namespace TextRPG
             {
                 CreateMonster(difficulty);
                 _reward.AddReward(_monsters[i].GoldReward, _monsters[i].Lv, _monsters[i].ItemReward);
+                _monsterNames.Add(_monsters[i].Name);
             }
 
             float sum = 0;
@@ -267,10 +272,6 @@ namespace TextRPG
         int Attack(out bool bCrit)
         {
             int dmg = _player.Attack(_selectedSkillIndex, _targetMonster, out bCrit);
-
-            //Mp가 부족할 경우 데미지 0
-            if (_player.MpCheck(_selectedSkillIndex)) 
-                return 0;
                 
             if (SetMonsterOrder())
             {
@@ -280,11 +281,14 @@ namespace TextRPG
             {
                 state = EDungeoState.MonsterAllDeath;
             }
-<<<<<<< Updated upstream
-            
-=======
 
->>>>>>> Stashed changes
+            //Mp가 부족할 경우 데미지 0
+            if (_player.MpCheck(_selectedSkillIndex))
+            {
+                dmg = 0;
+            }
+                
+
             return dmg;
         }
 

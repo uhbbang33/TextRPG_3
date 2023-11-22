@@ -253,7 +253,7 @@ namespace TextRPG
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
             GetChild<Text>("MPText").text = $" 마나 : {player.Mp} / {player.MaxMp}";
-            GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
+            GetChild<Text>("CritText").text = $"치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
 
             //스킬 목록
@@ -275,12 +275,14 @@ namespace TextRPG
             AddChild("Content", new Border(2, 1, width - 4, height - 2));
 
             AddChild("EXPLabel", new Text(5, 2));
-            AddChild("EXPText", new Text(25, 3));
+            AddChild("EXPText", new Text(5, 3));
+            GetChild<Text>("EXPText").SetColor(ConsoleColor.DarkGreen);
 
             AddChild("ItemLabel", new Text(5, 4));
 
             AddChild("GoldLabel", new Text(5, 17));
             AddChild("GoldText", new Text(23, 18));
+            GetChild<Text>("GoldText").SetColor(ConsoleColor.DarkYellow);
         }
 
         protected override void Draw(int x, int y)
@@ -291,7 +293,8 @@ namespace TextRPG
         public void SetResult(Reward reward)
         {
             GetChild<Text>("EXPLabel").text = $"경험치 --------------------";
-            GetChild<Text>("EXPText").text = $"+ {reward.Exp,3}";
+            string str = $"+ {reward.Exp} EXP";
+            GetChild<Text>("EXPText").text = $"{str, 25}";
 
             GetChild<Text>("ItemLabel").text = $"아이템 --------------------";
             ShowItems(reward.Items);
@@ -325,6 +328,7 @@ namespace TextRPG
             AddChild("AtkText", new Text(5, 11));
             AddChild("DefText", new Text(5, 13));
             AddChild("RecoveryText", new Text(5, 15));
+            AddChild("RecoveryText2", new Text(5, 17));
             SetText();
         }
 
@@ -346,7 +350,7 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = "공격력이 2.0 증가합니다.";
             GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
             GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
-            GetChild<Text>("RecoveryText").text = "마나을 모두 회복합니다.";
+            GetChild<Text>("RecoveryText2").text = "마나를 모두 회복합니다.";
         }
     }
 
@@ -441,6 +445,11 @@ namespace TextRPG
             base.Clear();
             _widgets.Clear();
             _index = 0;
+        }
+
+        public int GetChildCount()
+        {
+            return _widgets.Count;
         }
     }
 
@@ -590,19 +599,19 @@ namespace TextRPG
             AddChild("Text7", new Text(2, 8));
             AddChild("Text8", new Text(2, 9));
             AddChild("Text9", new Text(3, 11));
-            AddChild("Text10", new Text(13, 12));
+            AddChild("Text10", new Text(3, 12));
         }
 
         public void Init(Quest quest)
         {
             GetChild<Text>("Text1").text = "\t\t공고문";
             GetChild<Text>("Text2").text = $"현재 [{quest.Name}]의";
-            GetChild<Text>("Text3").text = "개체수가 너무 많아";
+            GetChild<Text>("Text3").text = "개체수가 매우 많아";
             GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
             GetChild<Text>("Text5").text = $"[{quest.Name}]";
-            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오면";
+            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오시면";
             GetChild<Text>("Text7").text = $"[{quest.Reward} Gold]를";
-            GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
+            GetChild<Text>("Text8").text = "지급하겠습니다.";
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
@@ -617,10 +626,10 @@ namespace TextRPG
             GetChild<Text>("Text10").text = "[진행불가]";
         }
 
-        public void QuestCompleteText()
+        public void QuestCompleteText(Quest quest)
         {
             GetChild<Text>("Text9").text = "[퀘스트 완료!]";
-            GetChild<Text>("Text10").text = "[보상지급]";
+            GetChild<Text>("Text10").text = $"[{quest.Reward}Gold 지급]";
         }
 
         public void RefuseQuestText()
@@ -628,8 +637,6 @@ namespace TextRPG
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
-
-
 
         protected override void Draw(int x, int y)
         {
@@ -655,8 +662,12 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
-            AddChild("HPText", new Text(10, 2));
+            AddChild("HPLabel", new Text(10, 2));
+            AddChild("HPText", new Text(13, 2));
+            AddChild("MPLabel", new Text(20, 2));            
+            AddChild("MPText", new Text(23, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
         public UnitViewer(int x, int y) : base(x, y)
@@ -666,8 +677,12 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
-            AddChild("HPText", new Text(2, 2));
+            AddChild("HPLabel", new Text(10, 2));
+            AddChild("HPText", new Text(13, 2));
+            AddChild("MPLabel", new Text(20, 2));
+            AddChild("MPText", new Text(23, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
         public UnitViewer(int x, int y, int width, int height) : base(x, y, width, height)
@@ -677,15 +692,19 @@ namespace TextRPG
             AddChild("Content", new Border(0, 0, 30, 5));
             AddChild("NameText", new Text(2, 1));
             AddChild("LvText", new Text(10, 1));
-            AddChild("HPText", new Text(2, 2));
+            AddChild("HPLabel", new Text(10, 2));
+            AddChild("HPText", new Text(13, 2));
+            AddChild("MPLabel", new Text(20, 2));
+            AddChild("MPText", new Text(23, 2));
             GetChild<Text>("HPText").SetColor(ConsoleColor.Red);
+            GetChild<Text>("MPText").SetColor(ConsoleColor.Blue);
         }
 
-        public void SetText(string monsterName, int monsterHP, int monsterLv)
+        public void SetText(string name, int lv, int hp)
         {
-            GetChild<Text>("NameText").text = monsterName;
-            GetChild<Text>("LvText").text = $"Lv. {monsterLv,3}";
-            if (monsterHP <= 0)
+            GetChild<Text>("NameText").text = name;
+            GetChild<Text>("LvText").text = $"Lv. {lv,3}";
+            if (hp <= 0)
             {
                 GetChild<Text>("NameText").SetColor(ConsoleColor.Gray);
                 GetChild<Text>("HPText").SetColor(ConsoleColor.Gray);
@@ -694,8 +713,16 @@ namespace TextRPG
             }
             else
             {
-                GetChild<Text>("HPText").text = monsterHP.ToString();
+                GetChild<Text>("HPLabel").text = "HP";
+                GetChild<Text>("HPText").text = $"{hp, 4}";
             }
+        }
+
+        public void SetText(string name, int lv, int hp, int mp)
+        {
+            SetText(name, lv, hp);
+            GetChild<Text>("MPLabel").text = "MP";
+            GetChild<Text>("MPText").text = mp.ToString();
         }
 
         protected override void Draw(int x, int y)

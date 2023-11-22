@@ -254,9 +254,17 @@ namespace TextRPG
             return _monsterOrder.Count > 0 ? true : false;
         }
 
-        public void SelectSkill(int index)
+        public bool SelectSkill(int index)
         {
-            _selectedSkillIndex = index;
+            if(_player.MpCheck(index))
+            {
+                _selectedSkillIndex = index;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool SelectMonster(int index)
@@ -272,7 +280,8 @@ namespace TextRPG
         int Attack(out bool bCrit)
         {
             int dmg = _player.Attack(_selectedSkillIndex, _targetMonster, out bCrit);
-                
+            if (dmg == -1) return -1;
+
             if (SetMonsterOrder())
             {
                 state = EDungeoState.MonsterTurn;
@@ -281,14 +290,7 @@ namespace TextRPG
             {
                 state = EDungeoState.MonsterAllDeath;
             }
-
-            //Mp가 부족할 경우 데미지 0
-            if (_player.MpCheck(_selectedSkillIndex))
-            {
-                dmg = 0;
-            }
-                
-
+            
             return dmg;
         }
 

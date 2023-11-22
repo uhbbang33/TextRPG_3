@@ -338,7 +338,7 @@ namespace TextRPG
             _name = "능력치";
             _comment = "플레이어의 능력치를 확인합니다.";
             _prev = parent;
-            _statusWidget = new StatusWidget(6, 2);
+            _statusWidget = new StatusWidget(2, 1);
         }
 
         override public void HandleInput(GameManager game, ConsoleKey key)
@@ -1453,8 +1453,14 @@ namespace TextRPG
                     break;
 
                 default:
-                    _dungeon.SelectSkill((int)key - 49);
-                    game.ChangeScene(new SelectMonsterScene(this));
+                    if(_dungeon.SelectSkill((int)key - 49))
+                    {
+                        game.ChangeScene(new SelectMonsterScene(this));
+                    }
+                    else
+                    {
+                        ThrowMessage("스킬을 사용할 마나가 부족합니다.");
+                    }                    
                     break;
             }
         }

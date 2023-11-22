@@ -195,6 +195,7 @@ namespace TextRPG
 
             _playerQuest = save["Quest"].ToObject<Quest>();
             _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
+            mp = 10;
         }
 
         public void EquipItem(int index)
@@ -376,11 +377,6 @@ namespace TextRPG
             }
         }
 
-        public void Damaged(int dmg)
-        {
-            Hp -= dmg;
-        }
-
         public void ReceiveGold(int gold)
         {
             _gold += gold;
@@ -537,7 +533,7 @@ namespace TextRPG
         // Attack
         public int Attack(int SID, Monster monster, out bool bCrit) // SID : Skill ID
         {
-            bCrit = false;
+            bCrit = false;        
             int atkOffset = (int)Math.Ceiling(0.1f * Atk);
 
             Random random = new Random();
@@ -550,7 +546,7 @@ namespace TextRPG
             }
 
             dmg = (int)(dmg * Skills[SID].damage);
-
+            Mp -= Skills[SID].cost;
             dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
             if (dmg == 0) bCrit = false;
             return dmg;
@@ -559,17 +555,7 @@ namespace TextRPG
         //소모하려는 스킬의 Mp를 체크하는 함수
         public bool MpCheck(int SID)
         {
-            //사용하려는 스킬의 소모MP가 남아있는 MP보다 작을 때
-            if (Mp < Skills[SID].cost)
-            {
-                return false;
-            }
-            else
-            {
-                Mp -= Skills[SID].cost;//스킬 사용가능할 때 mp소모
-            }
-
-            return true;
+            return Mp < Skills[SID].cost ? false : true;
         }
 
         public int TakeDamage(int damage)

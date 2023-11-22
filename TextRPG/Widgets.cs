@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text;
 
 namespace TextRPG
@@ -208,30 +209,34 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 24;
+            _maxChildrenCount = 30;
 
-            AddChild("Background", new Border(0, 0, 39, 22));
-            AddChild("Content", new Border(2, 1, 35, 20));
+            AddChild("Background", new Border(0, 0, 28, 22));
+            AddChild("Content", new Border(2, 1, 24, 20));
             AddChild("LvText", new Text(5, 2));
-            AddChild("ExpText", new Text(15, 2));
-            AddChild("ClassText", new Text(5, 4));
-            AddChild("AtkText", new Text(5, 6));
-            AddChild("DefText", new Text(5, 8));
-            AddChild("HPText", new Text(5, 10));
-            AddChild("MPText", new Text(5, 12));
-            AddChild("CritText", new Text(5, 14));
-            AddChild("GoldText", new Text(5, 16));
-            AddChild("PotionText", new Text(5, 18));
+            AddChild("NameText", new Text(15, 2));
+            AddChild("ExpText", new Text(5, 3));
+            GetChild<Text>("ExpText").SetColor(ConsoleColor.DarkGreen);
 
-            //스킬 목록
-            for (int i = 0; i < 4; i++)
-            {
-                AddChild("SkillName" + i.ToString(), new Text(41, i * 5 + 2));
-                AddChild("SkillDesc" + i.ToString(), new Text(41, i * 5 + 4));
-                AddChild("SkillBorder" + i.ToString(), new Border(40, i * 5 + 1, 39, 5));
-            }
+            AddChild("ClassText", new Text(5, 5));
+            AddChild("AtkText", new Text(5, 7));
+            AddChild("DefText", new Text(5, 9));
+            AddChild("HPText", new Text(5, 11));
+            GetChild<Text>("HPText").SetColor(ConsoleColor.DarkRed);
+            AddChild("MPText", new Text(5, 13));
+            GetChild<Text>("MPText").SetColor(ConsoleColor.DarkBlue);
+            AddChild("CritText", new Text(5, 15));
+            AddChild("GoldText", new Text(5, 17));
+            GetChild<Text>("GoldText").SetColor(ConsoleColor.DarkYellow);
+            AddChild("PotionText", new Text(5, 19));
 
+            AddChild("SkillLabel", new Text(30, 0));
+            AddChild("SkillLabelEnd", new Text(30, 21));
+            AddChild("SkillList", new GridBox());
+            GetChild<GridBox>("SkillList").SetPosition(29, 1);
 
+            GetChild<Text>("SkillLabel").text = "================[ 보유 스킬 ]================";
+            GetChild<Text>("SkillLabelEnd").text = "=============================================";
         }
 
         public void SetPlayer(Player player)
@@ -247,21 +252,67 @@ namespace TextRPG
             else
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
-            GetChild<Text>("ExpText").text = $"경험치 : [ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"이름 : {player.Name} ( {player.Class} )";
+            GetChild<Text>("NameText").text = $"{player.Name}";
+            GetChild<Text>("ExpText").text = $"Exp ({player.Exp}/{player.MaxExp})";
+            GetChild<Text>("ClassText").text = $"직업 : {player.Class}";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
-            GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
-            GetChild<Text>("MPText").text = $" 마나 : {player.Mp} / {player.MaxMp}";
+            GetChild<Text>("HPText").text = $"체력   : {player.Hp} / {player.MaxHp}";
+            GetChild<Text>("MPText").text = $"마나   : {player.Mp} / {player.MaxMp}";
             GetChild<Text>("CritText").text = $"치명타 : {(int)(player.Crit * 100)} %";
-            GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
+            GetChild<Text>("GoldText").text = $"골드   : {player.Gold} G";
 
             //스킬 목록
-            for (int i = 0; i < 4; i++)
+            GridBox box = GetChild<GridBox>("SkillList");
+            box.SetColomn(1);
+
+            box.Clear();
+            for(int i = 0; i < player.Skills.Count; ++i)
             {
-                GetChild<Text>("SkillName" + i.ToString()).text = $"  ({player.Skills[i].name})";
-                GetChild<Text>("SkillDesc" + i.ToString()).text = $" : {player.Skills[i].desc} ";
+                DetailSkillSlot dss = new DetailSkillSlot();
+                dss.SetSkill(player.Skills[i]);
+                box.AddItem(dss);
             }
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
+        }
+    }
+
+    class DetailSkillSlot : Widget
+    {        
+        public DetailSkillSlot() : base() 
+        {
+            _maxChildrenCount = 10;
+
+            _width = 45;
+            _height = 5;
+
+            AddChild("Content", new Border(0, 0, _width, _height));
+            AddChild("NameText", new Text(2, 1));
+            AddChild("DmgText", new Text(34, 1));
+            GetChild<Text>("DmgText").SetColor(ConsoleColor.DarkMagenta);
+            AddChild("AccuracyText", new Text(34, 2));
+            GetChild<Text>("AccuracyText").SetColor(ConsoleColor.DarkYellow);
+            AddChild("MPText", new Text(34, 3));
+            GetChild<Text>("MPText").SetColor(ConsoleColor.DarkBlue); 
+            AddChild("DescriptionText", new Text(2, 3));
+        }
+
+        public void SetSkill(Skill skill)
+        {
+            GetChild<Text>("NameText").text = $"[{skill.name}]";
+            GetChild<Text>("DmgText").text = $"|DMG {skill.damage * 100}%|";
+            GetChild<Text>("AccuracyText").text = $"|AR  {skill.accuracy * 100, 3}%|";
+            GetChild<Text>("MPText").text = $"|MP  {skill.cost, 3} |";
+            GetChild<Text>("DescriptionText").text = skill.desc;
+        }
+
+        protected override void Draw(int x, int y)
+        {
+            base.Draw(_x + x, _y + y);
         }
     }
 
@@ -791,7 +842,7 @@ namespace TextRPG
     {
         public SkillSlot()
         {
-            _maxChildrenCount = 5;
+            _maxChildrenCount = 6;
             _width = 38;
             _height = 5;
 
@@ -799,6 +850,8 @@ namespace TextRPG
             AddChild("NameText", new Text(2, 1));
             AddChild("AtkText", new Text(2, 3));
             AddChild("Accuracy", new Text(23, 3));
+            AddChild("CostText", new Text(29, 1));
+            GetChild<Text>("CostText").SetColor(ConsoleColor.DarkBlue);
         }
 
         public void SetSkill(int idx, Skill skill)
@@ -806,6 +859,7 @@ namespace TextRPG
             GetChild<Text>("NameText").text = $"{idx}. [ {skill.name} ]";
             GetChild<Text>("AtkText").text = $"피해배율 : {skill.damage * 100} %";
             GetChild<Text>("Accuracy").text = $"명중률 : {skill.accuracy * 100} %";
+            GetChild<Text>("CostText").text = $"MP :{skill.cost,3}";
         }
 
         protected override void Draw(int x, int y)

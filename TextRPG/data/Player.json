@@ -1,14 +1,14 @@
 {
   "Lv": 1,
-  "Name": "asdf",
-  "Class": "전사",
+  "Name": "Harvest",
+  "Class": "마법사",
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
-  "MaxMP": 100,
+  "MaxMP": 50,
   "Exp": 5,
   "MaxExp": 10,
-  "Gold": 1430,
+  "Gold": 1500,
   "Critical": 0.15,
   "CatchMonsterCountForQuest": 0,
   "Inventory": [
@@ -17,9 +17,9 @@
       "_status": 1,
       "type": 0,
       "restricted": 0,
-      "Name": "검",
+      "Name": "완드",
       "Value": 5,
-      "Description": "흔한 검이다.",
+      "Description": "흔한 완드다.",
       "Price": 3,
       "HasCount": 0
     },
@@ -33,58 +33,36 @@
       "Description": "나무로 만들어진 투구이다.",
       "Price": 5,
       "HasCount": 0
-    },
-    {
-      "bEquip": false,
-      "_status": 1,
-      "type": 0,
-      "restricted": 2,
-      "Name": "나무 지팡이",
-      "Value": 4,
-      "Description": " 나무로 만든 지팡이다.",
-      "Price": 50,
-      "HasCount": 1
-    },
-    {
-      "bEquip": false,
-      "_status": 0,
-      "type": 2,
-      "restricted": 0,
-      "Name": "HP물약",
-      "Value": 30,
-      "Description": " HP가 50 회복된다.",
-      "Price": 20,
-      "HasCount": 1
     }
   ],
   "Skills": [
     {
       "name": "일반 공격",
-      "desc": "후드려 패는 기술이다.",
-      "damage": 2.0,
+      "desc": "손에 있는 무기로 휘두른다.",
+      "damage": 1.0,
       "accuracy": 1.0,
       "cost": 0
     },
     {
-      "name": "내려 찍기",
-      "desc": "무기로 내려찍는 기술",
-      "damage": 2.0,
+      "name": "매직클로",
+      "desc": "마법으로 적을 할퀸다.",
+      "damage": 1.3,
       "accuracy": 0.9,
       "cost": 10
     },
     {
-      "name": "어둠의 다크 슬래시",
-      "desc": "궁극의 기술이다.",
+      "name": "썬더볼트",
+      "desc": "적에게 번개 공격을 가한다.",
       "damage": 2.0,
       "accuracy": 0.8,
-      "cost": 20
+      "cost": 10
     },
     {
-      "name": "뒤에서 베기",
-      "desc": "상대방의 뒤를 잡아 공격하는 기술",
+      "name": "아베다케다브라",
+      "desc": "함부로 쓰면 안되는 금술",
       "damage": 3.0,
       "accuracy": 0.7,
-      "cost": 7
+      "cost": 20
     }
   ],
   "Quest": {

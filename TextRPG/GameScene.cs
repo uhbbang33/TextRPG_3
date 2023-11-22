@@ -646,7 +646,7 @@ namespace TextRPG
         {
             base.HandleInput(game, key);
 
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _ShopItems.GetChildCount()) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;

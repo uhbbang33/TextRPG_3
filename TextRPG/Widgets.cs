@@ -1,7 +1,4 @@
-using System;
-using System.Diagnostics.Metrics;
 using System.Text;
-using System.Xml.Linq;
 
 namespace TextRPG
 
@@ -211,11 +208,10 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 17;
+            _maxChildrenCount = 25;
 
             AddChild("Background", new Border(0, 0, 39, 22));
             AddChild("Content", new Border(2, 1, 35, 20));
-            AddChild("SkillContent", new Border(39, 0, 39, 22));
             AddChild("LvText", new Text(5, 2));
             AddChild("ExpText", new Text(15, 2));
             AddChild("ClassText", new Text(5, 4));
@@ -226,6 +222,16 @@ namespace TextRPG
             AddChild("CritText", new Text(5, 14));
             AddChild("GoldText", new Text(5, 16));
             AddChild("PotionText", new Text(5, 18));
+
+            //스킬 목록
+            for (int i = 0; i < 4; i++)
+            {
+                AddChild("SkillName" + i.ToString(), new Text(41, i * 5 + 2));
+                AddChild("SkillDesc" + i.ToString(), new Text(41, i * 5 + 4));
+                AddChild("SkillBorder" + i.ToString(), new Border(40, i * 5 + 1, 39, 5));
+            }
+
+
         }
 
         public void SetPlayer(Player player)
@@ -249,6 +255,13 @@ namespace TextRPG
             GetChild<Text>("MPText").text = $" 마나 : {player.Mp} / {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
+
+            //스킬 목록
+            for (int i = 0; i < 4; i++)
+            {
+                GetChild<Text>("SkillName" + i.ToString()).text = $"  ({player.Skills[i].name})";
+                GetChild<Text>("SkillDesc" + i.ToString()).text = $" : {player.Skills[i].desc} ";
+            }
         }
     }
 
@@ -472,7 +485,7 @@ namespace TextRPG
             GetChild<Text>("Text6").text = "3. 퀘스트";
         }
 
-        
+
 
         protected override void Draw(int x, int y)
         {
@@ -608,14 +621,14 @@ namespace TextRPG
             GetChild<Text>("Text9").text = "[퀘스트 완료!]";
             GetChild<Text>("Text10").text = "[보상지급]";
         }
-        
+
         public void RefuseQuestText()
         {
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
 
-        
+
 
         protected override void Draw(int x, int y)
         {
@@ -849,7 +862,7 @@ namespace TextRPG
             Console.Write("┫");
         }
 
-        public static void ShowMapName(string name, string comment = "") 
+        public static void ShowMapName(string name, string comment = "")
         {
             DeleteLine(1);
 
@@ -889,7 +902,7 @@ namespace TextRPG
         {
             ClearTopScreen();
             int y = 2;
-            
+
             for (int i = 0; i < contents.Length; ++i)
             {
                 if (space) y++;

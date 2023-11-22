@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Numerics;
 
 
 
@@ -401,7 +399,7 @@ namespace TextRPG
         public bool UseItem(int index)
         {
             Item item = _inventory[index];
-            switch(item._status)
+            switch (item._status)
             {
                 case Item.EStatus.ATK:
                     break;
@@ -563,6 +561,22 @@ namespace TextRPG
             return dmg;
         }
 
+        //소모하려는 스킬의 Mp를 체크하는 함수
+        public bool MpCheck(int SID)
+        {
+            //사용하려는 스킬의 소모MP가 남아있는 MP보다 작을 때
+            if (Mp < Skills[SID].cost)
+            {
+                return false;
+            }
+            else
+            {
+                Mp -= Skills[SID].cost;//스킬 사용가능할 때 mp소모
+            }
+
+            return true;
+        }
+
         public int TakeDamage(int damage)
         {
             int dmg = damage - Def;
@@ -651,7 +665,7 @@ namespace TextRPG
 
             int cnt = 0;
             List<int> indexList = new List<int>();
-            for(int i =0; i< _inventory.Count; ++i)
+            for (int i = 0; i < _inventory.Count; ++i)
                 if (_inventory[i].Name == _playerQuest.Name)
                 {
                     ++cnt;
@@ -668,7 +682,7 @@ namespace TextRPG
                 for (int i = indexList.Count - 1; i >= 0; --i)
                 {
                     int _index = indexList[i];
-                    if(cnt > 0)
+                    if (cnt > 0)
                     {
                         _inventory.RemoveAt(_index);
                         --cnt;
@@ -695,11 +709,11 @@ namespace TextRPG
 
         #endregion
         public void Revival()
-        {            
+        {
             _gold /= 2;
-            
+
             hp = maxHp;
-            
+
             _exp -= (int)(MaxExp / 10);
             _exp = _exp < 0 ? 0 : _exp;
         }

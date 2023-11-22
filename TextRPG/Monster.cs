@@ -131,7 +131,7 @@
             _atk = 30 + (int)(_lv * 1.2f);
             _def = 30 + (int)(_lv * 1.2f);
             _goldReward = 50 + (int)(_lv * 1.2f);
-            _itemReward = new Item("그리폰 부리", "1:10", "쪼이면 아프다", Item.ClassRestricted.NoRestricted, Item.EType.Armor, 50);
+            _itemReward = new Item("그리폰 부리", "0:50", "쪼이면 아프다", Item.ClassRestricted.NoRestricted, Item.EType.Potion, 50);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\gryphon.txt");
         }
     }
@@ -147,7 +147,7 @@
             _atk = 35 + (int)(_lv * 1.4f);
             _def = 40 + (int)(_lv * 1.4f);
             _goldReward = 60 + (int)(_lv * 1.4f);
-            _itemReward = new Item("유니콘 뿔", "2:13", "관상용으로도 추천", Item.ClassRestricted.Wizard, Item.EType.Weapon, 60);
+            _itemReward = new Item("유니콘 뿔", "0:77", "관상용으로도 추천", Item.ClassRestricted.Wizard, Item.EType.Potion, 60);
             _display = File.ReadAllLines(@"..\..\..\MonstersArt\unicorn.txt");
         }
     }

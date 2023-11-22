@@ -1,7 +1,4 @@
-using System;
-using System.Diagnostics.Metrics;
 using System.Text;
-using System.Xml.Linq;
 
 namespace TextRPG
 
@@ -211,11 +208,10 @@ namespace TextRPG
     {
         public StatusWidget(int x, int y) : base(x, y)
         {
-            _maxChildrenCount = 17;
+            _maxChildrenCount = 24;
 
             AddChild("Background", new Border(0, 0, 39, 22));
             AddChild("Content", new Border(2, 1, 35, 20));
-            AddChild("SkillContent", new Border(39, 0, 39, 22));
             AddChild("LvText", new Text(5, 2));
             AddChild("ExpText", new Text(15, 2));
             AddChild("ClassText", new Text(5, 4));
@@ -226,6 +222,16 @@ namespace TextRPG
             AddChild("CritText", new Text(5, 14));
             AddChild("GoldText", new Text(5, 16));
             AddChild("PotionText", new Text(5, 18));
+
+            //스킬 목록
+            for (int i = 0; i < 4; i++)
+            {
+                AddChild("SkillName" + i.ToString(), new Text(41, i * 5 + 2));
+                AddChild("SkillDesc" + i.ToString(), new Text(41, i * 5 + 4));
+                AddChild("SkillBorder" + i.ToString(), new Border(40, i * 5 + 1, 39, 5));
+            }
+
+
         }
 
         public void SetPlayer(Player player)
@@ -241,14 +247,21 @@ namespace TextRPG
             else
                 eqDef = "";
             GetChild<Text>("LvText").text = $"Lv. {player.Lv}";
-            GetChild<Text>("ExpText").text = $"[ {player.Exp} / {player.MaxExp} ]";
-            GetChild<Text>("ClassText").text = $"{player.Name} ( {player.Class} )";
+            GetChild<Text>("ExpText").text = $"경험치 : [ {player.Exp} / {player.MaxExp} ]";
+            GetChild<Text>("ClassText").text = $"이름 : {player.Name} ( {player.Class} )";
             GetChild<Text>("AtkText").text = $"공격력 : {player.Atk} {eqAtk}";
             GetChild<Text>("DefText").text = $"방어력 : {player.Def} {eqDef}";
             GetChild<Text>("HPText").text = $" 체력 : {player.Hp} / {player.MaxHp}";
-            GetChild<Text>("MPText").text = $" 마나 : {player.MaxMp}";
+            GetChild<Text>("MPText").text = $" 마나 : {player.Mp} / {player.MaxMp}";
             GetChild<Text>("CritText").text = $" 치명타 : {(int)(player.Crit * 100)} %";
             GetChild<Text>("GoldText").text = $" 골드 : {player.Gold} G";
+
+            //스킬 목록
+            for (int i = 0; i < 4; i++)
+            {
+                GetChild<Text>("SkillName" + i.ToString()).text = $"  ({player.Skills[i].name})";
+                GetChild<Text>("SkillDesc" + i.ToString()).text = $" : {player.Skills[i].desc} ";
+            }
         }
     }
 
@@ -305,7 +318,7 @@ namespace TextRPG
     {
         public LevelUpWidget(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            _maxChildrenCount = 10;
+            _maxChildrenCount = 11;
 
             AddChild("Content", new Border(0, 0, width, height));
             AddChild("SubContent", new Border(2, 9, width - 4, height - 10));
@@ -333,6 +346,7 @@ namespace TextRPG
             GetChild<Text>("AtkText").text = "공격력이 2.0 증가합니다.";
             GetChild<Text>("DefText").text = "방어력이 1.0 증가합니다.";
             GetChild<Text>("RecoveryText").text = "체력을 모두 회복합니다.";
+            GetChild<Text>("RecoveryText").text = "마나을 모두 회복합니다.";
         }
     }
 
@@ -472,7 +486,7 @@ namespace TextRPG
             GetChild<Text>("Text6").text = "3. 퀘스트";
         }
 
-        
+
 
         protected override void Draw(int x, int y)
         {
@@ -576,19 +590,19 @@ namespace TextRPG
             AddChild("Text7", new Text(2, 8));
             AddChild("Text8", new Text(2, 9));
             AddChild("Text9", new Text(3, 11));
-            AddChild("Text10", new Text(13, 12));
+            AddChild("Text10", new Text(3, 12));
         }
 
         public void Init(Quest quest)
         {
             GetChild<Text>("Text1").text = "\t\t공고문";
             GetChild<Text>("Text2").text = $"현재 [{quest.Name}]의";
-            GetChild<Text>("Text3").text = "개체수가 너무 많아";
+            GetChild<Text>("Text3").text = "개체수가 매우 많아";
             GetChild<Text>("Text4").text = "피해가 속출하고 있으니";
             GetChild<Text>("Text5").text = $"[{quest.Name}]";
-            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오면";
+            GetChild<Text>("Text6").text = $"[{quest.Num}마리]를 잡아오시면";
             GetChild<Text>("Text7").text = $"[{quest.Reward} Gold]를";
-            GetChild<Text>("Text8").text = "보상으로 지급하겠다.";
+            GetChild<Text>("Text8").text = "지급하겠습니다.";
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
@@ -603,19 +617,17 @@ namespace TextRPG
             GetChild<Text>("Text10").text = "[진행불가]";
         }
 
-        public void QuestCompleteText()
+        public void QuestCompleteText(Quest quest)
         {
             GetChild<Text>("Text9").text = "[퀘스트 완료!]";
-            GetChild<Text>("Text10").text = "[보상지급]";
+            GetChild<Text>("Text10").text = $"[{quest.Reward}Gold 지급]";
         }
-        
+
         public void RefuseQuestText()
         {
             GetChild<Text>("Text9").text = "";
             GetChild<Text>("Text10").text = "";
         }
-
-        
 
         protected override void Draw(int x, int y)
         {
@@ -849,7 +861,7 @@ namespace TextRPG
             Console.Write("┫");
         }
 
-        public static void ShowMapName(string name, string comment = "") 
+        public static void ShowMapName(string name, string comment = "")
         {
             DeleteLine(1);
 
@@ -889,7 +901,7 @@ namespace TextRPG
         {
             ClearTopScreen();
             int y = 2;
-            
+
             for (int i = 0; i < contents.Length; ++i)
             {
                 if (space) y++;

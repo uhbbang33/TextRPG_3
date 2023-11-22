@@ -895,13 +895,12 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D2:
-                    if (!_player.PlayerQuest.IsMonsterHuntQuest)
+                    if (!_player.PlayerQuest.IsTempleQuest)
                     {
                         _player.SetQuestNull();
 
                         _widget.RefuseText();
                         DrawScene();
-                        //Thread.Sleep(2000);
                     }
                     else
                         game.ChangeScene(_prev);
@@ -926,17 +925,17 @@ namespace TextRPG
                 _widget.Init(_quest);
             }
             // 플레이어가 상점 퀘스트를 가지고 있을 때
-            else if (!playerQuest.IsMonsterHuntQuest
+            else if (!playerQuest.IsTempleQuest
                 && playerQuest.Name != null)
             {
                 // 현재 상점 퀘스트는 플레이어가 가지고 있는 퀘스트
                 _quest = new Quest(playerQuest.Name, playerQuest.Num,
-                    playerQuest.Reward, playerQuest.IsMonsterHuntQuest);
+                    playerQuest.Reward, playerQuest.IsTempleQuest);
                 // 아직 완료되지 않았음을 알려주는 widget
                 _widget.IncompletedText(_quest);
             }
             // 플레이어가 신전 퀘스트를 가지고 있을 때
-            else if (playerQuest.IsMonsterHuntQuest)
+            else if (playerQuest.IsTempleQuest)
             {
                 _widget.AlreadyHaveQuestText();
             }
@@ -947,13 +946,13 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
 
         public void CreateQuest()
         {
             Random random = new Random();
             _quest = _questList[random.Next(0, _questList.Count)];
-            _player.ShouldCreateShopQuest = false;
         }
     }
 
@@ -998,6 +997,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
     }
 
@@ -1011,7 +1011,7 @@ namespace TextRPG
             SetDisplay();
             _choices = new string[] { "회복하기 ( 300 G )", "퀘스트" };
 
-            AddScene("TempleQuestComplete", new TempleQuestScene(this));
+            AddScene("TempleQuestComplete", new TempleQuestCompleteScene(this));
             AddScene("TempleQuest", new TempleQuestScene(this));
         }
 
@@ -1034,7 +1034,7 @@ namespace TextRPG
                     }
                     break;
                 case ConsoleKey.D2:
-                    if (GameManager.Instance.Player.IsTempleQuestComplete())
+                    if (game.Player.IsTempleQuestComplete())
                         game.ChangeScene(SceneGroup["TempleQuestComplete"]);
                     else
                         game.ChangeScene(SceneGroup["TempleQuest"]);
@@ -1062,7 +1062,6 @@ namespace TextRPG
     class TempleQuestScene : Scene
     {
         TempleQuestInfoWidget _widget;
-        Player _player;
         protected Quest _quest;
         List<Quest> _questList;
 
@@ -1074,7 +1073,6 @@ namespace TextRPG
 
             _choices = new string[] { "수락", "거절" };
             _display = File.ReadAllLines(@"..\..\..\art\parchment.txt");
-            _player = GameManager.Instance.Player;
 
             _widget = new TempleQuestInfoWidget(8, 3);
             _widget.SetSize(25, 14);
@@ -1091,28 +1089,21 @@ namespace TextRPG
                     break;
 
                 case ConsoleKey.D1:
-                    if (_player.PlayerQuest.Name == null)
+                    if (game.Player.PlayerQuest.Name == null)
                     {
-                        _player.SetQuest(_quest);
+                        game.Player.SetQuest(_quest);
                         _widget.AcceptQuestText();
                         DrawScene();
                     }
-                    //else if (!_player.PlayerQuest.IsMonsterHuntQuest)
-                    //{
-                    //    _widget.AlreadyHaveQuestText();
-                    //    DrawScene();
-                    //    _widget.RefuseQuestText();
-                    //}
                     break;
 
                 case ConsoleKey.D2:
-                    if (_player.PlayerQuest.IsMonsterHuntQuest)
+                    if (game.Player.PlayerQuest.IsTempleQuest)
                     {
-                        _player.SetQuestNull();
+                        game.Player.RefuseTempleQuest();
                         _widget.RefuseQuestText();
                         DrawScene();
                     }
-                    
                     break;
 
                 default:
@@ -1134,19 +1125,19 @@ namespace TextRPG
                 _widget.Init(_quest);
             }
             // 플레이어가 신전 퀘스트를 가지고 있을 때
-            else if (playerQuest.IsMonsterHuntQuest
+            else if (playerQuest.IsTempleQuest
                 && playerQuest.Name != null)
             {
                 // 현재 신전 퀘스트는 플레이어가 가지고 있는 퀘스트
                 _quest = new Quest(playerQuest.Name, playerQuest.Num,
-                    playerQuest.Reward, playerQuest.IsMonsterHuntQuest);
+                    playerQuest.Reward, playerQuest.IsTempleQuest);
 
                 _widget.Init(_quest);
                 // 진행중 text
                 _widget.AcceptQuestText();
             }
             // 플레이어가 상점 퀘스트를 가지고 있을 때
-            else if (!playerQuest.IsMonsterHuntQuest)
+            else if (!playerQuest.IsTempleQuest)
             {
                 _widget.AlreadyHaveQuestText();
             }
@@ -1165,26 +1156,21 @@ namespace TextRPG
         {
             Random random = new Random();
             _quest = _questList[random.Next(0, _questList.Count)];
-            _player.ShouldCreateShopQuest = false;
         }
     }
 
     class TempleQuestCompleteScene : Scene
     {
-        ShopQuestInfoWidget _widget;
+        TempleQuestInfoWidget _widget;
         public TempleQuestCompleteScene(Scene parent)
         {
             _prev = parent;
             _name = "퀘스트";
             _comment = "퀘스트를 완료했습니다!";
-            _display = File.ReadAllLines(@"..\..\..\art\npc.txt");
+            _display = File.ReadAllLines(@"..\..\..\art\parchment.txt");
 
-            Player player = GameManager.Instance.Player;
-
-            _widget = new ShopQuestInfoWidget(35, 3);
-
-            player.GetQuestReward();
-            player.SetQuestNull();
+            _widget = new TempleQuestInfoWidget(8, 3);
+            _widget.SetSize(25, 14);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -1205,7 +1191,9 @@ namespace TextRPG
         {
             base.Update(game);
 
-            _widget.CompletedText(game.Player.PlayerQuest);
+            _widget.QuestCompleteText(game.Player.PlayerQuest);
+            game.Player.GetQuestReward();
+            game.Player.SetQuestNull();
         }
 
         public override void DrawScene()
@@ -1213,6 +1201,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _widget.Draw();
+            ShowGold();
         }
     }
 
@@ -1584,6 +1573,7 @@ namespace TextRPG
 
                 case Dungeon.EDungeoState.MonsterAllDeath:
                     GameManager.Instance.RefreshScene();
+                    GameManager.Instance.Player.GetMp(10);
                     break;
 
                 case Dungeon.EDungeoState.Clear:
@@ -1604,12 +1594,15 @@ namespace TextRPG
         Reward _reward;
         LevelUpWidget _lvUpWidget;
         bool isLvUp;
+        List<string> _monsterNames;
+        
         public RewardScene(Dungeon dungeon)
         {
             _name = "탐험 결과";
             _resultwidget = new ResultWidget(2, 0, 35, 23);
             _reward = dungeon.Reward;
             _resultwidget.SetResult(_reward);
+            _monsterNames = dungeon.MonsterNames;
 
             _lvUpWidget = new LevelUpWidget(41, 0, 35, 23);
         }
@@ -1635,6 +1628,8 @@ namespace TextRPG
             {
                 player.MergeIfConsumable(item);
             }
+
+            player.IncreaseQuestMonsterCount(_monsterNames);
 
             player.GetExp(_reward.Exp, out isLvUp);
             player.Gold += _reward.Gold;

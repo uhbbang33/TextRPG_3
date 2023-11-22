@@ -128,8 +128,6 @@ namespace TextRPG
 
             //다음으로 넘어갈 TownScene을 딕셔너리에 추가
             AddScene("Town", new TownScene(this));
-            //새 캐릭터를 만드는 SelectClassScene을 추가
-            AddScene("ClassSelect", new SelectClassScene(this));
 
             //위 화면에 출력할 아스키아트 로드
             SetDisplay();
@@ -143,7 +141,7 @@ namespace TextRPG
                     game.ChangeScene(_prev);
                     break;
                 case ConsoleKey.D1://새로하기
-                    game.ChangeScene(SceneGroup["ClassSelect"]);
+                    game.ChangeScene(new SelectClassScene(this));
                     break;
                 case ConsoleKey.D2://이어하기
                     game.ChangeScene(SceneGroup["Town"]);
@@ -447,17 +445,20 @@ namespace TextRPG
     class EquipScene : Scene
     {
         GridBox _inventoryWidget;
+        GridBox _selectInventory;
         public EquipScene(Scene parent)
         {
             _name = "장착관리";
             _comment = "플레이어의 착용 장비를 관리합니다.";
             _prev = parent;
             _inventoryWidget = ((InventoryScene)parent).InventoryWidget;
+            _selectInventory = new GridBox();
+            _selectInventory.SetPosition(0, 24);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
         {
-            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + _choices.Length) && (key != ConsoleKey.Q && key != ConsoleKey.E))
+            if ((key < ConsoleKey.D0 || key >= ConsoleKey.D1 + game.Player.Inventory.Count) && (key != ConsoleKey.Q && key != ConsoleKey.E))
             {
                 ThrowMessage("잘못된 입력입니다.");
                 return;
@@ -530,16 +531,19 @@ namespace TextRPG
 
         void SetOption(Player player)
         {
-            List<string> lines = new List<string>();
-
+            _selectInventory.Clear();
             for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
+                TextBlock tb = new TextBlock();                
+
                 Item item = player.Inventory[i];
                 string line = $"{item.Name}";
                 if (item.bEquip) line = line.Insert(0, "[E]");
-                lines.Add(line);
+                tb.SetText($"{i % 6 + 1}. {line}");
+
+                tb.SetSize(38, 3);
+                _selectInventory.AddItem(tb);
             }
-            _choices = lines.ToArray();
         }
 
         public override void DrawScene()
@@ -547,6 +551,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _inventoryWidget.Draw();
+            _selectInventory.Draw();
             ShowPagination();
         }
     }
@@ -620,6 +625,7 @@ namespace TextRPG
         Shop _shop;
 
         GridBox _ShopItems;
+        GridBox _selectItems;
 
         int _pagination = 0;
 
@@ -630,6 +636,8 @@ namespace TextRPG
             _prev = parent;
             _shop = ((ShopScene)Prev).shop;
             _ShopItems = new GridBox();
+            _selectItems = new GridBox();
+            _selectItems.SetPosition(0, 24);
             SetDisplay();
             SetOption();
         }
@@ -698,13 +706,14 @@ namespace TextRPG
 
         void SetOption()
         {
-            List<string> lines = new List<string>();
+            _selectItems.Clear();
             for (int i = 0 + (_pagination * 6); i < _shop.storeItems.Count && i < 6 + (_pagination * 6); ++i)
             {
-                string line = $"{_shop.storeItems[i].Name}";
-                lines.Add(line);
+                TextBlock tb = new TextBlock();
+                tb.SetSize(38, 3);
+                tb.SetText($"{i%6 + 1}. {_shop.storeItems[i].Name}");
+                _selectItems.AddItem(tb);
             }
-            _choices = lines.ToArray();
         }
 
         public override void DrawScene()
@@ -712,6 +721,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _ShopItems.Draw();
+            _selectItems.Draw();
             ShowPagination(_pagination + 1, _shop.storeItems.Count / 6 + 1);
             ShowGold();
         }
@@ -752,6 +762,7 @@ namespace TextRPG
     class SellScene : Scene
     {
         GridBox _playerInventory;
+        GridBox _selectInventory;
 
         public SellScene(Scene parent)
         {
@@ -759,6 +770,8 @@ namespace TextRPG
             _comment = "아이템을 판매합니다.";
             _prev = parent;
             _playerInventory = new GridBox();
+            _selectInventory = new GridBox();
+            _selectInventory.SetPosition(0, 24);
         }
 
         public override void HandleInput(GameManager game, ConsoleKey key)
@@ -834,14 +847,14 @@ namespace TextRPG
 
         void SetOption(Player player)
         {
-            List<string> lines = new List<string>();
+            _selectInventory.Clear();
             for (int i = 0 + (player.invenPage * 6); i < ((player.invenPage + 1) * 6) && i < player.Inventory.Count; ++i)
             {
-                Item item = player.Inventory[i];
-                string line = $"{item.Name}";
-                lines.Add(line);
+                TextBlock tb = new TextBlock();
+                tb.SetSize(38, 3);
+                tb.SetText($"{i%6 +1}. {player.Inventory[i].Name}");
+                _selectInventory.AddItem(tb);
             }
-            _choices = lines.ToArray();
         }
 
         public override void DrawScene()
@@ -849,6 +862,7 @@ namespace TextRPG
             base.DrawScene();
             Screen.DrawTopScreen(Display);
             _playerInventory.Draw();
+            _selectInventory.Draw();
             ShowPagination();
             ShowGold();
         }
@@ -1219,7 +1233,7 @@ namespace TextRPG
             _panel.SetColomn(1);
             _panel.SetMargine(1, 1);
             _choices = new string[] { "쉬운 던전", "일반 던전", "어려운 던전" };
-            _recommendDef = new string[] { "1 ~ 3", "5 ~ 10", "10 ~ 20" };
+            _recommendDef = new string[] { "1 - 3", "5 - 10", "10 - 20" };
 
 
             for (int i = 0; i < 3; ++i)
@@ -1323,7 +1337,7 @@ namespace TextRPG
             {
                 UnitViewer textBlock = new UnitViewer();
                 textBlock.SetSize(20, 4);
-                textBlock.SetText(monsters[i].Name, monsters[i].Hp, monsters[i].Lv);
+                textBlock.SetText(monsters[i].Name, monsters[i].Lv , monsters[i].Hp);
                 _monsters.AddItem(textBlock);
             }
         }
@@ -1369,7 +1383,7 @@ namespace TextRPG
         {
             _dungeon.Enter(game.Player);
             SetMonsterCount(_dungeon.GetMonster());
-            _playerWidget.SetText(game.Player.Class, game.Player.Hp, game.Player.Lv);
+            _playerWidget.SetText(game.Player.Class, game.Player.Lv, game.Player.Hp, game.Player.Mp);
             _playerWidget.SetSize(30, 4);
 
             _monsterList = _dungeon.GetMonster().ToList();
@@ -1518,7 +1532,7 @@ namespace TextRPG
             {
                 UnitViewer slot = new UnitViewer();
                 slot.SetSize(38, 5);
-                slot.SetText($"{idx++}. {monster.Name}", monster.Hp, monster.Lv);
+                slot.SetText($"{idx++}. {monster.Name}", monster.Lv, monster.Hp);
                 _monsters.AddItem(slot);
             }
         }
@@ -1710,7 +1724,6 @@ namespace TextRPG
                         Thread.Sleep(1000);
                         game.RefreshScene();
                     }
-
                     break;
             }
         }
@@ -1762,6 +1775,10 @@ namespace TextRPG
                 case Item.EStatus.HP:
                     msg[2] = $"체력을 {item.Value} 만큼 회복했습니다.";
                     break;
+
+                case Item.EStatus.MP:
+                    msg[2] = $"마나를 {item.Value} 만큼 회복했습니다.";
+                    break;
             }
             return msg;
         }
@@ -1782,6 +1799,10 @@ namespace TextRPG
 
                 case Item.EStatus.HP:
                     msg[2] = "체력이 이미 최대치 입니다.";
+                    break;
+
+                case Item.EStatus.MP:
+                    msg[2] = "마나가 이미 최대치 입니다.";
                     break;
             }
             return msg;

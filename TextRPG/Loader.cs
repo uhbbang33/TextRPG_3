@@ -39,6 +39,7 @@ namespace TextRPG
                 new JProperty("Atk", player.BaseAtk),
                 new JProperty("Def", player.BaseDef),
                 new JProperty("MaxHP", player.MaxHp),
+                new JProperty("MaxMP", player.MaxMp),
                 new JProperty("Exp", player.Exp),
                 new JProperty("MaxExp", player.MaxExp),
                 new JProperty("Gold", player.Gold),

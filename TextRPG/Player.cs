@@ -172,6 +172,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -193,25 +195,6 @@ namespace TextRPG
 
             _playerQuest = save["Quest"].ToObject<Quest>();
             _catchMonsterCountForQuest = (int)save["CatchMonsterCountForQuest"];
-        }
-
-        public Player(int lv, string job, int atk, int def, int maxHp, int exp, int maxExp, int gold, float critical)
-        {
-            this.lv = lv;
-            this.job = job;
-            this.atk = atk;
-
-            this.def = def;
-
-            this.maxHp = maxHp;
-            hp = maxHp;
-
-            _maxExp = maxExp;
-            _exp = exp;
-
-            _gold = gold;
-
-            _crit = critical;
         }
 
         public void EquipItem(int index)
@@ -251,6 +234,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -282,6 +267,8 @@ namespace TextRPG
             def = (int)save["Def"];
             maxHp = (int)save["MaxHP"];
             hp = maxHp;
+            maxMp = (int)save["MaxMP"];
+            mp = maxMp;
             _maxExp = (int)save["MaxExp"];
             _exp = (int)save["Exp"];
             _gold = (int)save["Gold"];
@@ -413,6 +400,11 @@ namespace TextRPG
                 case Item.EStatus.HP:
                     if (Hp == MaxHp) return false;
                     Hp += item.Value;
+                    break;
+
+                case Item.EStatus.MP:
+                    if (Mp == MaxMp) return false;
+                    Mp += item.Value;
                     break;
             }
 
@@ -624,7 +616,6 @@ namespace TextRPG
                 invenPage += 1;
             }
         }
-
 
         public void GetExp(int exp, out bool levelUp)
         {

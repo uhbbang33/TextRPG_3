@@ -556,7 +556,9 @@ namespace TextRPG
 
             dmg = (int)(dmg * Skills[SID].damage);
 
+            if (!MpCheck(SID)) dmg = 0;
             dmg = monster.TakeDamage(dmg, Skills[SID].accuracy);
+            
             if (dmg == 0) bCrit = false;
             return dmg;
         }
@@ -565,14 +567,12 @@ namespace TextRPG
         public bool MpCheck(int SID)
         {
             //사용하려는 스킬의 소모MP가 남아있는 MP보다 작을 때
-            if (Mp < Skills[SID].cost)
+            if (mp < _skills[SID].cost)
             {
                 return false;
             }
-            else
-            {
-                Mp -= Skills[SID].cost;//스킬 사용가능할 때 mp소모
-            }
+
+            mp -= _skills[SID].cost;//스킬 사용가능할 때 mp소모
 
             return true;
         }

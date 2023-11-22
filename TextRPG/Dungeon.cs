@@ -234,7 +234,7 @@ namespace TextRPG
             msg[0] = $"{attacker.Name} 의 공격!!";
 
             if (dmg == 0) msg[2] = "빗나갔습니다.";
-            else msg[2] = $"{deffender.Class} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
+            else msg[2] = $"{deffender.Name} 을(를) 맞췄습니다. [ 데미지 : {dmg} ]";
 
             return msg;
         }
@@ -280,7 +280,11 @@ namespace TextRPG
             {
                 state = EDungeoState.MonsterAllDeath;
             }
+<<<<<<< Updated upstream
             
+=======
+
+>>>>>>> Stashed changes
             return dmg;
         }
 

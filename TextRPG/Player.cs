@@ -613,6 +613,7 @@ namespace TextRPG
                 def += 1;
 
                 hp = MaxHp;
+                mp = maxMp;
                 levelUp = true;
             }
         }

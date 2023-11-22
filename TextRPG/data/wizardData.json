@@ -4,6 +4,7 @@
   "Atk": 10,
   "Def": 5,
   "MaxHP": 100,
+  "MaxMP": 50,
   "Exp": 5,
   "MaxExp": 10,
   "Gold": 1500,

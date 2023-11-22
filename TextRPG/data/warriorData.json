@@ -35,14 +35,14 @@
     {
       "Name": "일반 공격",
       "Desc": "후드려 패는 기술이다.",
-      "Damage": 2,
+      "Damage": 1.1,
       "accuracy": 1,
       "cost": 0
     },
     {
       "Name": "내려 찍기",
       "Desc": "무기로 내려찍는 기술",
-      "Damage": 2,
+      "Damage": 1.5,
       "accuracy": 0.9,
       "cost": 10
     },

@@ -272,10 +272,6 @@ namespace TextRPG
         int Attack(out bool bCrit)
         {
             int dmg = _player.Attack(_selectedSkillIndex, _targetMonster, out bCrit);
-
-            //Mp가 부족할 경우 데미지 0
-            if (_player.MpCheck(_selectedSkillIndex)) 
-                return 0;
                 
             if (SetMonsterOrder())
             {
@@ -285,7 +281,14 @@ namespace TextRPG
             {
                 state = EDungeoState.MonsterAllDeath;
             }
-            
+
+            //Mp가 부족할 경우 데미지 0
+            if (_player.MpCheck(_selectedSkillIndex))
+            {
+                dmg = 0;
+            }
+                
+
             return dmg;
         }
 

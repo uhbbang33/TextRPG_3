@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace TextRPG
 {
@@ -42,6 +44,8 @@ namespace TextRPG
         {
             ChangeScene(_currentScene);
             isPlay = true;
+
+            SoundInit();
         }
 
         public void GetInput(ConsoleKey key)
@@ -60,6 +64,27 @@ namespace TextRPG
         {
             _currentScene.Update(this);
             _currentScene.DrawScene();
+        }
+
+        void SoundInit()
+        {
+            AudioFileReader audioFile = new AudioFileReader(@"..\..\..\Music\strangerThings.wav");
+            WaveOutEvent waveOut = new WaveOutEvent();
+            VolumeSampleProvider v = new VolumeSampleProvider(audioFile.ToSampleProvider());
+            v.Volume = 0.15f;
+
+            // Music Loop
+            waveOut.PlaybackStopped += (sender, args) =>
+            {
+                if (waveOut.PlaybackState != PlaybackState.Stopped)
+                    return;
+
+                audioFile.Position = 0;
+                waveOut.Play();
+            };
+
+            waveOut.Init(v);
+            waveOut.Play();
         }
     }
 }
